@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/sprites.dart';
 import 'draw_utils.dart';
 
 /// 게임 맵(캔버스). 메뉴·패널은 위젯이 따로 그림.
@@ -229,8 +230,31 @@ extension WorldView on HubGame {
   }
 
   void _person(Canvas c, Offset p, String initial, int fill, int stroke,
-      {bool tired = false, double energy = 1.0}) {
+      {bool tired = false, double energy = 1.0, Object? key}) {
     const t = Cfg.tile;
+    if (Sprites.staffWalk != null) {
+      final f = _faces.putIfAbsent(key ?? initial, () => _Face(p));
+      final dx = p.dx - f.last.dx, dy = p.dy - f.last.dy;
+      final moved = dx * dx + dy * dy > 0.9;
+      if (moved) {
+        f.dir = dx.abs() > dy.abs() ? (dx < 0 ? 1 : 2) : (dy < 0 ? 3 : 0);
+        f.until = clock + 0.15;
+      }
+      f.last = p;
+      Sprites.drawStaff(c, p.dx, p.dy + t * 0.35, f.dir, clock < f.until, clock);
+      if (tired) {
+        label(c, 'Zz', p.dx + t * 0.18, p.dy - t * 0.7,
+            size: 11, color: const Color(0xFF8EC5FF));
+      }
+      if (energy < 0.98) {
+        box(c, p.dx - 12, p.dy + t * 0.42, 24, 3, 0xFF2A2438);
+        box(c, p.dx - 12, p.dy + t * 0.42, 24 * energy.clamp(0.0, 1.0), 3,
+            energy >= 0.6
+                ? 0xFF7BD389
+                : (energy >= 0.3 ? 0xFFF0963A : 0xFFE5484D));
+      }
+      return;
+    }
     c.drawCircle(p, t * 0.3, Paint()..color = Color(fill));
     c.drawCircle(
         p,
@@ -270,13 +294,13 @@ extension WorldView on HubGame {
       final p = Offset(s.pos.dx * t, s.pos.dy * t);
       if (s.carrier) {
         _person(c, p, s.initial, 0xFF8EC5FF, 0xFFFFFFFF,
-            tired: true, energy: s.energyPct);
+            tired: true, energy: s.energyPct, key: s);
       } else if (s.post?.type.id == 'counter') {
         _person(c, p, s.initial, 0xFFFFE0B2, 0xFF8B4A00,
-            tired: true, energy: s.energyPct);
+            tired: true, energy: s.energyPct, key: s);
       } else {
         _person(c, p, s.initial, 0xFFB9F6CA, 0xFF1B5E20,
-            tired: true, energy: s.energyPct);
+            tired: true, energy: s.energyPct, key: s);
       }
     }
 
@@ -292,7 +316,7 @@ extension WorldView on HubGame {
         final p =
         Offset((b.tx + spots[i].dx) * t, (b.ty + spots[i].dy) * t + bob);
         _person(c, p, act[i].initial, 0xFFFFE0B2, 0xFF8B4A00,
-            tired: act[i].tired, energy: act[i].energyPct);
+            tired: act[i].tired, energy: act[i].energyPct, key: act[i]);
       }
     }
 
@@ -307,7 +331,7 @@ extension WorldView on HubGame {
         final p =
         Offset((b.tx + spots[i].dx) * t, (b.ty + spots[i].dy) * t + bob);
         _person(c, p, act[i].initial, 0xFFB9F6CA, 0xFF1B5E20,
-            tired: act[i].tired, energy: act[i].energyPct);
+            tired: act[i].tired, energy: act[i].energyPct, key: act[i]);
       }
     }
 
@@ -361,7 +385,7 @@ extension WorldView on HubGame {
       if (w.staff.away) continue;
       final p = Offset(w.pos.dx * t, w.pos.dy * t);
       _person(c, p, w.staff.initial, 0xFF8EC5FF, 0xFFFFFFFF,
-          tired: w.staff.tired, energy: w.staff.energyPct);
+          tired: w.staff.tired, energy: w.staff.energyPct, key: w.staff);
       if (w.carrying && w.job != null) {
         box(c, p.dx - 7, p.dy - t * 0.62, 14, 14,
             Cfg.regionColor[w.job!.region]);
@@ -371,3 +395,11 @@ extension WorldView on HubGame {
     }
   }
 }
+class _Face {
+  Offset last;
+  int dir = 0;
+  double until = 0;
+  _Face(this.last);
+}
+
+final Map<Object, _Face> _faces = {};

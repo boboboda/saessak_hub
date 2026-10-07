@@ -17,6 +17,7 @@ import '../systems/staff_system.dart';
 import '../systems/worker_system.dart';
 import '../ui/world_view.dart';
 import 'config.dart';
+import 'sprites.dart';
 
 export '../systems/build_system.dart';
 export '../systems/dock_system.dart';
@@ -168,6 +169,7 @@ class HubGame extends FlameGame {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    await Sprites.load();
     if (!await this.loadGame()) {
       this.addStarters();
     }
