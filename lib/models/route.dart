@@ -1,5 +1,5 @@
 /// 배송 노선 설정 (지역마다 하나)
-class Route {
+class DeliveryRoute {
   bool on = true; // 운행 여부 (끄면 그 지역 택배는 쌓이기만 함)
   int vehicle = -1; // -1 자동, 그 외 Cfg.vehicles 번호로 고정
   double wait = 5; // 더 실을 게 없을 때 기다리는 시간(초). 길수록 꽉 채워 보내기 쉬움
