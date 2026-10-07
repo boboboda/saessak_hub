@@ -54,7 +54,7 @@ class Cfg {
   static const double patience = 45; // 손님 인내심(초)
   static const int shelfCap = 20; // 선반 1개 용량
   static const int outboxCap = 4; // 접수 창구 대기 택배 한도
-  static const int parcelPay = 60; // 배송 완료 택배 1건 기본 수익
+  static const int parcelPay = 100; // 배송 완료 택배 1건 기본 수익
   static const double fullBonus = 1.2; // 차량을 가득 채워 보내면 수익 배수
   static const double vehicleMove = 1.5; // 차량이 들어오고 나가는 시간(초)
   static const double vehicleWait = 5; // 더 실을 게 없을 때 기다리는 시간(초)
