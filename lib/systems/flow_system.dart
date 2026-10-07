@@ -1,0 +1,153 @@
+import 'package:flutter/material.dart';
+
+import '../game/config.dart';
+import '../game/hub_game.dart';
+import '../game/util.dart';
+import '../models/models.dart';
+
+extension FlowSystem on HubGame {
+  void spawnCustomer() {
+    customers.add(Customer(exitPoint, rnd.nextInt(Cfg.regionColor.length)));
+  }
+
+  Building? _bestCounter(List<Building> counters, Map<Building, int> load) {
+    Building? best;
+    var bl = 1 << 30;
+    for (final b in counters) {
+      final l = load[b] ?? 0;
+      if (l < bl) {
+        bl = l;
+        best = b;
+      }
+    }
+    if (best != null) load[best] = (load[best] ?? 0) + 1;
+    return best;
+  }
+
+  /// 자리에 있는 직원들의 합산 처리 속도 (지친 직원은 느림)
+  double _rate(Building b) =>
+      b.active.fold<double>(0, (a, s) => a + s.workRate);
+
+  /// 손님이 짜증 내는 속도 배수 (직원이 친절할수록 낮음)
+  double _calm(Building b) {
+    final act = b.active;
+    if (act.isEmpty) return 1.0;
+    final avg = act.fold<int>(0, (a, s) => a + s.kind) / act.length;
+    return 1.25 - 0.1 * avg;
+  }
+
+  /// 포장 실수 판정: 꼼꼼할수록 줄고, 지친 직원이 있으면 늘어남
+  bool _slipped(Building b) {
+    final act = b.active;
+    if (act.isEmpty) return false;
+    final care = act.fold<int>(0, (a, s) => a + s.care) / act.length;
+    var chance = Cfg.slipBase - Cfg.slipPerCare * care;
+    if (act.any((s) => s.tired)) chance += Cfg.slipTired;
+    return rnd.nextDouble() < chance.clamp(0.0, 0.9);
+  }
+
+  /// 손님 입장·접수·퇴장 + 포장대 포장 진행
+  void updateFlow(double dt) {
+    // 자리에 직원이 있는 접수 창구만 손님을 받음 (쉬러 간 직원은 빠짐)
+    final counters =
+    ofType('counter').where((b) => b.active.isNotEmpty).toList();
+
+    // 손님 생성
+    if (counters.isNotEmpty) {
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawnTimer = 5 + rnd.nextDouble() * 4;
+        if (customers.length < 4 + counters.length * 3) spawnCustomer();
+      }
+    }
+
+    // 창구별 대기 인원
+    final load = <Building, int>{};
+    for (final c in customers) {
+      if (c.state == 2) continue;
+      final b = c.counter;
+      if (b != null && buildings.contains(b)) {
+        load[b] = (load[b] ?? 0) + 1;
+      }
+    }
+
+    final lineIdx = <Building, int>{};
+    final remove = <Customer>[];
+    final exit = exitPoint;
+
+    for (final c in customers) {
+      if (c.state == 2) {
+        c.pos = stepToward(c.pos, exit, Cfg.customerSpeed, dt);
+        if ((c.pos - exit).distance < 0.05) remove.add(c);
+        continue;
+      }
+
+      // 창구 배정 (없거나 철거되거나 자리 직원이 없으면 다시)
+      final cur = c.counter;
+      if (cur == null || !buildings.contains(cur) || cur.active.isEmpty) {
+        c.counter = _bestCounter(counters, load);
+        c.serveT = 0;
+        if (c.counter == null) {
+          lost++; // 받아 줄 창구가 없어 그냥 돌아감
+          c.state = 2;
+          continue;
+        }
+      }
+      final cnt = c.counter!;
+      final idx = lineIdx[cnt] ?? 0;
+      lineIdx[cnt] = idx + 1;
+
+      final target = frontOf(cnt) + Offset(0, idx * 0.8);
+      c.pos = stepToward(c.pos, target, Cfg.customerSpeed, dt);
+      final arrived = (c.pos - target).distance < 0.05;
+      final serving = arrived &&
+          idx == 0 &&
+          cnt.active.isNotEmpty &&
+          cnt.outbox.length < Cfg.outboxCap;
+
+      if (serving) {
+        // 직원이 빠를수록, 많을수록 접수가 빨라짐 (일하는 동안 체력 소모)
+        for (final s in cnt.active) {
+          s.working = true;
+        }
+        c.serveT += dt * _rate(cnt);
+        if (c.serveT >= Cfg.serveTime) {
+          cnt.outbox.add(Parcel(c.region));
+          done++;
+          c.state = 2;
+        }
+      } else {
+        c.patience -= dt * _calm(cnt);
+        if (c.patience <= 0) {
+          lost++;
+          c.state = 2;
+        }
+      }
+    }
+    customers.removeWhere((c) => remove.contains(c));
+
+    // 포장대 진행 (자리에 직원이 있어야 함)
+    for (final b in ofType('pack')) {
+      if (b.flash > 0) b.flash -= dt;
+      final p = b.slot;
+      if (p != null && p.stage == 2 && b.active.isNotEmpty) {
+        for (final s in b.active) {
+          s.working = true;
+        }
+        b.progress += dt * _rate(b);
+        if (b.progress >= Cfg.packTime) {
+          if (_slipped(b)) {
+            // 포장 실수: 처음부터 다시
+            b.progress = 0;
+            b.flash = 1.5;
+            final act = b.active;
+            act[rnd.nextInt(act.length)].mistakes++;
+          } else {
+            p.stage = 3;
+            p.reserved = false;
+          }
+        }
+      }
+    }
+  }
+}

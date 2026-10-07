@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+
+import 'parcel.dart';
+import 'staff.dart';
+
+/// 건설 가능한 건물 종류
+class BuildingType {
+  final String id;
+  final String name;
+  final int w; // 칸 수
+  final int h;
+  final int cost;
+  final int color;
+  final String desc;
+  final int zone; // 0 접수, 1 포장, 2 보관·출고, 3 도크(벽 밖), -1 창고 어디든
+  final int slots; // 근무 직원 자리 수 (0이면 직원 없음)
+  const BuildingType(this.id, this.name, this.w, this.h, this.cost, this.color,
+      this.desc, this.zone, this.slots);
+}
+
+/// 설치된 건물 (타일 좌표)
+class Building {
+  final BuildingType type;
+  int tx;
+  int ty;
+  Building(this.type, this.tx, this.ty);
+
+  // ---- 런타임 상태 ----
+  final List<Parcel> outbox = []; // 접수 창구: 포장 대기 택배
+  Parcel? slot; // 포장대: 올려진 택배
+  double progress = 0; // 포장대: 포장 진행(초)
+  bool reservedIn = false; // 포장대: 운반 예약됨
+  int stored = 0; // 선반: 보관 수
+  int incoming = 0; // 선반: 운반 중 예약 수
+  final List<Staff> crew = []; // 배치된 직원 (쉬러 간 직원 포함)
+  double flash = 0; // 포장 실수 표시 남은 시간(초)
+
+  /// 지금 실제로 자리에 있는 직원 (쉬러 간 직원은 빠짐)
+  List<Staff> get active => crew.where((s) => !s.away).toList();
+
+  Rect get rect => Rect.fromLTWH(
+      tx.toDouble(), ty.toDouble(), type.w.toDouble(), type.h.toDouble());
+}
