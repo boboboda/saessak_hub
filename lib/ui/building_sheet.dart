@@ -60,6 +60,24 @@ class BuildingSheet extends StatelessWidget {
                 ],
               ),
             ),
+          if (t.id == 'dock')
+            CardBox(
+              child: Row(
+                children: [
+                  const Icon(Icons.local_shipping, size: 18, color: C.sub),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      b.vehicle == null
+                          ? '차량 대기 중 · 한 지역 택배가 ${Cfg.vehicles.last.minStock}건 이상 쌓이면 와요'
+                          : '${b.vehicle!.type.name} · ${b.vehicle!.loaded}/${b.vehicle!.type.cap}건 적재',
+                      style: Tx.body,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (t.id == 'dock') const SizedBox(height: 8),
           if (t.id == 'lounge')
             CardBox(
               child: Row(

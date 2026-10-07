@@ -181,8 +181,8 @@ extension WorkerSystem on HubGame {
         d.reservedIn = false;
       } else {
         d.stored++;
+        d.regions[p.region]++;
         d.incoming = max(0, d.incoming - 1);
-        money += Cfg.shelfIncome; // 임시 수익 (배송 수익 단계에서 교체)
       }
       _clear(c);
     }

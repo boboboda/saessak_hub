@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/building.dart';
+import '../models/vehicle.dart';
 
 class Cfg {
   static const double tile = 40; // 한 칸 픽셀
@@ -52,7 +53,16 @@ class Cfg {
   static const double patience = 45; // 손님 인내심(초)
   static const int shelfCap = 20; // 선반 1개 용량
   static const int outboxCap = 4; // 접수 창구 대기 택배 한도
-  static const int shelfIncome = 50; // 임시 수익 (배송 수익 단계에서 교체)
+  static const int parcelPay = 60; // 배송 완료 택배 1건 기본 수익
+  static const double fullBonus = 1.2; // 차량을 가득 채워 보내면 수익 배수
+  static const double vehicleMove = 1.5; // 차량이 들어오고 나가는 시간(초)
+  static const double vehicleWait = 5; // 더 실을 게 없을 때 기다리는 시간(초)
+  // 택배가 쌓인 양에 맞춰 알아서 오는 차량 (큰 것부터 검사)
+  static const List<VehicleType> vehicles = [
+    VehicleType('대형 트럭', 40, 30, 3.0, 1.5, 1.0, 0.85),
+    VehicleType('소형 트럭', 16, 12, 2.0, 1.2, 0.7, 0.65),
+    VehicleType('오토바이', 6, 4, 1.0, 1.0, 0.35, 0.4),
+  ];
 
   // ---- 체력·휴식·실수 ----
   static const double drainPerSec = 1.5; // 일하는 동안 초당 체력 소모

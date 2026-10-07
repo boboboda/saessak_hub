@@ -196,6 +196,22 @@ extension WorldView on HubGame {
             box(c, r.left + 14, r.top + i * r.height / 3 - 1, r.width - 22, 2,
                 0x55FFFFFF);
           }
+          final v = b.vehicle;
+          if (v != null) {
+            final span = r.width - 22;
+            final vw = span * v.type.len;
+            final vh = (r.height - 6) * v.type.wid;
+            final mv = (v.t / Cfg.vehicleMove).clamp(0.0, 1.0);
+            final off = v.state == 0 ? 1 - mv : (v.state == 2 ? mv : 0.0);
+            final vx = r.left + 14 + off * (Cfg.road.left - b.tx) * Cfg.tile;
+            final vy = r.center.dy - vh / 2;
+            box(c, vx, vy, vw, vh, Cfg.regionColor[v.region]);
+            box(c, vx + vw - vw * 0.25, vy, vw * 0.25, vh, 0xFF3D4466); // 운전석
+            strokeBox(c, Rect.fromLTWH(vx, vy, vw, vh), 0xFF2A2438, 2);
+            labelIn(c, '${v.loaded}/${v.type.cap}',
+                Rect.fromLTWH(vx, vy, vw * 0.75, vh),
+                size: 11, color: const Color(0xFF2A2438));
+          }
           break;
       }
       if (b == selected) strokeBox(c, r.inflate(2), 0xFFFFD166, 3);

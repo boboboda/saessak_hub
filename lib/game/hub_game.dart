@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../models/models.dart';
 import '../systems/build_system.dart';
+import '../systems/dock_system.dart';
 import '../systems/flow_system.dart';
 import '../systems/input_system.dart';
 import '../systems/interact_system.dart';
@@ -15,6 +16,7 @@ import '../ui/world_view.dart';
 import 'config.dart';
 
 export '../systems/build_system.dart';
+export '../systems/dock_system.dart';
 export '../systems/flow_system.dart';
 export '../systems/input_system.dart';
 export '../systems/interact_system.dart';
@@ -38,6 +40,7 @@ class HubGame extends FlameGame {
   double clock = 0; // 애니메이션용 실제 시간
   int done = 0;
   int lost = 0;
+  int delivered = 0; // 배송 나간 택배 수
   int speedIdx = 0;
   int get speedMul => Cfg.speeds[speedIdx];
 
@@ -186,6 +189,7 @@ class HubGame extends FlameGame {
 
     this.updateFlow(d);
     this.updateWorkers(d);
+    this.updateDocks(d);
 
     // 위젯 UI는 초당 5번 갱신
     _tickAcc += dt;
