@@ -1,0 +1,74 @@
+{
+  "staff_base": {
+    "endpoint": "/create-character-v3",
+    "note": "직원 기본 캐릭터 (8방향). 색 변형은 제가 후처리로 만듭니다",
+    "body": {
+      "description": "friendly parcel delivery hub worker, orange safety vest over white shirt, dark blue cap, brown hair, simple clean chibi pixel art, readable at small size",
+      "image_size": {"width": 48, "height": 48},
+      "view": "low top-down",
+      "outline": "thin",
+      "shading": "medium",
+      "detail": "medium"
+    }
+  },
+  "staff_walk": {
+    "endpoint": "/animate-character",
+    "note": "직원 걷기 (4방향, 6프레임). staff_base 를 먼저 만들어야 함",
+    "character_of": "staff_base",
+    "body": {
+      "character_id": "{staff_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": ["south", "east", "north", "west"],
+      "mode": "v3"
+    }
+  },
+  "floor_tile": {
+    "endpoint": "/create-1-direction-object",
+    "note": "창고 바닥 타일 시험 (품질 확인용)",
+    "body": {
+      "description": "seamless top-down warehouse concrete floor tile, light gray, subtle cracks, flat, no objects",
+      "image_size": {"width": 32, "height": 32}
+    }
+  },
+  "obj_counter": {
+    "endpoint": "/create-1-direction-object",
+    "note": "접수 창구",
+    "body": {
+      "description": "top-down service counter desk for a parcel shop, wooden with orange front panel, small scale on top, seen from slightly above",
+      "image_size": {"width": 64, "height": 32}
+    }
+  },
+  "obj_pack": {
+    "endpoint": "/create-1-direction-object",
+    "note": "포장대",
+    "body": {
+      "description": "top-down packing table with tape dispenser and a cardboard box on it, green metal table, seen from slightly above",
+      "image_size": {"width": 64, "height": 64}
+    }
+  },
+  "obj_shelf": {
+    "endpoint": "/create-1-direction-object",
+    "note": "선반 (빈 것)",
+    "body": {
+      "description": "empty warehouse storage shelf rack with three empty tiers, brown metal, seen from slightly above, nothing on the shelves",
+      "image_size": {"width": 64, "height": 96}
+    }
+  },
+  "obj_box": {
+    "endpoint": "/create-1-direction-object",
+    "note": "택배 상자",
+    "body": {
+      "description": "single closed brown cardboard parcel box with tape, simple, seen from slightly above",
+      "image_size": {"width": 32, "height": 32}
+    }
+  },
+  "veh_van": {
+    "endpoint": "/create-1-direction-object",
+    "note": "소형 트럭 (옆모습)",
+    "body": {
+      "description": "small white delivery truck, side view facing right, cargo box, orange stripe",
+      "image_size": {"width": 128, "height": 64}
+    }
+  }
+}
