@@ -7,7 +7,11 @@ import '../models/models.dart';
 
 extension FlowSystem on HubGame {
   void spawnCustomer() {
-    customers.add(Customer(exitPoint, rnd.nextInt(Cfg.regionColor.length)));
+    final open = <int>[
+      for (var i = 0; i < regionOpen.length; i++)
+        if (regionOpen[i]) i
+    ];
+    customers.add(Customer(exitPoint, open[rnd.nextInt(open.length)]));
   }
 
   Building? _bestCounter(List<Building> counters, Map<Building, int> load) {
@@ -59,7 +63,8 @@ extension FlowSystem on HubGame {
     if (counters.isNotEmpty) {
       spawnTimer -= dt;
       if (spawnTimer <= 0) {
-        spawnTimer = 5 + rnd.nextDouble() * 4;
+        spawnTimer = (5 + rnd.nextDouble() * 4) *
+            (fever > 0 ? Cfg.feverSpawn : 1.0);
         if (customers.length < 4 + counters.length * 3) spawnCustomer();
       }
     }

@@ -50,6 +50,20 @@ class BottomBar extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: _NavBtn(
+              icon: Icons.flag,
+              label: '운영',
+              sub: g.claimableCount > 0 ? '보상 ${g.claimableCount}' : null,
+              badge: g.claimableCount > 0,
+              onTap: () {
+                g.selected = null;
+                g.sheet = 'ops';
+                g.ui();
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _NavBtn(
               icon: Icons.open_in_full,
               label: '창고 확장',
               sub: expandSub,

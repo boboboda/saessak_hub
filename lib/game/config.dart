@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/building.dart';
+import '../models/mission.dart';
 import '../models/vehicle.dart';
 
 class Cfg {
@@ -107,6 +108,36 @@ class Cfg {
   ];
 
   static const List<int> speeds = [1, 3, 10];
+
+  // ---- 배송 지역 (택배 색과 같은 순서) ----
+  static const List<String> regionName = ['동네', '시내', '근교', '타도시', '전국'];
+  static const List<int> regionUnlock = [0, 8000, 25000, 60000, 150000];
+  static const List<double> regionPay = [1.0, 1.3, 1.7, 2.2, 3.0]; // 수익 배수
+
+  // ---- 피버 타임 (손님이 몰리고 수익이 오름) ----
+  static const double feverFirst = 180; // 첫 피버까지(게임 초)
+  static const double feverMin = 300;
+  static const double feverMax = 420;
+  static const double feverLen = 60;
+  static const double feverSpawn = 0.5; // 손님 도착 간격 배수
+  static const double feverPay = 1.5; // 수익 배수
+  static const double adCooldown = 300; // 광고로 피버를 켜는 재사용 대기(초)
+
+  // ---- 목표 ----
+  static const List<Mission> missions = [
+    Mission('건물을 3개 설치하세요', 1, 3, 1000),
+    Mission('택배 20건 배송', 0, 20, 1500),
+    Mission('직원 4명 모으기', 2, 4, 1500),
+    Mission('택배 100건 배송', 0, 100, 4000),
+    Mission('3일차 도달', 3, 3, 2000),
+    Mission('배송 지역 2곳 열기', 4, 2, 3000),
+    Mission('중형 창고로 확장', 5, 1, 5000),
+    Mission('택배 500건 배송', 0, 500, 12000),
+    Mission('배송 지역 4곳 열기', 4, 4, 15000),
+    Mission('대형 창고로 확장', 5, 2, 20000),
+    Mission('택배 2,000건 배송', 0, 2000, 50000),
+    Mission('모든 배송 지역 열기', 4, 5, 60000),
+  ];
 
   // ---- 편의 시설 ----
   static const double vendingCalm = 0.15; // 자판기 1대당 손님 짜증 속도 감소 (2대까지)

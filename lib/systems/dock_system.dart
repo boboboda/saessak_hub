@@ -78,13 +78,15 @@ extension DockSystem on HubGame {
             final pay = (v.loaded *
                     Cfg.parcelPay *
                     v.type.payMul *
+                    Cfg.regionPay[v.region] *
+                    (fever > 0 ? Cfg.feverPay : 1.0) *
                     (full ? Cfg.fullBonus : 1.0))
                 .round();
             if (v.loaded > 0) {
               money += pay;
               dayEarn += pay;
               delivered += v.loaded;
-              showToast('${v.type.name} 출발! 택배 ${v.loaded}건 +${fmt(pay)}원');
+              showToast('${Cfg.regionName[v.region]}행 ${v.type.name} 출발! 택배 ${v.loaded}건 +${fmt(pay)}원');
             }
           }
           break;

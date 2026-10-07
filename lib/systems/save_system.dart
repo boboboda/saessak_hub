@@ -21,6 +21,8 @@ extension SaveSystem on HubGame {
       'delivered': delivered,
       'dayEarn': dayEarn,
       'nextStaffId': nextStaffId,
+      'regions': regionOpen,
+      'claimed': claimed.toList(),
       'staff': [
         for (final s in staff)
           {
@@ -107,6 +109,15 @@ extension SaveSystem on HubGame {
       delivered = j['delivered'] as int;
       dayEarn = j['dayEarn'] as int;
       nextStaffId = j['nextStaffId'] as int;
+      final ro = j['regions'] as List?;
+      if (ro != null) {
+        for (var i = 0; i < regionOpen.length && i < ro.length; i++) {
+          regionOpen[i] = ro[i] as bool;
+        }
+      }
+      claimed
+        ..clear()
+        ..addAll(((j['claimed'] as List?) ?? const []).map((e) => e as int));
       staff
         ..clear()
         ..addAll(loadedStaff);

@@ -10,6 +10,7 @@ import '../systems/dock_system.dart';
 import '../systems/flow_system.dart';
 import '../systems/input_system.dart';
 import '../systems/interact_system.dart';
+import '../systems/ops_system.dart';
 import '../systems/save_system.dart';
 import '../systems/guide_system.dart';
 import '../systems/staff_system.dart';
@@ -22,6 +23,7 @@ export '../systems/dock_system.dart';
 export '../systems/flow_system.dart';
 export '../systems/input_system.dart';
 export '../systems/interact_system.dart';
+export '../systems/ops_system.dart';
 export '../systems/save_system.dart';
 export '../systems/guide_system.dart';
 export '../systems/staff_system.dart';
@@ -47,6 +49,11 @@ class HubGame extends FlameGame {
   int delivered = 0; // 배송 나간 택배 수
   int dayEarn = 0; // 오늘 번 돈 (하루 결산용)
   double saveTimer = 0;
+  final List<bool> regionOpen = [true, false, false, false, false]; // 열린 배송 지역
+  final Set<int> claimed = {}; // 보상을 받은 목표
+  double fever = 0; // 피버 남은 시간(초)
+  double feverCd = Cfg.feverFirst; // 다음 피버까지
+  double adCd = 0; // 광고 피버 재사용 대기
   bool noSave = false; // 저장 지우기 후 덮어쓰기 방지
   int speedIdx = 0;
   int get speedMul => Cfg.speeds[speedIdx];
@@ -194,6 +201,7 @@ class HubGame extends FlameGame {
       this.genCandidates();
     }
 
+    this.updateFever(d);
     if (sootheCd > 0) sootheCd = max(0.0, sootheCd - d);
 
     this.updateFlow(d);

@@ -92,6 +92,9 @@ class TopBar extends StatelessWidget {
                 Pill(Icons.sentiment_dissatisfied, '놓침 ${g.lost}',
                     color: g.lost > 0 ? C.bad : C.sub),
                 Pill(Icons.groups, '직원 ${g.staff.length}'),
+                if (g.fever > 0)
+                  Pill(Icons.local_fire_department, '피버 ${g.fever.ceil()}초',
+                      color: C.bad),
               ],
             ),
           ),
