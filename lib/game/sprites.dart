@@ -7,6 +7,7 @@ class Sprites {
   static ui.Image? staffWalk;
   static ui.Image? box;
   static ui.Image? floor;
+  static ui.Image? counter, pack, shelf, van;
 
   /// 시트: 가로 7프레임, 세로 4방향 (0 남, 1 서, 2 동, 3 북). 프레임 56x56.
   static const int frames = 7;
@@ -16,6 +17,10 @@ class Sprites {
     staffWalk = await _img('assets/sprites/staff/staff_walk.png');
     box = await _img('assets/sprites/props/box.png');
     floor = await _img('assets/sprites/tiles/floor.png');
+    counter = await _img('assets/sprites/props/counter.png');
+    pack = await _img('assets/sprites/props/pack.png');
+    shelf = await _img('assets/sprites/props/shelf.png');
+    van = await _img('assets/sprites/props/van.png');
   }
 
   static Future<ui.Image?> _img(String path) async {
@@ -68,5 +73,41 @@ class Sprites {
         ui.Rect.fromLTWH(x, y, t, t),
         ui.Paint()..filterQuality = ui.FilterQuality.none);
     return true;
+  }
+
+  static ui.Image? forBuilding(String id) {
+    switch (id) {
+      case 'counter':
+        return counter;
+      case 'pack':
+        return pack;
+      case 'shelf':
+        return shelf;
+    }
+    return null;
+  }
+
+  /// 칸 너비에 맞춰(비율 유지) 아래쪽 기준으로 그린다. 위로 넘쳐도 됨.
+  static void drawFitWidth(ui.Canvas c, ui.Image img, ui.Rect r) {
+    final h = r.width * img.height / img.width;
+    _blit(c, img, ui.Rect.fromLTWH(r.left, r.bottom - h, r.width, h));
+  }
+
+  /// 칸 안에 비율을 유지하며 가운데에 맞춘다.
+  static void drawContain(ui.Canvas c, ui.Image img, ui.Rect r) {
+    final k = (r.width / img.width) < (r.height / img.height)
+        ? r.width / img.width
+        : r.height / img.height;
+    final w = img.width * k, h = img.height * k;
+    _blit(c, img,
+        ui.Rect.fromLTWH(r.center.dx - w / 2, r.center.dy - h / 2, w, h));
+  }
+
+  static void _blit(ui.Canvas c, ui.Image img, ui.Rect dst) {
+    c.drawImageRect(
+        img,
+        ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+        dst,
+        ui.Paint()..filterQuality = ui.FilterQuality.none);
   }
 }

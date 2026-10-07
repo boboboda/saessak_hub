@@ -133,9 +133,14 @@ extension WorldView on HubGame {
   void _drawBuildings(Canvas c) {
     for (final b in buildings) {
       final r = _px(b.rect).deflate(1);
-      box(c, r.left, r.top, r.width, r.height, b.type.color);
-      strokeBox(c, r, 0xFF2A2438, 2);
-      labelIn(c, b.type.name, r, size: 12);
+      final sp = Sprites.forBuilding(b.type.id);
+      if (sp != null) {
+        Sprites.drawFitWidth(c, sp, r);
+      } else {
+        box(c, r.left, r.top, r.width, r.height, b.type.color);
+        strokeBox(c, r, 0xFF2A2438, 2);
+        labelIn(c, b.type.name, r, size: 12);
+      }
 
       if (b.level > 1) {
         box(c, r.left + 2, r.top + 2, 28, 13, 0xFFFFD166);
@@ -228,12 +233,23 @@ extension WorldView on HubGame {
             final off = v.state == 0 ? 1 - mv : (v.state == 2 ? mv : 0.0);
             final vx = r.left + 14 + off * (Cfg.road.left - b.tx) * Cfg.tile;
             final vy = r.center.dy - vh / 2;
-            box(c, vx, vy, vw, vh, Cfg.regionColor[v.region]);
-            box(c, vx + vw - vw * 0.25, vy, vw * 0.25, vh, 0xFF3D4466); // 운전석
-            strokeBox(c, Rect.fromLTWH(vx, vy, vw, vh), 0xFF2A2438, 2);
-            labelIn(c, '${v.loaded}/${v.type.cap}',
-                Rect.fromLTWH(vx, vy, vw * 0.75, vh),
-                size: 11, color: const Color(0xFF2A2438));
+            if (Sprites.van != null && v.type.len >= 0.5) {
+              final vr = Rect.fromLTWH(vx, vy, vw, vh);
+              Sprites.drawContain(c, Sprites.van!, vr);
+              // 구역 색 띠 + 적재 현황
+              box(c, vr.left + vr.width * 0.12, vr.top + 4, vr.width * 0.4, 5,
+                  Cfg.regionColor[v.region]);
+              labelIn(c, '${v.loaded}/${v.type.cap}',
+                  Rect.fromLTWH(vr.left, vr.top + 10, vr.width * 0.68, 16),
+                  size: 11, color: const Color(0xFF2A2438));
+            } else {
+              box(c, vx, vy, vw, vh, Cfg.regionColor[v.region]);
+              box(c, vx + vw - vw * 0.25, vy, vw * 0.25, vh, 0xFF3D4466); // 운전석
+              strokeBox(c, Rect.fromLTWH(vx, vy, vw, vh), 0xFF2A2438, 2);
+              labelIn(c, '${v.loaded}/${v.type.cap}',
+                  Rect.fromLTWH(vx, vy, vw * 0.75, vh),
+                  size: 11, color: const Color(0xFF2A2438));
+            }
           }
           break;
       }
