@@ -4,5 +4,8 @@
   },
   "staff_walk": {
     "animation_group_id": "9c4ae4a1-4e79-41dd-83c6-2f3bb4c925ba"
+  },
+  "floor_tile": {
+    "object_id": "f985d06a-38bd-4ffc-aaa2-df4fea9bcce9"
   }
 }
