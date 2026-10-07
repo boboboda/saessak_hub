@@ -50,6 +50,8 @@ class HubGame extends FlameGame {
   int dayEarn = 0; // 오늘 번 돈 (하루 결산용)
   double saveTimer = 0;
   final List<bool> regionOpen = [true, false, false, false, false]; // 열린 배송 지역
+  final List<Route> routes = List.generate(5, (_) => Route()); // 지역별 노선 설정
+  final List<Trip> trips = []; // 달리는 중인 차량
   final Set<int> claimed = {}; // 보상을 받은 목표
   double fever = 0; // 피버 남은 시간(초)
   double feverCd = Cfg.feverFirst; // 다음 피버까지

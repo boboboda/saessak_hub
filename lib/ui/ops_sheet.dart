@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import 'route_panel.dart';
 import 'theme.dart';
 
 /// 운영 시트: 피버 타임 / 배송 지역 / 목표
@@ -23,6 +24,8 @@ class OpsSheet extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
         children: [
           _fever(),
+          const SizedBox(height: 16),
+          RoutePanel(g),
           const SizedBox(height: 16),
           const Text('배송 지역', style: Tx.h2),
           const SizedBox(height: 4),

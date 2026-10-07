@@ -114,6 +114,9 @@ class Cfg {
   static const List<int> regionUnlock = [0, 8000, 25000, 60000, 150000];
   static const List<double> regionPay = [1.0, 1.3, 1.7, 2.2, 3.0]; // 수익 배수
 
+  static const List<double> regionTrip = [15, 30, 50, 80, 120]; // 노선 지도에서 달리는 시간(초)
+  static const List<double> waitOptions = [5, 15, 30];
+
   // ---- 피버 타임 (손님이 몰리고 수익이 오름) ----
   static const double feverFirst = 180; // 첫 피버까지(게임 초)
   static const double feverMin = 300;

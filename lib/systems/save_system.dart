@@ -23,6 +23,10 @@ extension SaveSystem on HubGame {
       'nextStaffId': nextStaffId,
       'regions': regionOpen,
       'claimed': claimed.toList(),
+      'routes': [
+        for (final r in routes)
+          {'on': r.on, 'v': r.vehicle, 'w': r.wait, 'p': r.prio}
+      ],
       'staff': [
         for (final s in staff)
           {
@@ -113,6 +117,16 @@ extension SaveSystem on HubGame {
       if (ro != null) {
         for (var i = 0; i < regionOpen.length && i < ro.length; i++) {
           regionOpen[i] = ro[i] as bool;
+        }
+      }
+      final rl = j['routes'] as List?;
+      if (rl != null) {
+        for (var i = 0; i < routes.length && i < rl.length; i++) {
+          final m = rl[i] as Map<String, dynamic>;
+          routes[i].on = m['on'] as bool;
+          routes[i].vehicle = m['v'] as int;
+          routes[i].wait = (m['w'] as num).toDouble();
+          routes[i].prio = m['p'] as int;
         }
       }
       claimed

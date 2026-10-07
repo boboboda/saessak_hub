@@ -20,5 +20,6 @@ class Vehicle {
   double acc = 0; // 싣기 진행 누적
   double idle = 0; // 더 실을 게 없어 기다린 시간
   int loaded = 0;
-  Vehicle(this.type, this.region);
+  final double wait; // 더 실을 게 없을 때 기다리는 시간(노선 설정)
+  Vehicle(this.type, this.region, [this.wait = 5]);
 }

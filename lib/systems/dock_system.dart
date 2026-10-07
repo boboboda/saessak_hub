@@ -23,25 +23,47 @@ extension DockSystem on HubGame {
     return true;
   }
 
-  /// 쌓인 양에 맞는 차량을 고름 (없으면 null)
+  /// 노선 설정에 맞는 차량을 고름 (없으면 null)
   Vehicle? _callVehicle() {
     var region = -1;
+    var bestPrio = 0;
     var most = 0;
+    VehicleType? type;
     for (var r = 0; r < Cfg.regionColor.length; r++) {
+      if (!regionOpen[r]) continue;
+      final rt = routes[r];
+      if (!rt.on) continue;
       final n = regionStock(r);
-      if (n > most) {
+      if (n <= 0) continue;
+      VehicleType? t;
+      if (rt.vehicle >= 0) {
+        final f = Cfg.vehicles[rt.vehicle];
+        if (n >= f.minStock) t = f;
+      } else {
+        for (final c in Cfg.vehicles) {
+          if (n >= c.minStock) {
+            t = c;
+            break;
+          }
+        }
+      }
+      if (t == null) continue;
+      if (rt.prio > bestPrio || (rt.prio == bestPrio && n > most)) {
+        bestPrio = rt.prio;
         most = n;
         region = r;
+        type = t;
       }
     }
-    if (region < 0) return null;
-    for (final t in Cfg.vehicles) {
-      if (most >= t.minStock) return Vehicle(t, region);
-    }
-    return null;
+    if (region < 0 || type == null) return null;
+    return Vehicle(type, region, routes[region].wait);
   }
 
   void updateDocks(double dt) {
+    for (final t in trips) {
+      t.t += dt;
+    }
+    trips.removeWhere((t) => t.t >= t.dur);
     for (final dock in ofType('dock')) {
       final v = dock.vehicle;
       if (v == null) {
@@ -71,7 +93,7 @@ extension DockSystem on HubGame {
           final noStock = regionStock(v.region) == 0;
           if (noStock) v.idle += dt;
           if (v.loaded >= v.type.cap ||
-              (noStock && v.idle >= Cfg.vehicleWait)) {
+              (noStock && v.idle >= v.wait)) {
             v.state = 2;
             v.t = 0;
             final full = v.loaded >= v.type.cap;
@@ -86,6 +108,7 @@ extension DockSystem on HubGame {
               money += pay;
               dayEarn += pay;
               delivered += v.loaded;
+              trips.add(Trip(v.region, v.loaded, Cfg.regionTrip[v.region]));
               showToast('${Cfg.regionName[v.region]}행 ${v.type.name} 출발! 택배 ${v.loaded}건 +${fmt(pay)}원');
             }
           }

@@ -5,4 +5,5 @@ export 'customer.dart';
 export 'parcel.dart';
 export 'staff.dart';
 export 'mission.dart';
+export 'route.dart';
 export 'vehicle.dart';
