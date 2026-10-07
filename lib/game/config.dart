@@ -108,6 +108,13 @@ class Cfg {
 
   static const List<int> speeds = [1, 3, 10];
 
+  // ---- 편의 시설 ----
+  static const double vendingCalm = 0.15; // 자판기 1대당 손님 짜증 속도 감소 (2대까지)
+  static const int vendingMax = 2;
+
+  // ---- 저장 ----
+  static const double autosaveSec = 10;
+
   // ---- 직접 개입 ----
   static const int tapBonus = 10; // 내 자리에서 손님을 직접 탭해 접수하면 받는 보너스(원)
   static const double alertAngry = 0.3; // 인내심이 이 비율 아래면 '화난 손님'

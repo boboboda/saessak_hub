@@ -31,9 +31,11 @@ extension FlowSystem on HubGame {
   /// 손님이 짜증 내는 속도 배수 (직원이 친절할수록 낮음)
   double _calm(Building b) {
     final act = b.active;
-    if (act.isEmpty) return 1.0;
+    final vend = ofType('vending').length.clamp(0, Cfg.vendingMax);
+    final vm = 1.0 - Cfg.vendingCalm * vend;
+    if (act.isEmpty) return 1.0 * vm;
     final avg = act.fold<int>(0, (a, s) => a + s.kind) / act.length;
-    return 1.25 - 0.1 * avg;
+    return (1.25 - 0.1 * avg) * vm;
   }
 
   /// 포장 실수 판정: 꼼꼼할수록 줄고, 지친 직원이 있으면 늘어남
@@ -112,6 +114,7 @@ extension FlowSystem on HubGame {
         cnt.outbox.add(Parcel(c.region));
         done++;
         money += Cfg.tapBonus;
+        dayEarn += Cfg.tapBonus;
         c.tapped = false;
         c.ready = false;
         c.state = 2;

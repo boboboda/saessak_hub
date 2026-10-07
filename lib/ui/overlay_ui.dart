@@ -30,6 +30,25 @@ class OverlayUi extends StatelessWidget {
     return Stack(
       children: [
         Positioned(top: 0, left: 0, right: 0, child: TopBar(g)),
+        if (g.mode == 0 && sheet == null && g.alerts.isEmpty && g.hint != null)
+          Positioned(
+            top: mq.padding.top + 98,
+            left: 12,
+            right: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xDD2A2640),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFF0963A)),
+              ),
+              child: Text(g.hint!,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700)),
+            ),
+          ),
         if (g.mode == 0 && sheet == null && g.alerts.isNotEmpty)
           Positioned(
             top: mq.padding.top + 98,

@@ -10,6 +10,8 @@ import '../systems/dock_system.dart';
 import '../systems/flow_system.dart';
 import '../systems/input_system.dart';
 import '../systems/interact_system.dart';
+import '../systems/save_system.dart';
+import '../systems/guide_system.dart';
 import '../systems/staff_system.dart';
 import '../systems/worker_system.dart';
 import '../ui/world_view.dart';
@@ -20,6 +22,8 @@ export '../systems/dock_system.dart';
 export '../systems/flow_system.dart';
 export '../systems/input_system.dart';
 export '../systems/interact_system.dart';
+export '../systems/save_system.dart';
+export '../systems/guide_system.dart';
 export '../systems/staff_system.dart';
 export '../systems/worker_system.dart';
 export '../ui/world_view.dart';
@@ -41,6 +45,9 @@ class HubGame extends FlameGame {
   int done = 0;
   int lost = 0;
   int delivered = 0; // 배송 나간 택배 수
+  int dayEarn = 0; // 오늘 번 돈 (하루 결산용)
+  double saveTimer = 0;
+  bool noSave = false; // 저장 지우기 후 덮어쓰기 방지
   int speedIdx = 0;
   int get speedMul => Cfg.speeds[speedIdx];
 
@@ -149,7 +156,9 @@ class HubGame extends FlameGame {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    this.addStarters();
+    if (!await this.loadGame()) {
+      this.addStarters();
+    }
     this.genCandidates();
   }
 
@@ -191,12 +200,28 @@ class HubGame extends FlameGame {
     this.updateWorkers(d);
     this.updateDocks(d);
 
+    saveTimer += dt;
+    if (saveTimer >= Cfg.autosaveSec) {
+      saveTimer = 0;
+      this.saveGame();
+    }
+
     // 위젯 UI는 초당 5번 갱신
     _tickAcc += dt;
     if (_tickAcc >= 0.2) {
       _tickAcc = 0;
       this.refreshAlerts();
       ui();
+    }
+  }
+
+  @override
+  void lifecycleStateChange(AppLifecycleState state) {
+    super.lifecycleStateChange(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      this.saveGame();
     }
   }
 

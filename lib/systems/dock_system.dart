@@ -82,6 +82,7 @@ extension DockSystem on HubGame {
                 .round();
             if (v.loaded > 0) {
               money += pay;
+              dayEarn += pay;
               delivered += v.loaded;
               showToast('${v.type.name} 출발! 택배 ${v.loaded}건 +${fmt(pay)}원');
             }

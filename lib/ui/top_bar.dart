@@ -63,6 +63,9 @@ class TopBar extends StatelessWidget {
                         g.spawnCustomer();
                       }
                       break;
+                    case 4:
+                      g.resetSave();
+                      break;
                   }
                   g.ui();
                 },
@@ -71,6 +74,7 @@ class TopBar extends StatelessWidget {
                   PopupMenuItem(value: 1, child: Text('후보 새로고침 (무료)', style: Tx.body)),
                   PopupMenuItem(value: 2, child: Text('하루 넘기기 (월급)', style: Tx.body)),
                   PopupMenuItem(value: 3, child: Text('손님 +3', style: Tx.body)),
+                  PopupMenuItem(value: 4, child: Text('저장 지우기 (다시 켜면 새로 시작)', style: Tx.body)),
                 ],
               ),
             ],
@@ -84,6 +88,7 @@ class TopBar extends StatelessWidget {
               children: [
                 Pill(Icons.inbox, '접수 ${g.done}'),
                 Pill(Icons.inventory_2, '보관 ${g.totalStored}'),
+                Pill(Icons.local_shipping, '배송 ${g.delivered}'),
                 Pill(Icons.sentiment_dissatisfied, '놓침 ${g.lost}',
                     color: g.lost > 0 ? C.bad : C.sub),
                 Pill(Icons.groups, '직원 ${g.staff.length}'),

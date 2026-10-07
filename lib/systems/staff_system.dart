@@ -31,7 +31,21 @@ extension StaffSystem on HubGame {
   void addStarters() {
     staff.add(Staff(nextStaffId++, '김신입', 3, 2, 3, 3, 2, 0, 100));
     staff.add(Staff(nextStaffId++, '이성실', 2, 3, 4, 2, 4, 0, 110));
-    staff.add(Staff(nextStaffId++, '박쾌속', 4, 4, 2, 4, 1, 0, 130));
+    final fast = Staff(nextStaffId++, '박쾌속', 4, 4, 2, 4, 1, 0, 130);
+    fast.carrier = true; // 걸음이 빠른 직원은 처음부터 운반 담당
+    staff.add(fast);
+    syncCarriers();
+  }
+
+  /// 새로 설치한 건물에 대기 중인 직원이 있으면 자동으로 한 명 배치
+  void autoAssign(Building b) {
+    if (b.type.slots == 0) return;
+    for (final s in staff) {
+      if (s.idle) {
+        assignTo(s, b);
+        return;
+      }
+    }
   }
 
   void genCandidates() {
@@ -237,10 +251,12 @@ extension StaffSystem on HubGame {
     }
     final total = dailyWages;
     lastPayroll = total;
+    final earned = dayEarn;
+    dayEarn = 0;
     if (total == 0) return;
     if (money >= total) {
       money -= total;
-      showToast('월급 지급 -${fmt(total)}원');
+      showToast('${day - 1}일차 결산: 수익 +${fmt(earned)} · 월급 -${fmt(total)}원');
     } else {
       final paid = money;
       money = 0;

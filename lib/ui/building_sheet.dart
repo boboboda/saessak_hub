@@ -78,6 +78,21 @@ class BuildingSheet extends StatelessWidget {
               ),
             ),
           if (t.id == 'dock') const SizedBox(height: 8),
+          if (t.id == 'vending')
+            CardBox(
+              child: Row(
+                children: [
+                  const Icon(Icons.local_drink, size: 18, color: C.sub),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '손님 짜증 -${(Cfg.vendingCalm * 100).round()}% (최대 ${Cfg.vendingMax}대까지 겹쳐요)',
+                      style: Tx.body,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           if (t.id == 'lounge')
             CardBox(
               child: Row(
