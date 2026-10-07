@@ -149,17 +149,33 @@ def run_asset(name, spec, st):
     if ARGS.dry_run:
         print(spec["endpoint"], json.dumps(body, ensure_ascii=False, indent=2)[:1500])
         return
-    resp = call(spec.get("method", "POST"), spec["endpoint"], body)
-    dump_raw(f"{name}_create", resp)
     folder = OUT / name
     entry = st.setdefault(name, {})
-    for k in ("character_id", "object_id", "tileset_id", "animation_id", "id"):
-        if isinstance(resp.get(k), str):
-            entry[k] = resp[k]
-    for jid in job_ids(resp):
-        j = wait_job(jid)
-        dump_raw(f"{name}_job_{jid}", j)
-        harvest(j, folder, "job")
+    # 방향마다 따로 요청 (서버가 한 번에 한 방향만 만들어 줄 때를 대비)
+    dirs = ARGS.dirs.split(",") if ARGS.dirs else (body.get("directions") if spec.get("per_direction") else None)
+    bodies = []
+    if dirs:
+        for d in dirs:
+            b = dict(body)
+            b["directions"] = [d]
+            bodies.append((d, b))
+    else:
+        bodies.append((None, body))
+    for d, b in bodies:
+        if d and entry.get("animation_group_id"):
+            b["animation_group_id"] = entry["animation_group_id"]
+        resp = call(spec.get("method", "POST"), spec["endpoint"], b)
+        tag = f"{name}_{d}" if d else name
+        dump_raw(f"{tag}_create", resp)
+        print("  응답 항목:", ", ".join(f"{k}" for k in resp.keys()))
+        for k in ("character_id", "object_id", "tileset_id", "animation_id", "animation_group_id", "id"):
+            if isinstance(resp.get(k), str):
+                entry[k] = resp[k]
+        for jid in job_ids(resp):
+            j = wait_job(jid)
+            dump_raw(f"{tag}_job_{jid}", j)
+            harvest(j, folder / (d or "job"), "job")
+        save_state(st)
     # 캐릭터면 최종 정보와 전체 내보내기(zip)도 받는다
     cid = entry.get("character_id") or (st.get(spec.get("character_of", ""), {}) or {}).get("character_id")
     if cid and spec["endpoint"] in ("/create-character-v3", "/animate-character", "/characters/animations"):
@@ -182,6 +198,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("cmd", choices=["balance", "list", "run"])
     ap.add_argument("names", nargs="*")
+    ap.add_argument("--dirs", help="방향만 골라 만들기 (예: east,north,west)")
     ap.add_argument("--dry-run", action="store_true", help="요청 내용만 보고 실제로는 보내지 않음")
     ap.add_argument("--push", action="store_true", help="끝나면 assets/raw/pixellab 을 git에 커밋·푸시")
     ARGS = ap.parse_args()

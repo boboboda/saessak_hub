@@ -28,7 +28,8 @@
         "west"
       ],
       "mode": "v3"
-    }
+    },
+    "per_direction": true
   },
   "floor_tile": {
     "endpoint": "/create-1-direction-object",
