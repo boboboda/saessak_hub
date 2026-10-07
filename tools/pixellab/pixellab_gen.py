@@ -43,13 +43,20 @@ def call(method, path, body=None, raw=False):
         req.add_header("Authorization", "Bearer " + token())
     req.add_header("Content-Type", "application/json")
     req.add_header("User-Agent", "saessak-hub-pixellab-script")
-    try:
-        with urllib.request.urlopen(req, timeout=120) as r:
-            blob = r.read()
-            return blob if raw else json.loads(blob.decode() or "{}")
-    except urllib.error.HTTPError as e:
-        msg = e.read().decode(errors="replace")
-        sys.exit(f"[HTTP {e.code}] {method} {path}\n{msg[:2000]}")
+    last = None
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                blob = r.read()
+                return blob if raw else json.loads(blob.decode() or "{}")
+        except urllib.error.HTTPError as e:
+            msg = e.read().decode(errors="replace")
+            sys.exit(f"[HTTP {e.code}] {method} {path}\n{msg[:2000]}")
+        except (TimeoutError, urllib.error.URLError, ConnectionError, OSError) as e:
+            last = e
+            print(f"  (연결 문제, 다시 시도 {attempt + 1}/3: {e})")
+            time.sleep(3)
+    raise RuntimeError(f"요청 실패: {method} {path}: {last}")
 
 
 def dump_raw(tag, obj):
@@ -106,8 +113,14 @@ def harvest(obj, folder, prefix="img", counter=None):
             save_png(base64.b64decode(s), folder / f"{prefix}.png")
         elif s.startswith("http") and re.search(r"\.(png|gif|zip)(\?|$)", s.lower()):
             ext = re.search(r"\.(png|gif|zip)", s.lower()).group(1)
-            blob = call("GET", s, raw=True)
             fn = folder / f"{prefix}.{ext}"
+            if fn.exists():
+                return
+            try:
+                blob = call("GET", s, raw=True)
+            except Exception as e:
+                print(f"  다운로드 실패(건너뜀): {fn.name}: {e}")
+                return
             save_png(blob, fn)
             if ext == "zip":
                 try:
@@ -141,6 +154,28 @@ def wait_job(jid):
             sys.exit(f"시간 초과: {jid}")
         print(f"  ... {status} ({int(time.time() - t0)}초)")
         time.sleep(POLL_SEC)
+
+
+def push(names):
+    subprocess.run(["git", "add", "assets/raw/pixellab"], cwd=ROOT, check=True)
+    subprocess.run(["git", "commit", "-m", "PixelLab 에셋 추가: " + ", ".join(names)], cwd=ROOT, check=True)
+    subprocess.run(["git", "push"], cwd=ROOT, check=True)
+
+
+def fetch_character(name, cid):
+    """캐릭터의 최종 정보·이미지·전체 내보내기(zip)를 받는다."""
+    folder = OUT / name
+    info = call("GET", f"/characters/{cid}")
+    dump_raw(f"{name}_character", info)
+    harvest(info, folder, "char")
+    try:
+        blob = call("GET", f"/characters/{cid}/zip", raw=True)
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "export.zip").write_bytes(blob)
+        zipfile.ZipFile(io.BytesIO(blob)).extractall(folder / "export")
+        print("  전체 내보내기 저장:", (folder / "export").relative_to(ROOT))
+    except (SystemExit, RuntimeError):
+        print("  (zip 내보내기는 건너뜀)")
 
 
 def run_asset(name, spec, st):
@@ -179,24 +214,14 @@ def run_asset(name, spec, st):
     # 캐릭터면 최종 정보와 전체 내보내기(zip)도 받는다
     cid = entry.get("character_id") or (st.get(spec.get("character_of", ""), {}) or {}).get("character_id")
     if cid and spec["endpoint"] in ("/create-character-v3", "/animate-character", "/characters/animations"):
-        info = call("GET", f"/characters/{cid}")
-        dump_raw(f"{name}_character", info)
-        harvest(info, folder, "char")
-        try:
-            blob = call("GET", f"/characters/{cid}/zip", raw=True)
-            (folder).mkdir(parents=True, exist_ok=True)
-            (folder / "export.zip").write_bytes(blob)
-            zipfile.ZipFile(io.BytesIO(blob)).extractall(folder / "export")
-            print("  전체 내보내기 저장:", (folder / "export").relative_to(ROOT))
-        except SystemExit:
-            print("  (zip 내보내기는 건너뜀)")
+        fetch_character(name, cid)
     save_state(st)
 
 
 def main():
     global ARGS
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["balance", "list", "run"])
+    ap.add_argument("cmd", choices=["balance", "list", "run", "fetch"])
     ap.add_argument("names", nargs="*")
     ap.add_argument("--dirs", help="방향만 골라 만들기 (예: east,north,west)")
     ap.add_argument("--dry-run", action="store_true", help="요청 내용만 보고 실제로는 보내지 않음")
@@ -212,14 +237,22 @@ def main():
             print(f"{k:16} {v['endpoint']:28} {v.get('note', '')}")
         return
     st = load_state()
+    if ARGS.cmd == "fetch":
+        for n in ARGS.names:
+            spec = manifest.get(n, {})
+            cid = (st.get(n, {}) or {}).get("character_id") or (st.get(spec.get("character_of", ""), {}) or {}).get("character_id")
+            if not cid:
+                sys.exit(f"{n}: 저장된 character_id 가 없어요.")
+            fetch_character(n, cid)
+        if ARGS.push:
+            push(ARGS.names)
+        return
     for n in ARGS.names:
         if n not in manifest:
             sys.exit(f"없는 에셋: {n} (list 로 확인)")
         run_asset(n, manifest[n], st)
     if ARGS.push and not ARGS.dry_run:
-        subprocess.run(["git", "add", "assets/raw/pixellab"], cwd=ROOT, check=True)
-        subprocess.run(["git", "commit", "-m", "PixelLab 에셋 추가: " + ", ".join(ARGS.names)], cwd=ROOT, check=True)
-        subprocess.run(["git", "push"], cwd=ROOT, check=True)
+        push(ARGS.names)
 
 
 if __name__ == "__main__":
