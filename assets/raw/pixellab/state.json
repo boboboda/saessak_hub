@@ -10,5 +10,17 @@
   },
   "obj_box": {
     "object_id": "3ace10de-d0e1-4f8f-9aea-89abebf99253"
+  },
+  "obj_counter": {
+    "object_id": "3d6c4302-d1a9-46f3-b546-3bb9cb476482"
+  },
+  "obj_pack": {
+    "object_id": "3e04fec9-b36e-426d-8efa-4a69e9f9db70"
+  },
+  "obj_shelf": {
+    "object_id": "2496853d-fb63-4e42-88ed-8132cae903b6"
+  },
+  "veh_van": {
+    "object_id": "f90d98d1-5838-44e4-87f2-0dfd45a8fa02"
   }
 }
