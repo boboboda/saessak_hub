@@ -76,6 +76,12 @@ extension OpsSystem on HubGame {
         return day;
       case 4:
         return openRegions;
+      case 6:
+        return staff.fold<int>(0, (a, s) => s.level > a ? s.level : a);
+      case 7:
+        return upgrades;
+      case 8:
+        return urgentOk;
       default:
         return areaLevel;
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../game/config.dart';
 import 'parcel.dart';
 import 'staff.dart';
 import 'vehicle.dart';
@@ -38,6 +39,27 @@ class Building {
   final List<Staff> crew = []; // 배치된 직원 (쉬러 간 직원 포함)
   double flash = 0; // 포장 실수 표시 남은 시간(초)
   bool mine = false; // 접수 창구: 내가 직접 앉는 자리 (손님을 탭해서 접수)
+
+  // ---- 업그레이드 ----
+  int level = 1;
+  static const int maxLevel = 3;
+  bool get upgradable =>
+      const ['counter', 'pack', 'shelf', 'dock'].contains(type.id) &&
+      level < maxLevel;
+  int get upgradeCost => (type.cost * (level == 1 ? 1.5 : 3)).round();
+
+  /// 접수·포장 속도 배수
+  double get speedMul =>
+      (type.id == 'counter' || type.id == 'pack') ? 1 + 0.25 * (level - 1) : 1.0;
+
+  /// 선반 용량
+  int get cap => Cfg.shelfCap + 10 * (level - 1);
+
+  /// 접수 창구 대기 택배 한도
+  int get outCap => Cfg.outboxCap + 2 * (level - 1);
+
+  /// 도크 싣는 속도 배수
+  double get loadMul => type.id == 'dock' ? 1 + 0.5 * (level - 1) : 1.0;
 
   /// 지금 실제로 자리에 있는 직원 (쉬러 간 직원은 빠짐)
   List<Staff> get active => crew.where((s) => !s.away).toList();

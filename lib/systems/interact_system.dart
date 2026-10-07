@@ -75,7 +75,7 @@ extension InteractSystem on HubGame {
     }
 
     for (final b in ofType('counter')) {
-      if (b.outbox.length >= Cfg.outboxCap) {
+      if (b.outbox.length >= b.outCap) {
         alerts.add(Alert(Alert.jam, '접수 택배가 가득 찼어요', '운반 직원', building: b));
         break;
       }

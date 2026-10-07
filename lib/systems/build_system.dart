@@ -160,6 +160,20 @@ extension BuildSystem on HubGame {
     showToast('${b.type.name} 철거 (+${fmt(refund)}원)');
   }
 
+  void upgradeBuilding(Building b) {
+    if (!b.upgradable) return;
+    final cost = b.upgradeCost;
+    if (money < cost) {
+      showToast('돈이 부족해요');
+      return;
+    }
+    money -= cost;
+    b.level++;
+    upgrades++;
+    showToast('${b.type.name} Lv.${b.level} 업그레이드!');
+    ui();
+  }
+
   void confirmExpand() {
     if (!canExpand) return;
     final cost = nextAreaCost;

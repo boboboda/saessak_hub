@@ -240,7 +240,30 @@ extension StaffSystem on HubGame {
       }
       s.energy += (s.working ? -drain : gain) * dt;
       s.energy = s.energy.clamp(0.0, s.maxEnergy).toDouble();
+      if (s.working) _grow(s, dt);
       s.working = false;
+    }
+  }
+
+  /// 일한 시간만큼 경험치가 쌓이고, 차면 레벨업 (3레벨부터 맡은 일에 맞는 특기)
+  void _grow(Staff s, double dt) {
+    if (s.level < Staff.maxLevel) {
+      s.xp += dt;
+      if (s.xp >= s.xpNeed) {
+        s.xp -= s.xpNeed;
+        s.level++;
+        s.wage += 15;
+        showToast('${s.name} 레벨 ${s.level}! 일급 +15원');
+      }
+    }
+    if (s.level >= 3 && s.spec == 0) {
+      final role = s.carrier
+          ? 3
+          : (s.post?.type.id == 'counter' ? 1 : (s.post?.type.id == 'pack' ? 2 : 0));
+      if (role > 0) {
+        s.spec = role;
+        showToast('${s.name} 특기: ${s.specName}');
+      }
     }
   }
 

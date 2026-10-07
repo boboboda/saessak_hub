@@ -12,10 +12,19 @@ class Staff {
   final int stamina; // 체력 1~5: 오래 일할 수 있는 정도
   final int care; // 꼼꼼 1~5: 포장 실수 확률 감소
   final int hireCost; // 고용비
-  final int wage; // 일급(하루 월급)
+  int wage; // 일급(하루 월급). 레벨이 오르면 올라감
 
   Building? post; // 배치된 건물 (접수 창구·포장대)
   bool carrier = false; // 운반 담당
+
+  // ---- 성장 ----
+  static const int maxLevel = 6;
+  static const List<String> specNames = ['', '접수 베테랑', '포장 장인', '쾌속 운반'];
+  int level = 1;
+  double xp = 0; // 일한 시간(게임 초)이 쌓임
+  int spec = 0; // 특기: 1 접수 베테랑, 2 포장 장인, 3 쾌속 운반
+  double get xpNeed => 120.0 * level;
+  String get specName => specNames[spec];
 
   double energy; // 현재 체력 (일하면 줄고, 쉬면 참)
   bool working = false; // 이번 프레임에 일했는지 (체력 계산용)
@@ -37,7 +46,7 @@ class Staff {
   bool get away => rest != 0;
 
   /// 체력 최대치 (체력 1 → 80, 3 → 120, 5 → 160)
-  double get maxEnergy => 60.0 + 20.0 * stamina;
+  double get maxEnergy => (60.0 + 20.0 * stamina) * (1 + 0.04 * (level - 1));
 
   /// 체력 비율 0~1
   double get energyPct => (energy / maxEnergy).clamp(0.0, 1.0);
@@ -50,10 +59,15 @@ class Staff {
       energyPct >= 0.3 ? 1.0 : 0.5 + 0.5 * (energyPct / 0.3);
 
   /// 일하는 속도 배수 (손속도 1 → 0.8, 3 → 1.2, 5 → 1.6) × 피로
-  double get workRate => (0.6 + 0.2 * speed) * fatigueMul;
+  double get workRate =>
+      (0.6 + 0.2 * speed) * fatigueMul * (1 + 0.06 * (level - 1));
 
   /// 걷는 속도 배수 (걸음 1 → 0.85, 3 → 1.15, 5 → 1.45) × 피로
-  double get walkMul => (0.7 + 0.15 * walk) * fatigueMul;
+  double get walkMul =>
+      (0.7 + 0.15 * walk) *
+      fatigueMul *
+      (1 + 0.06 * (level - 1)) *
+      (spec == 3 ? 1.25 : 1.0);
 
   String get initial => name.isEmpty ? '?' : name.substring(0, 1);
 }

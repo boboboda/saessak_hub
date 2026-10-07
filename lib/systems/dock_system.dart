@@ -79,7 +79,7 @@ extension DockSystem on HubGame {
           }
           break;
         case 1:
-          v.acc += dt * v.type.loadPerSec;
+          v.acc += dt * v.type.loadPerSec * dock.loadMul;
           while (v.acc >= 1 && v.loaded < v.type.cap) {
             v.acc -= 1;
             if (_takeFromShelf(v.region)) {

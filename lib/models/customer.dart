@@ -11,6 +11,8 @@ class Customer {
   double serveT = 0;
   bool ready = false; // 내 자리 맨 앞에 서서 접수를 기다리는 중
   bool tapped = false; // 내가 탭해서 접수 요청함
+  int kind = 0; // 맡기는 택배 종류 (0 일반, 1 급송, 2 파손주의, 3 대형)
+  bool vip = false; // VIP: 인내심이 짧지만 접수하면 팁
   final int region;
   Customer(this.pos, this.region);
 }

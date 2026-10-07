@@ -78,7 +78,7 @@ extension WorkerSystem on HubGame {
           from);
     }
     return _nearest(
-        ofType('shelf').where((b) => b.stored + b.incoming < Cfg.shelfCap),
+        ofType('shelf').where((b) => b.stored + b.incoming < b.cap),
         from);
   }
 
@@ -115,7 +115,7 @@ extension WorkerSystem on HubGame {
     for (final b in ofType('pack')) {
       final p = b.slot;
       if (p == null || p.stage != 3 || p.reserved) continue;
-      final d = (frontOf(b) - c.pos).distance;
+      final d = (frontOf(b) - c.pos).distance - (p.kind == 1 ? 100 : 0);
       if (d >= bestD) continue;
       final dst = _findDst(p, frontOf(b));
       if (dst == null) continue;
@@ -129,13 +129,11 @@ extension WorkerSystem on HubGame {
       for (final b in ofType('counter')) {
         Parcel? p;
         for (final q in b.outbox) {
-          if (!q.reserved) {
-            p = q;
-            break;
-          }
+          if (q.reserved) continue;
+          if (p == null || (q.kind == 1 && p.kind != 1)) p = q;
         }
         if (p == null) continue;
-        final d = (frontOf(b) - c.pos).distance;
+        final d = (frontOf(b) - c.pos).distance - (p.kind == 1 ? 100 : 0);
         if (d >= bestD) continue;
         final dst = _findDst(p, frontOf(b));
         if (dst == null) continue;
@@ -158,7 +156,9 @@ extension WorkerSystem on HubGame {
   void _move(Carrier c, double dt) {
     c.staff.working = true; // 걷는 동안 체력 소모
     final target = c.carrying ? frontOf(c.dst!) : frontOf(c.src!);
-    c.pos = stepToward(c.pos, target, Cfg.carrierSpeed * c.staff.walkMul, dt);
+    final slow = (c.carrying && c.job!.kind == 3) ? Cfg.bulkySlow : 1.0;
+    c.pos = stepToward(
+        c.pos, target, Cfg.carrierSpeed * c.staff.walkMul * slow, dt);
     if ((c.pos - target).distance > 0.05) return;
 
     final p = c.job!;
@@ -183,6 +183,19 @@ extension WorkerSystem on HubGame {
         d.stored++;
         d.regions[p.region]++;
         d.incoming = max(0, d.incoming - 1);
+        if (p.kind == 1) {
+          if (gt - p.born <= Cfg.urgentLimit) {
+            money += Cfg.urgentBonus;
+            dayEarn += Cfg.urgentBonus;
+            urgentOk++;
+            showToast('급송 성공! +${Cfg.urgentBonus}원');
+          } else {
+            showToast('급송이 늦었어요');
+          }
+        } else if (p.kind == 3) {
+          money += Cfg.bulkyBonus;
+          dayEarn += Cfg.bulkyBonus;
+        }
       }
       _clear(c);
     }

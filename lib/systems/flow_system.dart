@@ -11,7 +11,16 @@ extension FlowSystem on HubGame {
       for (var i = 0; i < regionOpen.length; i++)
         if (regionOpen[i]) i
     ];
-    customers.add(Customer(exitPoint, open[rnd.nextInt(open.length)]));
+    final cu = Customer(exitPoint, open[rnd.nextInt(open.length)]);
+    final r = rnd.nextDouble();
+    if (day >= 2) {
+      cu.kind = r < 0.08 ? 1 : (r < 0.16 ? 2 : (r < 0.22 ? 3 : 0));
+    }
+    if (day >= 3 && rnd.nextDouble() < 0.06) {
+      cu.vip = true;
+      cu.patience *= Cfg.vipPatience;
+    }
+    customers.add(cu);
   }
 
   Building? _bestCounter(List<Building> counters, Map<Building, int> load) {
@@ -28,9 +37,25 @@ extension FlowSystem on HubGame {
     return best;
   }
 
-  /// 자리에 있는 직원들의 합산 처리 속도 (지친 직원은 느림)
+  /// 자리에 있는 직원들의 합산 처리 속도 (지친 직원은 느림, 건물 레벨·특기 반영)
   double _rate(Building b) =>
-      b.active.fold<double>(0, (a, s) => a + s.workRate);
+      b.active.fold<double>(
+          0,
+          (a, s) =>
+              a + s.workRate * (b.type.id == 'counter' && s.spec == 1 ? 1.25 : 1.0)) *
+      b.speedMul;
+
+  /// 손님이 맡긴 택배 만들기 (VIP 팁 포함)
+  Parcel _mkParcel(Customer c) {
+    final p = Parcel(c.region);
+    p.kind = c.kind;
+    p.born = gt;
+    if (c.vip) {
+      money += Cfg.vipTip;
+      dayEarn += Cfg.vipTip;
+    }
+    return p;
+  }
 
   /// 손님이 짜증 내는 속도 배수 (직원이 친절할수록 낮음)
   double _calm(Building b) {
@@ -49,6 +74,7 @@ extension FlowSystem on HubGame {
     final care = act.fold<int>(0, (a, s) => a + s.care) / act.length;
     var chance = Cfg.slipBase - Cfg.slipPerCare * care;
     if (act.any((s) => s.tired)) chance += Cfg.slipTired;
+    if (act.any((s) => s.spec == 2)) chance *= 0.5;
     return rnd.nextDouble() < chance.clamp(0.0, 0.9);
   }
 
@@ -111,12 +137,12 @@ extension FlowSystem on HubGame {
       c.pos = stepToward(c.pos, target, Cfg.customerSpeed, dt);
       final arrived = (c.pos - target).distance < 0.05;
       final canServe =
-          arrived && idx == 0 && cnt.outbox.length < Cfg.outboxCap;
+          arrived && idx == 0 && cnt.outbox.length < cnt.outCap;
       c.ready = canServe && cnt.mine;
 
       if (canServe && cnt.mine && c.tapped) {
         // 내가 직접 탭해서 접수: 기다리지 않고 바로 끝, 보너스
-        cnt.outbox.add(Parcel(c.region));
+        cnt.outbox.add(_mkParcel(c));
         done++;
         money += Cfg.tapBonus;
         dayEarn += Cfg.tapBonus;
@@ -130,7 +156,7 @@ extension FlowSystem on HubGame {
         }
         c.serveT += dt * _rate(cnt);
         if (c.serveT >= Cfg.serveTime) {
-          cnt.outbox.add(Parcel(c.region));
+          cnt.outbox.add(_mkParcel(c));
           done++;
           c.state = 2;
         }
@@ -155,14 +181,23 @@ extension FlowSystem on HubGame {
         b.progress += dt * _rate(b);
         if (b.progress >= Cfg.packTime) {
           if (_slipped(b)) {
-            // 포장 실수: 처음부터 다시
+            // 포장 실수: 처음부터 다시 (파손주의 택배는 배상)
             b.progress = 0;
             b.flash = 1.5;
             final act = b.active;
             act[rnd.nextInt(act.length)].mistakes++;
+            if (p.kind == 2) {
+              final pen = money < Cfg.breakPenalty ? money : Cfg.breakPenalty;
+              money -= pen;
+              showToast('파손! 배상 -$pen원');
+            }
           } else {
             p.stage = 3;
             p.reserved = false;
+            if (p.kind == 2) {
+              money += Cfg.fragileBonus;
+              dayEarn += Cfg.fragileBonus;
+            }
           }
         }
       }

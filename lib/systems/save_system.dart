@@ -20,6 +20,8 @@ extension SaveSystem on HubGame {
       'lost': lost,
       'delivered': delivered,
       'dayEarn': dayEarn,
+      'upgrades': upgrades,
+      'urgentOk': urgentOk,
       'nextStaffId': nextStaffId,
       'regions': regionOpen,
       'claimed': claimed.toList(),
@@ -38,6 +40,9 @@ extension SaveSystem on HubGame {
             'energy': s.energy,
             'mistakes': s.mistakes,
             'carrier': s.carrier,
+            'lv': s.level,
+            'xp': s.xp,
+            'spec': s.spec,
           }
       ],
       'buildings': [
@@ -47,6 +52,7 @@ extension SaveSystem on HubGame {
             'x': b.tx,
             'y': b.ty,
             'mine': b.mine,
+            'lv': b.level,
             'regions': b.regions,
             'crew': [for (final s in b.crew) s.id],
           }
@@ -80,6 +86,9 @@ extension SaveSystem on HubGame {
         s.energy = (m['energy'] as num).toDouble();
         s.mistakes = m['mistakes'] as int;
         s.carrier = m['carrier'] as bool;
+        s.level = (m['lv'] as int?) ?? 1;
+        s.xp = ((m['xp'] as num?) ?? 0).toDouble();
+        s.spec = (m['spec'] as int?) ?? 0;
         loadedStaff.add(s);
       }
       final byId = {for (final s in loadedStaff) s.id: s};
@@ -89,6 +98,7 @@ extension SaveSystem on HubGame {
         final type = Cfg.types.firstWhere((t) => t.id == m['type']);
         final b = Building(type, m['x'] as int, m['y'] as int);
         b.mine = m['mine'] as bool;
+        b.level = (m['lv'] as int?) ?? 1;
         final rg = (m['regions'] as List).map((e) => e as int).toList();
         for (var i = 0; i < b.regions.length && i < rg.length; i++) {
           b.regions[i] = rg[i];
@@ -112,6 +122,8 @@ extension SaveSystem on HubGame {
       lost = j['lost'] as int;
       delivered = j['delivered'] as int;
       dayEarn = j['dayEarn'] as int;
+      upgrades = (j['upgrades'] as int?) ?? 0;
+      urgentOk = (j['urgentOk'] as int?) ?? 0;
       nextStaffId = j['nextStaffId'] as int;
       final ro = j['regions'] as List?;
       if (ro != null) {

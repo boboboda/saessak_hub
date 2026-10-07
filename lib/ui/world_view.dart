@@ -134,6 +134,12 @@ extension WorldView on HubGame {
       strokeBox(c, r, 0xFF2A2438, 2);
       labelIn(c, b.type.name, r, size: 12);
 
+      if (b.level > 1) {
+        box(c, r.left + 2, r.top + 2, 28, 13, 0xFFFFD166);
+        labelIn(c, 'Lv${b.level}', Rect.fromLTWH(r.left + 2, r.top + 2, 28, 13),
+            size: 10, color: const Color(0xFF2A2438));
+      }
+
       // 직원이 필요한 건물: 배치가 없으면 빨강, 전원 휴식 중이면 주황
       if (b.mine) {
         box(c, r.left + 2, r.bottom - 16, 40, 14, 0xFF3FB27F);
@@ -159,6 +165,10 @@ extension WorldView on HubGame {
           for (var i = 0; i < b.outbox.length; i++) {
             box(c, r.left + 4 + i * 11, r.top + 3, 9, 9,
                 Cfg.regionColor[b.outbox[i].region]);
+            if (b.outbox[i].kind > 0) {
+              strokeBox(c, Rect.fromLTWH(r.left + 4 + i * 11, r.top + 3, 9, 9),
+                  0xFFFF3B30, 1.5);
+            }
           }
           break;
         case 'pack':
@@ -178,9 +188,9 @@ extension WorldView on HubGame {
         case 'shelf':
           box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
           box(c, r.left + 4, r.bottom - 10,
-              (r.width - 8) * (b.stored / Cfg.shelfCap).clamp(0.0, 1.0), 6,
-              b.stored >= Cfg.shelfCap ? 0xFFE5484D : 0xFF7BD389);
-          label(c, '${b.stored}/${Cfg.shelfCap}', r.left + 5, r.bottom - 26,
+              (r.width - 8) * (b.stored / b.cap).clamp(0.0, 1.0), 6,
+              b.stored >= b.cap ? 0xFFE5484D : 0xFF7BD389);
+          label(c, '${b.stored}/${b.cap}', r.left + 5, r.bottom - 26,
               size: 11);
           break;
         case 'lounge':
@@ -313,6 +323,19 @@ extension WorldView on HubGame {
             ..strokeWidth = 1.5
             ..color = const Color(0xFF2A2438));
       box(c, p.dx - 4, p.dy - t * 0.5, 8, 8, Cfg.regionColor[cu.region]);
+      if (cu.vip) {
+        c.drawCircle(
+            p,
+            t * 0.34,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 2.5
+              ..color = const Color(0xFFFFD166));
+      }
+      if (cu.kind > 0 && cu.state != 2) {
+        label(c, Cfg.kindName[cu.kind], p.dx + 7, p.dy - t * 0.62,
+            size: 10, color: const Color(0xFFFF8A80));
+      }
       if (cu.state != 2 && cu.ready) {
         // 내 자리 맨 앞 손님: 눌러 달라는 말풍선 (살짝 깜빡임)
         final pulse = 0.5 + 0.5 * sin(clock * 8);

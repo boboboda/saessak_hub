@@ -47,6 +47,9 @@ class HubGame extends FlameGame {
   int done = 0;
   int lost = 0;
   int delivered = 0; // 배송 나간 택배 수
+  int upgrades = 0; // 건물 업그레이드 횟수
+  int urgentOk = 0; // 급송 성공 건수
+  double gt = 0; // 게임 시간(속도 배수 반영)
   int dayEarn = 0; // 오늘 번 돈 (하루 결산용)
   double saveTimer = 0;
   final List<bool> regionOpen = [true, false, false, false, false]; // 열린 배송 지역
@@ -203,6 +206,7 @@ class HubGame extends FlameGame {
       this.genCandidates();
     }
 
+    gt += d;
     this.updateFever(d);
     if (sootheCd > 0) sootheCd = max(0.0, sootheCd - d);
 

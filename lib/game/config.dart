@@ -109,6 +109,17 @@ class Cfg {
 
   static const List<int> speeds = [1, 3, 10];
 
+  // ---- 특수 택배 ----
+  static const List<String> kindName = ['', '급송', '파손', '대형'];
+  static const double urgentLimit = 90; // 급송: 접수 후 이 시간(게임 초) 안에 선반에 넣어야 보너스
+  static const int urgentBonus = 300;
+  static const int fragileBonus = 60; // 파손주의: 실수 없이 포장하면 보너스
+  static const int breakPenalty = 120; // 파손주의: 포장 실수하면 배상
+  static const int bulkyBonus = 150; // 대형: 선반까지 옮기면 보너스
+  static const double bulkySlow = 0.6; // 대형을 들면 걸음이 느려짐
+  static const int vipTip = 200;
+  static const double vipPatience = 0.55; // VIP 인내심 배수
+
   // ---- 배송 지역 (택배 색과 같은 순서) ----
   static const List<String> regionName = ['동네', '시내', '근교', '타도시', '전국'];
   static const List<int> regionUnlock = [0, 8000, 25000, 60000, 150000];
@@ -140,6 +151,11 @@ class Cfg {
     Mission('대형 창고로 확장', 5, 2, 20000),
     Mission('택배 2,000건 배송', 0, 2000, 50000),
     Mission('모든 배송 지역 열기', 4, 5, 60000),
+    Mission('직원 레벨 3 달성', 6, 3, 3000),
+    Mission('건물 업그레이드 3번', 7, 3, 5000),
+    Mission('급송 택배 5건 성공', 8, 5, 4000),
+    Mission('직원 레벨 6 달성', 6, 6, 30000),
+    Mission('급송 택배 30건 성공', 8, 30, 25000),
   ];
 
   // ---- 편의 시설 ----

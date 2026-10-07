@@ -56,7 +56,7 @@ class BuildingSheet extends StatelessWidget {
                 children: [
                   const Icon(Icons.inventory_2, size: 18, color: C.sub),
                   const SizedBox(width: 8),
-                  Text('보관 ${b.stored}/${Cfg.shelfCap}', style: Tx.body),
+                  Text('보관 ${b.stored}/${b.cap}', style: Tx.body),
                 ],
               ),
             ),
@@ -106,6 +106,33 @@ class BuildingSheet extends StatelessWidget {
                 ],
               ),
             ),
+          if (b.type.id == 'counter' ||
+              b.type.id == 'pack' ||
+              b.type.id == 'shelf' ||
+              b.type.id == 'dock') ...[
+            const SizedBox(height: 8),
+            CardBox(
+              child: Row(
+                children: [
+                  const Icon(Icons.upgrade, size: 18, color: C.gold),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Lv.${b.level}/${Building.maxLevel} · ${_upgradeText(b)}',
+                      style: Tx.body,
+                    ),
+                  ),
+                  if (b.upgradable)
+                    AppButton('${g.fmt(b.upgradeCost)}원',
+                        small: true,
+                        color: C.gold.withOpacity(0.9),
+                        onTap: g.money >= b.upgradeCost
+                            ? () => g.upgradeBuilding(b)
+                            : null),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 14),
           AppButton(
             '철거 (+$refund원)',
@@ -116,6 +143,19 @@ class BuildingSheet extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _upgradeText(Building b) {
+    switch (b.type.id) {
+      case 'counter':
+        return '접수 속도 +${((b.speedMul - 1) * 100).round()}% · 대기 택배 ${b.outCap}건';
+      case 'pack':
+        return '포장 속도 +${((b.speedMul - 1) * 100).round()}%';
+      case 'shelf':
+        return '보관 용량 ${b.cap}건';
+      default:
+        return '싣는 속도 +${((b.loadMul - 1) * 100).round()}%';
+    }
   }
 
   List<Widget> _crewSection(BuildContext context) {
@@ -148,7 +188,9 @@ class BuildingSheet extends StatelessWidget {
                     runSpacing: 4,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Text(s.name, style: Tx.h2),
+                      Text(
+                          '${s.name} Lv.${s.level}${s.spec > 0 ? ' · ${s.specName}' : ''}',
+                          style: Tx.h2),
                       if (s.away) RoleChip(g, s),
                     ],
                   ),

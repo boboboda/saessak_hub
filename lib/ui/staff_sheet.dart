@@ -167,7 +167,9 @@ class _StaffCard extends StatelessWidget {
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Text(s.name, style: Tx.h2),
+                        Text(
+                            '${s.name} Lv.${s.level}${s.spec > 0 ? ' · ${s.specName}' : ''}',
+                            style: Tx.h2),
                         RoleChip(g, s),
                       ],
                     ),
@@ -185,7 +187,7 @@ class _StaffCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '일급 ${_n(s.wage)}원 · 실수 ${s.mistakes}회',
+                  '일급 ${_n(s.wage)}원 · 실수 ${s.mistakes}회 · ${s.level >= Staff.maxLevel ? '최고 레벨' : '경험 ${(s.xp / s.xpNeed * 100).floor()}%'}',
                   style: const TextStyle(
                       color: C.gold, fontSize: 12, fontWeight: FontWeight.w700),
                 ),
