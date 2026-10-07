@@ -96,8 +96,10 @@ extension WorldView on HubGame {
     final a = area;
     for (var y = a.top.toInt(); y < a.bottom.toInt(); y++) {
       for (var x = a.left.toInt(); x < a.right.toInt(); x++) {
-        box(c, x * t, y * t, t, t,
-            (x + y) % 2 == 0 ? 0xFFE3D5B8 : 0xFFDCCDAE);
+        if (!Sprites.drawFloor(c, x * t, y * t, t)) {
+          box(c, x * t, y * t, t, t,
+              (x + y) % 2 == 0 ? 0xFFE3D5B8 : 0xFFDCCDAE);
+        }
       }
     }
 
@@ -164,8 +166,13 @@ extension WorldView on HubGame {
         case 'counter':
         // 대기 중인 택배는 창구 안쪽 위에 작은 상자로
           for (var i = 0; i < b.outbox.length; i++) {
-            box(c, r.left + 4 + i * 11, r.top + 3, 9, 9,
-                Cfg.regionColor[b.outbox[i].region]);
+            if (!Sprites.drawBox(
+                c,
+                Rect.fromLTWH(r.left + 2 + i * 12, r.top + 1, 13, 13),
+                Cfg.regionColor[b.outbox[i].region])) {
+              box(c, r.left + 4 + i * 11, r.top + 3, 9, 9,
+                  Cfg.regionColor[b.outbox[i].region]);
+            }
             if (b.outbox[i].kind > 0) {
               strokeBox(c, Rect.fromLTWH(r.left + 4 + i * 11, r.top + 3, 9, 9),
                   0xFFFF3B30, 1.5);
@@ -176,8 +183,13 @@ extension WorldView on HubGame {
           final p = b.slot;
           if (p != null) {
             if (p.stage == 3) {
-              box(c, r.center.dx - 7, r.bottom - 20, 14, 14,
-                  Cfg.regionColor[p.region]);
+              if (!Sprites.drawBox(
+                  c,
+                  Rect.fromLTWH(r.center.dx - 10, r.bottom - 25, 20, 20),
+                  Cfg.regionColor[p.region])) {
+                box(c, r.center.dx - 7, r.bottom - 20, 14, 14,
+                    Cfg.regionColor[p.region]);
+              }
             } else {
               box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
               box(c, r.left + 4, r.bottom - 10,
@@ -387,10 +399,15 @@ extension WorldView on HubGame {
       _person(c, p, w.staff.initial, 0xFF8EC5FF, 0xFFFFFFFF,
           tired: w.staff.tired, energy: w.staff.energyPct, key: w.staff);
       if (w.carrying && w.job != null) {
-        box(c, p.dx - 7, p.dy - t * 0.62, 14, 14,
-            Cfg.regionColor[w.job!.region]);
-        strokeBox(c, Rect.fromLTWH(p.dx - 7, p.dy - t * 0.62, 14, 14),
-            0xFF2A2438, 1.5);
+        if (!Sprites.drawBox(
+            c,
+            Rect.fromLTWH(p.dx - 10, p.dy - t * 0.95, 20, 20),
+            Cfg.regionColor[w.job!.region])) {
+          box(c, p.dx - 7, p.dy - t * 0.62, 14, 14,
+              Cfg.regionColor[w.job!.region]);
+          strokeBox(c, Rect.fromLTWH(p.dx - 7, p.dy - t * 0.62, 14, 14),
+              0xFF2A2438, 1.5);
+        }
       }
     }
   }
