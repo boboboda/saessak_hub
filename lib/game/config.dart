@@ -5,7 +5,7 @@ import '../models/mission.dart';
 import '../models/vehicle.dart';
 
 class Cfg {
-  static const double tile = 40; // 한 칸 픽셀
+  static const double tile = 32; // 한 칸 픽셀 (도트 에셋과 1:1)
   static const int cols = 36; // 월드 가로 칸
   static const int rows = 36; // 월드 세로 칸
 

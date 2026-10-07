@@ -78,5 +78,109 @@
       "description": "small white delivery truck, side view facing right, cargo box, orange stripe",
       "size": 128
     }
+  },
+  "obj_shelf2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "선반 정면 (대각선 아님)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, empty warehouse storage shelf rack, three tiers, seen straight from the front, symmetrical, brown metal, nothing on the shelves",
+      "size": 96
+    }
+  },
+  "decor_tree": {
+    "endpoint": "/create-1-direction-object",
+    "note": "나무",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, green leafy round tree with brown trunk, game decoration",
+      "size": 64
+    }
+  },
+  "decor_bush": {
+    "endpoint": "/create-1-direction-object",
+    "note": "덤불",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, small green round bush, game decoration",
+      "size": 32
+    }
+  },
+  "decor_lamp": {
+    "endpoint": "/create-1-direction-object",
+    "note": "가로등",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, street lamp post, dark metal, tall and thin",
+      "size": 64
+    }
+  },
+  "decor_light": {
+    "endpoint": "/create-1-direction-object",
+    "note": "신호등",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, traffic light on a pole, red yellow green lights",
+      "size": 64
+    }
+  },
+  "decor_bench": {
+    "endpoint": "/create-1-direction-object",
+    "note": "벤치",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, wooden park bench",
+      "size": 32
+    }
+  },
+  "decor_cone": {
+    "endpoint": "/create-1-direction-object",
+    "note": "라바콘",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, orange traffic cone",
+      "size": 32
+    }
+  },
+  "decor_sign": {
+    "endpoint": "/create-1-direction-object",
+    "note": "표지판",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, small street sign on pole",
+      "size": 32
+    }
+  },
+  "decor_house1": {
+    "endpoint": "/create-1-direction-object",
+    "note": "가게 1",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, small convenience store building front, flat roof, awning, storefront window",
+      "size": 128
+    }
+  },
+  "decor_house2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "집 2",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, small two-story apartment house front, red roof, windows",
+      "size": 128
+    }
+  },
+  "decor_house3": {
+    "endpoint": "/create-1-direction-object",
+    "note": "가게 3",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, small bakery shop building front, striped awning, windows",
+      "size": 128
+    }
+  },
+  "decor_pallet": {
+    "endpoint": "/create-1-direction-object",
+    "note": "팔레트+상자",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, wooden pallet with a few stacked cardboard boxes",
+      "size": 32
+    }
+  },
+  "decor_flower": {
+    "endpoint": "/create-1-direction-object",
+    "note": "꽃",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, small flower patch, colorful flowers on grass",
+      "size": 32
+    }
   }
 }

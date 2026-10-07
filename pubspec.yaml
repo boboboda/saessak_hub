@@ -64,6 +64,7 @@ flutter:
     - assets/sprites/staff/
     - assets/sprites/props/
     - assets/sprites/tiles/
+    - assets/sprites/decor/
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

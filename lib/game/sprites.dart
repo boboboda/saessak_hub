@@ -8,6 +8,14 @@ class Sprites {
   static ui.Image? box;
   static ui.Image? floor;
   static ui.Image? counter, pack, shelf, van;
+  static ui.Image? grass, asphalt, sidewalk, yard;
+
+  /// 배경 장식 도트 (assets/sprites/decor/<이름>.png). 없는 건 null.
+  static final Map<String, ui.Image> decor = {};
+  static const List<String> decorNames = [
+    'tree', 'bush', 'lamp', 'light', 'bench', 'cone', 'sign',
+    'house1', 'house2', 'house3', 'pallet', 'flower',
+  ];
 
   /// 시트: 가로 7프레임, 세로 4방향 (0 남, 1 서, 2 동, 3 북). 프레임 56x56.
   static const int frames = 7;
@@ -21,6 +29,14 @@ class Sprites {
     pack = await _img('assets/sprites/props/pack.png');
     shelf = await _img('assets/sprites/props/shelf.png');
     van = await _img('assets/sprites/props/van.png');
+    grass = await _img('assets/sprites/tiles/grass.png');
+    asphalt = await _img('assets/sprites/tiles/asphalt.png');
+    sidewalk = await _img('assets/sprites/tiles/sidewalk.png');
+    yard = await _img('assets/sprites/tiles/yard.png');
+    for (final n in decorNames) {
+      final im = await _img('assets/sprites/decor/$n.png');
+      if (im != null) decor[n] = im;
+    }
   }
 
   static Future<ui.Image?> _img(String path) async {
@@ -36,7 +52,7 @@ class Sprites {
   /// 직원 한 명을 그린다. (x,y)는 발 위치. dir 0남 1서 2동 3북, moving이면 걷기 모션.
   static void drawStaff(ui.Canvas c, double x, double y, int dir, bool moving,
       double clock,
-      {double size = 50, double alpha = 1}) {
+      {double size = 56, double alpha = 1}) {
     final img = staffWalk;
     if (img == null) return;
     final f = moving ? 1 + (clock * 9).floor() % (frames - 1) : 0;
@@ -109,5 +125,18 @@ class Sprites {
         ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
         dst,
         ui.Paint()..filterQuality = ui.FilterQuality.none);
+  }
+
+  /// 32x32 바닥 한 칸. variants>1이면 가로로 이어진 시트에서 v번째를 그림.
+  static bool drawTile(ui.Canvas c, ui.Image? img, double x, double y,
+      double t, [int variants = 1, int v = 0]) {
+    if (img == null) return false;
+    final w = img.width / variants;
+    c.drawImageRect(
+        img,
+        ui.Rect.fromLTWH(w * v, 0, w, img.height.toDouble()),
+        ui.Rect.fromLTWH(x, y, t, t),
+        ui.Paint()..filterQuality = ui.FilterQuality.none);
+    return true;
   }
 }

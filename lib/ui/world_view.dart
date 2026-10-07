@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/scenery.dart';
 import '../game/sprites.dart';
 import 'draw_utils.dart';
 
@@ -11,6 +12,28 @@ import 'draw_utils.dart';
 extension WorldView on HubGame {
   Rect _px(Rect r) => Rect.fromLTWH(r.left * Cfg.tile, r.top * Cfg.tile,
       r.width * Cfg.tile, r.height * Cfg.tile);
+
+  int x0Of(HubGame g) => max(0, (g.cam.dx / Cfg.tile).floor());
+  int x1Of(HubGame g) => min(Cfg.cols, ((g.cam.dx + g.size.x) / Cfg.tile).ceil());
+  int y0Of(HubGame g) => max(0, (g.cam.dy / Cfg.tile).floor());
+  int y1Of(HubGame g) => min(Cfg.rows, ((g.cam.dy + g.size.y) / Cfg.tile).ceil());
+
+  // ---------------- 배경 장식 ----------------
+  void _drawDecor(Canvas c) {
+    const t = Cfg.tile;
+    final a = area.inflate(0.5);
+    final view = Rect.fromLTWH(cam.dx - 160, cam.dy - 160, size.x + 320, size.y + 320);
+    for (final d in Scenery.items) {
+      final img = Sprites.decor[d.key];
+      if (img == null) continue;
+      if (a.contains(Offset(d.x, d.y - 1))) continue; // 확장한 창고가 덮는 자리
+      final w = d.wTiles * t;
+      final h = w * img.height / img.width;
+      final r = Rect.fromLTWH(d.x * t - w / 2, d.y * t - h, w, h);
+      if (!r.overlaps(view)) continue;
+      Sprites.drawContain(c, img, r);
+    }
+  }
 
   void renderWorld(Canvas c) {
     const t = Cfg.tile;
@@ -20,17 +43,16 @@ extension WorldView on HubGame {
     c.translate(-cam.dx, -cam.dy);
 
     // 잔디
-    box(c, 0, 0, Cfg.cols * t, Cfg.rows * t, 0xFF6FAE5B);
-    final x0 = max(0, (cam.dx / t).floor());
-    final x1 = min(Cfg.cols, ((cam.dx + size.x) / t).ceil());
-    final y0 = max(0, (cam.dy / t).floor());
-    final y1 = min(Cfg.rows, ((cam.dy + size.y) / t).ceil());
-    for (var y = y0; y < y1; y++) {
-      for (var x = x0; x < x1; x++) {
-        if ((x + y) % 2 == 0) box(c, x * t, y * t, t, t, 0xFF69A857);
+    for (var y = y0Of(this); y < y1Of(this); y++) {
+      for (var x = x0Of(this); x < x1Of(this); x++) {
+        final v = (x * 7 + y * 13) % 4;
+        if (!Sprites.drawTile(c, Sprites.grass, x * t, y * t, t, 4, v)) {
+          box(c, x * t, y * t, t, t, (x + y) % 2 == 0 ? 0xFF69A857 : 0xFF6FAE5B);
+        }
       }
     }
 
+    _drawDecor(c);
     _drawRoadAndYard(c);
     _drawWarehouse(c);
     _drawBuildings(c);
@@ -52,21 +74,38 @@ extension WorldView on HubGame {
   void _drawRoadAndYard(Canvas c) {
     const t = Cfg.tile;
 
-    // 도로
+    // 도로 (아스팔트 + 중앙 점선) + 오른쪽 인도
     final rd = _px(Cfg.road);
-    box(c, rd.left, rd.top, rd.width, rd.height, 0xFF3A3A48);
-    for (var y = 0; y < Cfg.rows; y++) {
-      box(c, rd.center.dx - 2, y * t + 8, 4, t - 16, 0xFFFFD166);
+    for (var ty = 0; ty < Cfg.rows; ty++) {
+      for (var tx = Cfg.road.left.toInt(); tx < Cfg.road.right.toInt(); tx++) {
+        if (!Sprites.drawTile(c, Sprites.asphalt, tx * t, ty * t, t)) {
+          box(c, tx * t, ty * t, t, t, 0xFF3A3A48);
+        }
+      }
+      for (var tx = Cfg.road.right.toInt(); tx < Cfg.cols; tx++) {
+        if (!Sprites.drawTile(c, Sprites.sidewalk, tx * t, ty * t, t)) {
+          box(c, tx * t, ty * t, t, t, 0xFFB9B5A8);
+        }
+      }
+      box(c, rd.center.dx - 1.5, ty * t + 6, 3, t - 12, 0xFFFFD166);
     }
-    label(c, '도로', rd.left + 8, area.top * t, size: 12);
-    label(c, '→ 운송', rd.left + 4, area.top * t + 16, size: 11);
+    // 횡단보도 (위·아래)
+    for (final cy in [Cfg.yard.top - 1, Cfg.yard.bottom]) {
+      for (var i = 0; i < 6; i++) {
+        box(c, rd.left + 3 + i * (rd.width - 6) / 6, cy * t + 4,
+            (rd.width - 6) / 6 - 3, t - 8, 0xDDFFFFFF);
+      }
+    }
+    label(c, '→ 운송', rd.left + 4, area.top * t, size: 11);
 
     // 도크 마당 바닥
     final y = Cfg.yard;
     for (var ty = y.top.toInt(); ty < y.bottom.toInt(); ty++) {
       for (var tx = y.left.toInt(); tx < y.right.toInt(); tx++) {
-        box(c, tx * t, ty * t, t, t,
-            (tx + ty) % 2 == 0 ? 0xFF55556A : 0xFF4D4D62);
+        if (!Sprites.drawTile(c, Sprites.yard, tx * t, ty * t, t)) {
+          box(c, tx * t, ty * t, t, t,
+              (tx + ty) % 2 == 0 ? 0xFF55556A : 0xFF4D4D62);
+        }
       }
     }
     // 도크를 고르면 마당이 강조됨
@@ -340,7 +379,7 @@ extension WorldView on HubGame {
       final spots = [Offset(w - 0.5, -0.15), Offset(0.5, -0.15)];
       final act = b.active;
       for (var i = 0; i < act.length && i < spots.length; i++) {
-        final bob = working ? sin(clock * 10 + i) * 3 : 0.0;
+        const bob = 0.0;
         final p =
         Offset((b.tx + spots[i].dx) * t, (b.ty + spots[i].dy) * t + bob);
         _person(c, p, act[i].initial, 0xFFFFE0B2, 0xFF8B4A00,
@@ -352,14 +391,31 @@ extension WorldView on HubGame {
     for (final b in ofType('pack')) {
       final working = b.slot != null && b.slot!.stage == 2;
       final w = b.type.w.toDouble();
-      final spots = [Offset(w - 0.55, 0.55), Offset(0.55, 0.55)];
+      final spots = [Offset(w - 0.6, 0.47), Offset(0.6, 0.47)];
       final act = b.active;
       for (var i = 0; i < act.length && i < spots.length; i++) {
-        final bob = working ? sin(clock * 12 + i) * 3 : 0.0;
+        const bob = 0.0;
         final p =
         Offset((b.tx + spots[i].dx) * t, (b.ty + spots[i].dy) * t + bob);
         _person(c, p, act[i].initial, 0xFFB9F6CA, 0xFF1B5E20,
             tired: act[i].tired, energy: act[i].energyPct, key: act[i]);
+      }
+    }
+
+    // 책상 앞면을 직원 위에 다시 그려서 '책상 뒤에 서 있는' 모습으로
+    for (final id in const ['counter', 'pack']) {
+      for (final b in ofType(id)) {
+        if (b.active.isEmpty) continue;
+        final sp = Sprites.forBuilding(id);
+        if (sp == null) continue;
+        final r = _px(b.rect).deflate(1);
+        final h = r.width * sp.height / sp.width;
+        final top = r.bottom - h;
+        c.save();
+        c.clipRect(Rect.fromLTRB(
+            r.left, top + h * (id == 'pack' ? 0.25 : 0.3), r.right, r.bottom));
+        Sprites.drawFitWidth(c, sp, r);
+        c.restore();
       }
     }
 
