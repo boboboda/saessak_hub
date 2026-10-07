@@ -36,10 +36,7 @@
     "note": "창고 바닥 타일 시험 (품질 확인용)",
     "body": {
       "description": "seamless top-down warehouse concrete floor tile, light gray, subtle cracks, flat, no objects",
-      "size": {
-        "width": 32,
-        "height": 32
-      }
+      "size": 32
     }
   },
   "obj_counter": {
@@ -47,10 +44,7 @@
     "note": "접수 창구",
     "body": {
       "description": "top-down service counter desk for a parcel shop, wooden with orange front panel, small scale on top, seen from slightly above",
-      "size": {
-        "width": 64,
-        "height": 32
-      }
+      "size": 64
     }
   },
   "obj_pack": {
@@ -58,10 +52,7 @@
     "note": "포장대",
     "body": {
       "description": "top-down packing table with tape dispenser and a cardboard box on it, green metal table, seen from slightly above",
-      "size": {
-        "width": 64,
-        "height": 64
-      }
+      "size": 64
     }
   },
   "obj_shelf": {
@@ -69,10 +60,7 @@
     "note": "선반 (빈 것)",
     "body": {
       "description": "empty warehouse storage shelf rack with three empty tiers, brown metal, seen from slightly above, nothing on the shelves",
-      "size": {
-        "width": 64,
-        "height": 96
-      }
+      "size": 96
     }
   },
   "obj_box": {
@@ -80,10 +68,7 @@
     "note": "택배 상자",
     "body": {
       "description": "single closed brown cardboard parcel box with tape, simple, seen from slightly above",
-      "size": {
-        "width": 32,
-        "height": 32
-      }
+      "size": 32
     }
   },
   "veh_van": {
@@ -91,10 +76,7 @@
     "note": "소형 트럭 (옆모습)",
     "body": {
       "description": "small white delivery truck, side view facing right, cargo box, orange stripe",
-      "size": {
-        "width": 128,
-        "height": 64
-      }
+      "size": 128
     }
   }
 }
