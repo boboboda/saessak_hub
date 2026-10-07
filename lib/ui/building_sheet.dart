@@ -28,6 +28,27 @@ class BuildingSheet extends StatelessWidget {
         children: [
           Text(t.desc, style: Tx.sub),
           const SizedBox(height: 10),
+          if (t.id == 'counter')
+            CardBox(
+              child: Row(
+                children: [
+                  const Icon(Icons.touch_app, size: 18, color: C.good),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      b.mine
+                          ? '내 자리예요. 손님을 탭하면 바로 접수돼요 (+${Cfg.tapBonus}원)'
+                          : '직원 창구예요. 내 자리로 바꾸면 손님을 직접 탭해서 접수해요',
+                      style: Tx.body,
+                    ),
+                  ),
+                  if (!b.mine)
+                    AppButton('내 자리로',
+                        small: true, color: C.good, onTap: () => g.setMine(b)),
+                ],
+              ),
+            ),
+          if (t.id == 'counter') const SizedBox(height: 8),
           if (hasSlots) ..._crewSection(context),
           if (t.id == 'shelf')
             CardBox(

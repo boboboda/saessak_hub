@@ -8,6 +8,7 @@ import '../models/models.dart';
 import '../systems/build_system.dart';
 import '../systems/flow_system.dart';
 import '../systems/input_system.dart';
+import '../systems/interact_system.dart';
 import '../systems/staff_system.dart';
 import '../systems/worker_system.dart';
 import '../ui/world_view.dart';
@@ -16,6 +17,7 @@ import 'config.dart';
 export '../systems/build_system.dart';
 export '../systems/flow_system.dart';
 export '../systems/input_system.dart';
+export '../systems/interact_system.dart';
 export '../systems/staff_system.dart';
 export '../systems/worker_system.dart';
 export '../ui/world_view.dart';
@@ -28,6 +30,8 @@ class HubGame extends FlameGame {
   final List<Staff> staff = []; // 내 직원
   final List<Staff> candidates = []; // 고용 후보
   final List<Carrier> carriers = []; // 운반 담당 직원의 몸
+  final List<Alert> alerts = []; // 위기 알림
+  double sootheCd = 0; // 손님 달래기 재사용 대기(초)
   int nextStaffId = 1;
   final rnd = Random();
   double spawnTimer = 2;
@@ -178,6 +182,8 @@ class HubGame extends FlameGame {
       this.genCandidates();
     }
 
+    if (sootheCd > 0) sootheCd = max(0.0, sootheCd - d);
+
     this.updateFlow(d);
     this.updateWorkers(d);
 
@@ -185,6 +191,7 @@ class HubGame extends FlameGame {
     _tickAcc += dt;
     if (_tickAcc >= 0.2) {
       _tickAcc = 0;
+      this.refreshAlerts();
       ui();
     }
   }

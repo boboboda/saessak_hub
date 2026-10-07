@@ -48,9 +48,10 @@ extension FlowSystem on HubGame {
 
   /// 손님 입장·접수·퇴장 + 포장대 포장 진행
   void updateFlow(double dt) {
-    // 자리에 직원이 있는 접수 창구만 손님을 받음 (쉬러 간 직원은 빠짐)
-    final counters =
-    ofType('counter').where((b) => b.active.isNotEmpty).toList();
+    // 내 자리이거나 자리에 직원이 있는 접수 창구만 손님을 받음 (쉬러 간 직원은 빠짐)
+    final counters = ofType('counter')
+        .where((b) => b.mine || b.active.isNotEmpty)
+        .toList();
 
     // 손님 생성
     if (counters.isNotEmpty) {
@@ -84,7 +85,9 @@ extension FlowSystem on HubGame {
 
       // 창구 배정 (없거나 철거되거나 자리 직원이 없으면 다시)
       final cur = c.counter;
-      if (cur == null || !buildings.contains(cur) || cur.active.isEmpty) {
+      if (cur == null ||
+          !buildings.contains(cur) ||
+          !(cur.mine || cur.active.isNotEmpty)) {
         c.counter = _bestCounter(counters, load);
         c.serveT = 0;
         if (c.counter == null) {
@@ -100,12 +103,19 @@ extension FlowSystem on HubGame {
       final target = frontOf(cnt) + Offset(0, idx * 0.8);
       c.pos = stepToward(c.pos, target, Cfg.customerSpeed, dt);
       final arrived = (c.pos - target).distance < 0.05;
-      final serving = arrived &&
-          idx == 0 &&
-          cnt.active.isNotEmpty &&
-          cnt.outbox.length < Cfg.outboxCap;
+      final canServe =
+          arrived && idx == 0 && cnt.outbox.length < Cfg.outboxCap;
+      c.ready = canServe && cnt.mine;
 
-      if (serving) {
+      if (canServe && cnt.mine && c.tapped) {
+        // 내가 직접 탭해서 접수: 기다리지 않고 바로 끝, 보너스
+        cnt.outbox.add(Parcel(c.region));
+        done++;
+        money += Cfg.tapBonus;
+        c.tapped = false;
+        c.ready = false;
+        c.state = 2;
+      } else if (canServe && cnt.active.isNotEmpty) {
         // 직원이 빠를수록, 많을수록 접수가 빨라짐 (일하는 동안 체력 소모)
         for (final s in cnt.active) {
           s.working = true;

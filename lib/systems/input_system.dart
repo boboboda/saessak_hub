@@ -18,6 +18,9 @@ extension InputSystem on HubGame {
     }
     if (mode == 3) return;
 
+    // 내 자리 손님을 눌렀으면 접수
+    if (this.tapCustomer(w)) return;
+
     final tx = (w.dx / Cfg.tile).floor();
     final ty = (w.dy / Cfg.tile).floor();
     sheet = null;

@@ -34,6 +34,7 @@ class Building {
   int incoming = 0; // 선반: 운반 중 예약 수
   final List<Staff> crew = []; // 배치된 직원 (쉬러 간 직원 포함)
   double flash = 0; // 포장 실수 표시 남은 시간(초)
+  bool mine = false; // 접수 창구: 내가 직접 앉는 자리 (손님을 탭해서 접수)
 
   /// 지금 실제로 자리에 있는 직원 (쉬러 간 직원은 빠짐)
   List<Staff> get active => crew.where((s) => !s.away).toList();

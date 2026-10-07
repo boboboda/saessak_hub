@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../game/hub_game.dart';
+import 'alert_bar.dart';
 import 'bottom_bar.dart';
 import 'build_sheet.dart';
 import 'building_sheet.dart';
@@ -29,6 +30,13 @@ class OverlayUi extends StatelessWidget {
     return Stack(
       children: [
         Positioned(top: 0, left: 0, right: 0, child: TopBar(g)),
+        if (g.mode == 0 && sheet == null && g.alerts.isNotEmpty)
+          Positioned(
+            top: mq.padding.top + 98,
+            left: 8,
+            right: 8,
+            child: AlertBar(g),
+          ),
         Positioned(
           left: 0,
           right: 0,

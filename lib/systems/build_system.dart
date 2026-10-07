@@ -122,7 +122,11 @@ extension BuildSystem on HubGame {
       return;
     }
     money -= t.cost;
-    buildings.add(Building(t, ghostX, ghostY));
+    final nb = Building(t, ghostX, ghostY);
+    if (t.id == 'counter' && !ofType('counter').any((b) => b.mine)) {
+      nb.mine = true; // 첫 접수 창구는 내 자리
+    }
+    buildings.add(nb);
     final needStaff = t.slots > 0;
     cancelPlacing();
     showToast(needStaff
@@ -145,6 +149,12 @@ extension BuildSystem on HubGame {
     money += refund;
     this.releaseCrew(b);
     buildings.remove(b);
+    if (b.mine) {
+      for (final o in ofType('counter')) {
+        o.mine = true; // 내 자리가 철거되면 다른 접수 창구로 이전
+        break;
+      }
+    }
     selected = null;
     showToast('${b.type.name} 철거 (+${fmt(refund)}원)');
   }

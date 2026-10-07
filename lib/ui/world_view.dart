@@ -135,7 +135,12 @@ extension WorldView on HubGame {
       labelIn(c, b.type.name, r, size: 12);
 
       // 직원이 필요한 건물: 배치가 없으면 빨강, 전원 휴식 중이면 주황
-      if (b.type.slots > 0 && b.active.isEmpty) {
+      if (b.mine) {
+        box(c, r.left + 2, r.bottom - 16, 40, 14, 0xFF3FB27F);
+        labelIn(c, '내 자리', Rect.fromLTWH(r.left + 2, r.bottom - 16, 40, 14),
+            size: 10);
+      }
+      if (b.type.slots > 0 && b.active.isEmpty && !(b.mine && b.crew.isEmpty)) {
         final none = b.crew.isEmpty;
         box(c, r.right - 46, r.top + 2, 44, 15, none ? 0xFFE5484D : 0xFFD98B2B);
         labelIn(c, none ? '직원 필요' : '자리 비움',
@@ -292,6 +297,18 @@ extension WorldView on HubGame {
             ..strokeWidth = 1.5
             ..color = const Color(0xFF2A2438));
       box(c, p.dx - 4, p.dy - t * 0.5, 8, 8, Cfg.regionColor[cu.region]);
+      if (cu.state != 2 && cu.ready) {
+        // 내 자리 맨 앞 손님: 눌러 달라는 말풍선 (살짝 깜빡임)
+        final pulse = 0.5 + 0.5 * sin(clock * 8);
+        final bubble = Rect.fromLTWH(p.dx - 17, p.dy - t * 0.98, 34, 15);
+        box(c, bubble.left, bubble.top, bubble.width, bubble.height,
+            pulse > 0.5 ? 0xFFFFD166 : 0xFFF0963A);
+        labelIn(c, '탭!', bubble, size: 11, color: const Color(0xFF2A2438));
+      } else if (cu.state != 2 &&
+          cu.patience / Cfg.patience < Cfg.alertAngry) {
+        label(c, '!', p.dx - 3, p.dy - t * 0.98,
+            size: 14, color: const Color(0xFFE5484D));
+      }
       if (cu.state != 2) {
         final ratio = (cu.patience / Cfg.patience).clamp(0.0, 1.0);
         box(c, p.dx - 12, p.dy + t * 0.34, 24, 3, 0xFF2A2438);

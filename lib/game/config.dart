@@ -97,4 +97,13 @@ class Cfg {
   ];
 
   static const List<int> speeds = [1, 3, 10];
+
+  // ---- 직접 개입 ----
+  static const int tapBonus = 10; // 내 자리에서 손님을 직접 탭해 접수하면 받는 보너스(원)
+  static const double alertAngry = 0.3; // 인내심이 이 비율 아래면 '화난 손님'
+  static const double alertTired = 0.25; // 체력이 이 비율 아래면 '지친 직원' (자동 휴식은 0.15)
+  static const double sootheTo = 0.7; // 달래면 인내심이 이 비율까지 회복
+  static const double sootheCooldown = 20; // 달래기 재사용 대기(게임 초)
+  static const int snackCost = 200; // 간식 비용(원)
+  static const double snackRestore = 0.4; // 간식으로 회복하는 체력 비율
 }
