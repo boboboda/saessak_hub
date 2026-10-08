@@ -150,5 +150,19 @@
   "staff_f_walk": {
     "animation_group_id": "802e159b-36b2-4513-ae10-b780d01761e3",
     "for_character": "496caf53-8f80-4c05-b3aa-3fbce88733cc"
+  },
+  "staff_g_base": {
+    "character_id": "817630c7-9244-4b17-85c9-f16febebdd11"
+  },
+  "staff_g_walk": {
+    "animation_group_id": "ad8b766b-1ef3-4f5c-a50e-e28b8f57d7a9",
+    "for_character": "817630c7-9244-4b17-85c9-f16febebdd11"
+  },
+  "staff_h_base": {
+    "character_id": "25c8cde9-0b8a-4a6a-acd1-9c0a09f5c601"
+  },
+  "staff_h_walk": {
+    "animation_group_id": "aa2303ba-03ba-4ff5-8e26-4412619036bf",
+    "for_character": "25c8cde9-0b8a-4a6a-acd1-9c0a09f5c601"
   }
 }
