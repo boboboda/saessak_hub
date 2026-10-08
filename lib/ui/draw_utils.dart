@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
+final Paint _fill = Paint();
+final Paint _stroke = Paint()..style = PaintingStyle.stroke;
+
 void box(Canvas c, double x, double y, double bw, double bh, int color) {
-  c.drawRect(Rect.fromLTWH(x, y, bw, bh), Paint()..color = Color(color));
+  _fill.color = Color(color);
+  c.drawRect(Rect.fromLTWH(x, y, bw, bh), _fill);
 }
 
 void strokeBox(Canvas c, Rect r, int color, double width) {
-  c.drawRect(
-      r,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = width
-        ..color = Color(color));
+  _stroke
+    ..strokeWidth = width
+    ..color = Color(color);
+  c.drawRect(r, _stroke);
 }
 
 // 글자 레이아웃은 비싸서 같은 글자는 한 번만 계산해 재사용한다.

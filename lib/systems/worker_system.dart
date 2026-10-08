@@ -28,11 +28,10 @@ extension WorkerSystem on HubGame {
       _abortLoad(c);
       return;
     }
-    if (!c.carrying) {
-      p.reserved = false;
-      final d = c.dst;
-      if (d != null && buildings.contains(d)) _release(d);
-    }
+    // 든 채로 빠져도 목적지 예약은 반드시 풀어야 한다 (안 풀면 선반·포장대가 영구히 막힘)
+    final d = c.dst;
+    if (d != null && buildings.contains(d)) _release(d);
+    if (!c.carrying) p.reserved = false;
     _clear(c);
   }
 

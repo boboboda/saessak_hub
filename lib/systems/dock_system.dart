@@ -38,10 +38,13 @@ extension DockSystem on HubGame {
       if (!regionOpen[r]) continue;
       final rt = routes[r];
       if (!rt.on) continue;
-      final n = regionStock(r);
+      final n = _availStock(r); // 이미 운반 예약된 택배는 빼고 센다
       if (n <= 0) continue;
       // 허브 도크에는 간선 대형 트럭만 온다 (동네 배송 차량은 지역센터 단계)
-      if (n < Cfg.hubTruckMin) continue;
+      // 선반이 거의 찼으면 적은 양이라도 트럭을 불러 비운다 (허브가 막히지 않게)
+      final shelfCap = ofType('shelf').fold<int>(0, (a, b) => a + b.cap);
+      final crowded = shelfCap > 0 && totalStored >= shelfCap * 0.8;
+      if (n < (crowded ? 1 : Cfg.hubTruckMin)) continue;
       final u = freeTrunk(r);
       if (u == null) continue; // 이 노선에 배정된 놀고 있는 대형 트럭이 없음
       final VehicleType t = Cfg.vehicles[0];

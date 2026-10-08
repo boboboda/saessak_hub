@@ -592,9 +592,6 @@ class _MapPainter extends CustomPainter {
       Offset(x.floorToDouble() + 0.5, y.floorToDouble() + 0.5);
 
   static List<Offset> _trunkPath(int r) {
-    const e = [
-      [3.6, 10.5, 9.8, 10.5],
-    ];
     // 지역마다 멀수록 길이 꼬불꼬불 길어진다
     final List<List<double>> w;
     switch (r) {
@@ -613,7 +610,6 @@ class _MapPainter extends CustomPainter {
       default:
         w = [[3.6, 10.5], [4.4, 10.5], [4.4, 2.5], [6, 2.5], [6, 12.9], [7.6, 12.9], [7.6, 2.5], [8.8, 2.5], [8.8, 10.5], [9.8, 10.5]];
     }
-    assert(e.isNotEmpty);
     return [for (final p in w) _n(p[0], p[1])];
   }
 
@@ -755,7 +751,8 @@ class _MapPainter extends CustomPainter {
         _tile(c, Sprites.grass, x, y, 4, v, const Color(0xFF69A857));
       }
     }
-    // 2) 길: 도로 + 인도
+    // 2) 길: 허브 앞 마당 + 인도 + 도로
+    _yard(c, Rect.fromLTRB(3.0, 9.0, 4.0, 12.0));
     for (final key in l.walkCells) {
       _tile(c, Sprites.sidewalk, key % 100, key ~/ 100, 1, 0, const Color(0xFFB9B5A8));
     }
@@ -763,8 +760,6 @@ class _MapPainter extends CustomPainter {
       _tile(c, Sprites.asphalt, key % 100, key ~/ 100, 1, 0, const Color(0xFF3A3A48));
     }
     _roadMarks(c, l.trunk);
-    // 센터 앞 짐 내리는 자리 / 허브 마당
-    _yard(c, Rect.fromLTRB(3.0, 9.0, 4.0, 12.0));
 
     // 3) 세워진 것들을 아래쪽 순서대로 그림 (앞에 있는 게 위에 오도록)
     final items = <_Item>[];

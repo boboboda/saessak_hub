@@ -161,7 +161,7 @@ class HubGame extends FlameGame {
     }
     final minY = -insetTop;
     final maxY = worldH - size.y + insetBottom;
-    y = y.clamp(minY, maxY).toDouble();
+    y = maxY < minY ? (minY + maxY) / 2 : y.clamp(minY, maxY).toDouble();
     cam = Offset(x, y);
   }
 

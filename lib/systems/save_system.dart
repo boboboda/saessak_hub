@@ -36,8 +36,8 @@ extension SaveSystem on HubGame {
             'sk': u.skill,
             'lv': u.level,
             'rg': u.region,
-            // 운행 중 상태는 저장하지 않고, 불러오면 대기로 돌아감 (택배는 센터에 반환)
-            'cg': u.state == 1 && u.isTrunk ? u.cargo : 0,
+            // 운행 중 상태는 저장하지 않고 불러오면 대기로 돌아감. 싣고 가던 택배는 지역센터에 도착한 것으로 처리
+            'cg': u.state == 1 ? u.cargo : _dockLoaded(u),
           }
       ],
       'claimed': claimed.toList(),
@@ -87,6 +87,15 @@ extension SaveSystem on HubGame {
   }
 
   /// 저장된 게임을 불러옴. 저장이 없거나 깨졌으면 false (새 게임)
+  /// 도크에서 싣는 중인 트럭의 택배 수 (저장 때 잃지 않도록)
+  int _dockLoaded(FleetUnit u) {
+    for (final b in buildings) {
+      final v = b.vehicle;
+      if (v != null && v.unit == u) return v.loaded;
+    }
+    return 0;
+  }
+
   Future<bool> loadGame() async {
     try {
       final p = await SharedPreferences.getInstance();

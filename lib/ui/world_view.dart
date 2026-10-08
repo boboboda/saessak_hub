@@ -7,6 +7,7 @@ import '../game/hub_game.dart';
 import '../game/scenery.dart';
 import '../game/sprites.dart';
 import '../models/building.dart';
+import '../models/customer.dart';
 import '../models/staff.dart';
 import 'draw_utils.dart';
 
@@ -31,8 +32,8 @@ extension WorldView on HubGame {
   void _drawPaths(Canvas c) {
     const t = Cfg.tile;
     for (final r in [...Scenery.paths, entrancePath]) {
-      for (var y = r.top.toInt(); y < r.bottom.toInt(); y++) {
-        for (var x = r.left.toInt(); x < r.right.ceil(); x++) {
+      for (var y = max(r.top.toInt(), y0Of(this)); y < min(r.bottom.toInt(), y1Of(this)); y++) {
+        for (var x = max(r.left.toInt(), x0Of(this)); x < min(r.right.ceil(), x1Of(this)); x++) {
           if (!Sprites.drawTile(c, Sprites.sidewalk, x * t, y * t, t)) {
             box(c, x * t, y * t, t, t, 0xFFB9B5A8);
           }
@@ -94,6 +95,12 @@ extension WorldView on HubGame {
     }
 
     c.restore();
+    // 오래된 표정 기록 정리 (사라진 손님·직원)
+    if (_faces.length > 64) {
+      _faces.removeWhere((k, _) =>
+          (k is Customer && !customers.contains(k)) ||
+          (k is Staff && !staff.contains(k)));
+    }
   }
 
   // ---------------- 도로 + 도크 마당 (창고 오른쪽 벽 바깥) ----------------
@@ -102,13 +109,13 @@ extension WorldView on HubGame {
 
     // 도로 (아스팔트 + 중앙 점선) + 오른쪽 인도
     final rd = _px(Cfg.road);
-    for (var ty = 0; ty < Cfg.rows; ty++) {
+    for (var ty = y0Of(this); ty < y1Of(this); ty++) {
       for (var tx = Cfg.road.left.toInt(); tx < Cfg.road.right.toInt(); tx++) {
         if (!Sprites.drawTile(c, Sprites.asphalt, tx * t, ty * t, t)) {
           box(c, tx * t, ty * t, t, t, 0xFF3A3A48);
         }
       }
-      for (var tx = Cfg.road.right.toInt(); tx < Cfg.cols; tx++) {
+      for (var tx = Cfg.road.right.toInt(); tx < x1Of(this); tx++) {
         if (!Sprites.drawTile(c, Sprites.sidewalk, tx * t, ty * t, t)) {
           box(c, tx * t, ty * t, t, t, 0xFFB9B5A8);
         }
@@ -159,8 +166,8 @@ extension WorldView on HubGame {
 
     // 창고 바닥
     final a = area;
-    for (var y = a.top.toInt(); y < a.bottom.toInt(); y++) {
-      for (var x = a.left.toInt(); x < a.right.toInt(); x++) {
+    for (var y = max(a.top.toInt(), y0Of(this)); y < min(a.bottom.toInt(), y1Of(this)); y++) {
+      for (var x = max(a.left.toInt(), x0Of(this)); x < min(a.right.toInt(), x1Of(this)); x++) {
         if (!Sprites.drawFloor(c, x * t, y * t, t)) {
           box(c, x * t, y * t, t, t,
               (x + y) % 2 == 0 ? 0xFFE3D5B8 : 0xFFDCCDAE);

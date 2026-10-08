@@ -149,6 +149,11 @@ extension BuildSystem on HubGame {
     final refund = b.type.cost ~/ 2;
     money += refund;
     this.releaseCrew(b);
+    final dv = b.vehicle; // 도크를 철거하면 싣던 택배는 지역센터로 보내고 트럭은 풀어줌
+    if (dv != null) {
+      centerStock[dv.region] += dv.loaded;
+      dv.unit?.state = 0;
+    }
     buildings.remove(b);
     if (b.mine) {
       for (final o in ofType('counter')) {

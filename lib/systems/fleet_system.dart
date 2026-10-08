@@ -80,6 +80,11 @@ extension FleetSystem on HubGame {
       showToast('운행이 끝나면 바꿀 수 있어요');
       return;
     }
+    final left = u.isTrunk ? trunkCount(u.region) : courierCount(u.region);
+    if (left <= 1) {
+      showToast('이 노선의 마지막 ${u.name}라 옮길 수 없어요');
+      return;
+    }
     for (var k = 1; k <= regionOpen.length; k++) {
       final r = (u.region + k) % regionOpen.length;
       if (regionOpen[r]) {

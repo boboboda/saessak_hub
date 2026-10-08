@@ -9,8 +9,9 @@ extension FlowSystem on HubGame {
   void spawnCustomer() {
     final open = <int>[
       for (var i = 0; i < regionOpen.length; i++)
-        if (regionOpen[i]) i
+        if (regionOpen[i] && routes[i].on) i
     ];
+    if (open.isEmpty) return; // 켜진 노선이 없으면 손님도 오지 않음
     final cu = Customer(exitPoint, open[rnd.nextInt(open.length)]);
     cu.look = rnd.nextInt(6);
     final r = rnd.nextDouble();
