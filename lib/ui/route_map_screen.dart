@@ -665,7 +665,8 @@ class _MapPainter extends CustomPainter {
     // 장식: 길·건물이 없는 빈 곳에 나무·덤불·꽃·가로등을 흩뿌림 (지역마다 다른 모양)
     final rnd = Random(r * 977 + 13);
     final blocked = <Rect>[
-      hubR.inflate(0.3),
+      // 허브: 지붕 위와, 앞에서 대형 트럭이 기다리는 자리까지 비움
+      Rect.fromLTRB(hubR.left - 0.3, hubR.top - 0.8, hubR.right + 3.0, hubR.bottom + 1.4),
       // 센터 건물: 위로 넘치는 지붕·이름표와, 앞(아래)에 선 나무가 건물을 가리는 자리까지 비움
       Rect.fromLTRB(centerR.left - 0.6, centerR.top - 1.4, centerR.right + 0.4, centerR.bottom + 1.6),
       for (final h in houseFoot)
@@ -874,6 +875,14 @@ class _MapPainter extends CustomPainter {
   }
 
   void _hub(Canvas c) {
+    final img = Sprites.hub;
+    if (img != null) {
+      // 허브는 칸보다 조금 크게, 바닥은 앞(y 13)에서 기다리는 대형 트럭 지붕선 위에 맞춰 도크 문이 보이게
+      _buildingSprite(c, img, Rect.fromLTRB(0.1, 7.6, 3.5, 11.9),
+          '허브', C.accent, Colors.white,
+          center: true);
+      return;
+    }
     final r = _pr(hubR);
     // 그림자
     c.drawRect(r.shift(Offset(t * 0.15, t * 0.15)), Paint()..color = const Color(0x33000000));
@@ -896,7 +905,14 @@ class _MapPainter extends CustomPainter {
     final col = Color(Cfg.regionColor[sel]);
     final img = Sprites.centers[sel];
     if (img != null) {
-      _centerSprite(c, img, open, col);
+      _buildingSprite(
+          c,
+          img,
+          Rect.fromLTRB(centerR.left, centerR.top - 0.8, centerR.right, centerR.bottom),
+          '${Cfg.regionName[sel]} 센터',
+          open ? col : const Color(0xFF8A8799),
+          open ? Colors.black : Colors.white70,
+          grey: !open);
     } else {
       _centerShape(c, r, open, col);
     }
@@ -922,16 +938,19 @@ class _MapPainter extends CustomPainter {
     }
   }
 
-  /// 도트 건물: 센터 칸 왼쪽 아래에 붙이고(도로가 닿게), 위로 조금 넘쳐도 되는 칸 안에 비율 유지로 맞춤
-  void _centerSprite(Canvas c, ui.Image img, bool open, Color col) {
-    final box = _pr(Rect.fromLTRB(centerR.left, centerR.top - 0.8, centerR.right, centerR.bottom));
+  /// 도트 건물: 칸(타일 좌표) 안에 비율 유지로 맞추고 아래에 붙임. 기본은 왼쪽 정렬(센터는 도로가 왼쪽에서 닿음)
+  void _buildingSprite(Canvas c, ui.Image img, Rect tiles, String name, Color tagColor,
+      Color textColor,
+      {bool grey = false, bool center = false}) {
+    final box = _pr(tiles);
     final k = min(box.width / img.width, box.height / img.height);
     final w = img.width * k, h = img.height * k;
-    final dst = Rect.fromLTWH(box.left, box.bottom - h, w, h);
+    final left = center ? box.center.dx - w / 2 : box.left;
+    final dst = Rect.fromLTWH(left, box.bottom - h, w, h);
     c.drawOval(Rect.fromLTWH(dst.left + w * 0.04, dst.bottom - t * 0.22, w * 0.96, t * 0.4),
         Paint()..color = const Color(0x33000000));
     final p = Paint()..filterQuality = FilterQuality.none;
-    if (!open) {
+    if (grey) {
       p.colorFilter = const ColorFilter.matrix(<double>[
         0.25, 0.45, 0.1, 0, 10, //
         0.25, 0.45, 0.1, 0, 10, //
@@ -943,9 +962,9 @@ class _MapPainter extends CustomPainter {
     // 이름표 (지붕 위)
     final tp = TextPainter(
       text: TextSpan(
-          text: '${Cfg.regionName[sel]} 센터',
+          text: name,
           style: TextStyle(
-              color: open ? Colors.black : Colors.white70,
+              color: textColor,
               fontSize: max(9.0, t * 0.48),
               fontWeight: FontWeight.w900)),
       textDirection: TextDirection.ltr,
@@ -955,7 +974,7 @@ class _MapPainter extends CustomPainter {
         width: tp.width + t * 0.5,
         height: tp.height + t * 0.12);
     c.drawRRect(RRect.fromRectAndRadius(tag, Radius.circular(t * 0.2)),
-        Paint()..color = open ? col : const Color(0xFF8A8799));
+        Paint()..color = tagColor);
     tp.paint(c, Offset(tag.center.dx - tp.width / 2, tag.center.dy - tp.height / 2));
   }
 

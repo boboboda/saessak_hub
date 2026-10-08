@@ -23,6 +23,7 @@ class Sprites {
 
   /// 노선 지도 지역센터 건물 (assets/sprites/map/center_<지역>.png). 없으면 null → 도형으로 그림.
   static final List<ui.Image?> centers = List.filled(5, null);
+  static ui.Image? hub; // 노선 지도 허브 외관
 
   /// 배경 장식 도트 (assets/sprites/decor/<이름>.png). 없는 건 null.
   static final Map<String, ui.Image> decor = {};
@@ -64,6 +65,7 @@ class Sprites {
     asphalt = await _img('assets/sprites/tiles/asphalt.png');
     sidewalk = await _img('assets/sprites/tiles/sidewalk.png');
     yard = await _img('assets/sprites/tiles/yard.png');
+    hub = await _img('assets/sprites/map/hub.png');
     for (var i = 0; i < centers.length; i++) {
       centers[i] = await _img('assets/sprites/map/center_$i.png');
     }

@@ -758,5 +758,13 @@
       "description": "pixel art, black outline, front view, flat orthographic, no perspective, wide large national distribution center building, purple roof, grey corrugated metal walls, three roll-up loading dock doors, conveyor sign, building twice as wide as tall",
       "size": 128
     }
+  },
+  "map_hub": {
+    "endpoint": "/create-1-direction-object",
+    "note": "노선 지도: 허브 외관 (주황 지붕 대형 택배 허브)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, large parcel sorting hub warehouse building, orange roof, cream concrete walls, two big roll-up truck loading dock doors, small office windows on top, logo sign with cardboard box icon, building slightly taller than wide",
+      "size": 128
+    }
   }
 }
