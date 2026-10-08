@@ -702,5 +702,21 @@
       "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, delivery motorcycle scooter with a large rear rack stacked with brown cardboard parcel boxes strapped on, orange body, rider not included",
       "size": 64
     }
+  },
+  "veh_truck_side_empty": {
+    "endpoint": "/create-1-direction-object",
+    "note": "대형 트럭 옆모습: 높은 난간의 빈 짐칸",
+    "body": {
+      "description": "pixel art, black outline, strict side view facing right, flat orthographic, no perspective, no rear view, large white flatbed cargo truck with tall open cargo bed side rails, blue stripe, cab on the right, empty cargo bed, nothing inside",
+      "size": 128
+    }
+  },
+  "veh_truck_side_full": {
+    "endpoint": "/create-1-direction-object",
+    "note": "대형 트럭 옆모습: 상자 가득",
+    "body": {
+      "description": "pixel art, black outline, strict side view facing right, flat orthographic, no perspective, no rear view, large white flatbed cargo truck with tall open cargo bed, bed piled high with stacked brown cardboard parcel boxes, blue stripe, cab on the right",
+      "size": 128
+    }
   }
 }
