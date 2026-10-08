@@ -1,3 +1,5 @@
+import 'fleet.dart';
+
 /// 차량 종류 (택배가 쌓인 양에 맞춰 알아서 온다)
 class VehicleType {
   final String name;
@@ -14,6 +16,8 @@ class VehicleType {
 /// 도크에 서 있는 차량 한 대
 class Vehicle {
   final VehicleType type;
+  final FleetUnit? unit; // 이 도크 차량이 되는 내 대형 트럭
+  final int cap; // 이 트럭의 적재 한도 (레벨 반영)
   final int region; // 이 차량이 가는 지역(택배 색)
   int state = 0; // 0 들어오는 중, 1 싣는 중, 2 떠나는 중
   double t = 0; // 현재 상태 경과 시간(초)
@@ -22,5 +26,5 @@ class Vehicle {
   int loaded = 0;
   int incoming = 0; // 운반 직원이 싣고 오는 중인 수 (예약)
   final double wait; // 더 실을 게 없을 때 기다리는 시간(노선 설정)
-  Vehicle(this.type, this.region, [this.wait = 5]);
+  Vehicle(this.type, this.region, this.cap, [this.wait = 5, this.unit]);
 }

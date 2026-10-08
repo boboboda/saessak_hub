@@ -28,6 +28,7 @@ export '../systems/ops_system.dart';
 export '../systems/save_system.dart';
 export '../systems/guide_system.dart';
 export '../systems/staff_system.dart';
+export '../systems/fleet_system.dart';
 export '../systems/worker_system.dart';
 export '../ui/world_view.dart';
 
@@ -55,7 +56,12 @@ class HubGame extends FlameGame {
   double saveTimer = 0;
   final List<bool> regionOpen = [true, false, false, false, false]; // 열린 배송 지역
   final List<DeliveryRoute> routes = List.generate(5, (_) => DeliveryRoute()); // 지역별 노선 설정
-  final List<Trip> trips = []; // 달리는 중인 차량
+  final List<FleetUnit> fleet = []; // 내 차량들
+  final List<int> centerStock = List.filled(5, 0); // 지역센터에 내려진 택배
+  final List<MapNote> notes = []; // 노선 지도 소식
+  int fame = 0; // 명성 (지역을 여는 조건)
+  int nextUnitId = 1;
+  bool showMap = false; // 전체화면 노선 지도
   final Set<int> claimed = {}; // 보상을 받은 목표
   double fever = 0; // 피버 남은 시간(초)
   double feverCd = Cfg.feverFirst; // 다음 피버까지
@@ -215,6 +221,7 @@ class HubGame extends FlameGame {
     this.updateFlow(d);
     this.updateWorkers(d);
     this.updateDocks(d);
+    this.updateFleet(d);
 
     saveTimer += dt;
     if (saveTimer >= Cfg.autosaveSec) {

@@ -70,7 +70,7 @@ class BuildingSheet extends StatelessWidget {
                     child: Text(
                       b.vehicle == null
                           ? '대형 트럭 대기 중 · 한 지역 택배가 ${Cfg.hubTruckMin}건 이상 쌓이면 와요'
-                          : '${b.vehicle!.type.name} · ${b.vehicle!.loaded}/${b.vehicle!.type.cap}건 적재',
+                          : '${b.vehicle!.type.name} · ${b.vehicle!.loaded}/${b.vehicle!.cap}건 적재',
                       style: Tx.body,
                     ),
                   ),

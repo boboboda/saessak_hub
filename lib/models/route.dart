@@ -5,12 +5,3 @@ class DeliveryRoute {
   double wait = 5; // 더 실을 게 없을 때 기다리는 시간(초). 길수록 꽉 채워 보내기 쉬움
   int prio = 1; // 우선순위 1~3 (여러 노선이 동시에 준비되면 높은 쪽이 먼저)
 }
-
-/// 출발해서 달리는 중인 차량 (지도 표시용)
-class Trip {
-  final int region;
-  final int count;
-  final double dur;
-  double t = 0;
-  Trip(this.region, this.count, this.dur);
-}

@@ -303,7 +303,7 @@ extension WorldView on HubGame {
               final vr = Rect.fromLTWH(vx, vy, vw, vh);
               final drawn = Sprites.containRect(vimg, vr);
               final fimg = Sprites.vehicleFullImg(v.type.name);
-              if (fimg != null && v.loaded >= v.type.cap * 0.6) {
+              if (fimg != null && v.loaded >= v.cap * 0.6) {
                 // 거의 찼으면 상자 가득 실린 그림 (빈 그림과 같은 배율, 바닥·오른쪽 맞춤)
                 final k = drawn.width / vimg.width;
                 final fw = fimg.width * k, fh = fimg.height * k;
@@ -319,19 +319,19 @@ extension WorldView on HubGame {
                 Sprites.drawContain(c, vimg, vr);
                 // 싣은 만큼 짐칸에 상자가 쌓임
                 Sprites.drawCargo(
-                    c, v.type.name, vimg, drawn, v.loaded, v.type.cap);
+                    c, v.type.name, vimg, drawn, v.loaded, v.cap);
               }
               // 구역 색 띠 + 적재 현황 (차량 위쪽)
               box(c, drawn.left + 2, drawn.top - 7, 22, 4,
                   Cfg.regionColor[v.region]);
-              labelIn(c, '${v.loaded}/${v.type.cap}',
+              labelIn(c, '${v.loaded}/${v.cap}',
                   Rect.fromLTWH(drawn.left + 26, drawn.top - 13, 44, 14),
                   size: 11, color: const Color(0xFFFFFFFF));
             } else {
               box(c, vx, vy, vw, vh, Cfg.regionColor[v.region]);
               box(c, vx + vw - vw * 0.25, vy, vw * 0.25, vh, 0xFF3D4466); // 운전석
               strokeBox(c, Rect.fromLTWH(vx, vy, vw, vh), 0xFF2A2438, 2);
-              labelIn(c, '${v.loaded}/${v.type.cap}',
+              labelIn(c, '${v.loaded}/${v.cap}',
                   Rect.fromLTWH(vx, vy, vw * 0.75, vh),
                   size: 11, color: const Color(0xFF2A2438));
             }

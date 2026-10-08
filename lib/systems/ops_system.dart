@@ -43,7 +43,7 @@ extension OpsSystem on HubGame {
 
   // ---- 배송 지역 ----
   bool canUnlockRegion(int i) =>
-      i > 0 && !regionOpen[i] && regionOpen[i - 1] && money >= Cfg.regionUnlock[i];
+      i > 0 && !regionOpen[i] && regionOpen[i - 1] && fame >= Cfg.regionFame[i];
 
   void unlockRegion(int i) {
     if (i <= 0 || regionOpen[i]) return;
@@ -51,12 +51,12 @@ extension OpsSystem on HubGame {
       showToast('앞 지역을 먼저 열어야 해요');
       return;
     }
-    if (money < Cfg.regionUnlock[i]) {
-      showToast('돈이 부족해요');
+    if (fame < Cfg.regionFame[i]) {
+      showToast('명성이 부족해요 (${Cfg.regionFame[i]} 필요)');
       return;
     }
-    money -= Cfg.regionUnlock[i];
     regionOpen[i] = true;
+    grantStarterUnits(i);
     showToast('${Cfg.regionName[i]} 배송 시작! (수익 ×${Cfg.regionPay[i]})');
     ui();
   }

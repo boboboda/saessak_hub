@@ -88,7 +88,7 @@ extension WorkerSystem on HubGame {
     for (final d in ofType('dock')) {
       final v = d.vehicle;
       if (v == null || v.state != 1) continue;
-      if (v.loaded + v.incoming >= v.type.cap) continue;
+      if (v.loaded + v.incoming >= v.cap) continue;
       final dist = (frontOf(d) - c.pos).distance;
       if (dist >= bestD) continue;
       final shelf = _nearest(

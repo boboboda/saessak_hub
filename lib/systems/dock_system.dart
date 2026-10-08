@@ -33,6 +33,7 @@ extension DockSystem on HubGame {
     var bestPrio = 0;
     var most = 0;
     VehicleType? type;
+    FleetUnit? unit;
     for (var r = 0; r < Cfg.regionColor.length; r++) {
       if (!regionOpen[r]) continue;
       final rt = routes[r];
@@ -40,24 +41,24 @@ extension DockSystem on HubGame {
       final n = regionStock(r);
       if (n <= 0) continue;
       // 허브 도크에는 간선 대형 트럭만 온다 (동네 배송 차량은 지역센터 단계)
-      final VehicleType? t = n >= Cfg.hubTruckMin ? Cfg.vehicles[0] : null;
-      if (t == null) continue;
+      if (n < Cfg.hubTruckMin) continue;
+      final u = freeTrunk(r);
+      if (u == null) continue; // 이 노선에 배정된 놀고 있는 대형 트럭이 없음
+      final VehicleType t = Cfg.vehicles[0];
       if (rt.prio > bestPrio || (rt.prio == bestPrio && n > most)) {
         bestPrio = rt.prio;
         most = n;
         region = r;
         type = t;
+        unit = u;
       }
     }
     if (region < 0 || type == null) return null;
-    return Vehicle(type, region, routes[region].wait);
+    unit!.state = 3; // 허브 도크에서 싣는 중
+    return Vehicle(type, region, unit.cap, routes[region].wait, unit);
   }
 
   void updateDocks(double dt) {
-    for (final t in trips) {
-      t.t += dt;
-    }
-    trips.removeWhere((t) => t.t >= t.dur);
     for (final dock in ofType('dock')) {
       final v = dock.vehicle;
       if (v == null) {
@@ -77,24 +78,20 @@ extension DockSystem on HubGame {
           final noStock = _availStock(v.region) == 0 && v.incoming == 0;
           if (v.incoming > 0) v.idle = 0;
           if (noStock) v.idle += dt;
-          if (v.loaded >= v.type.cap ||
+          if (v.loaded >= v.cap ||
               (noStock && v.idle >= v.wait)) {
             v.state = 2;
             v.t = 0;
-            final full = v.loaded >= v.type.cap;
-            final pay = (v.loaded *
-                    Cfg.parcelPay *
-                    v.type.payMul *
-                    Cfg.regionPay[v.region] *
-                    (fever > 0 ? Cfg.feverPay : 1.0) *
-                    (full ? Cfg.fullBonus : 1.0))
-                .round();
-            if (v.loaded > 0) {
-              money += pay;
-              dayEarn += pay;
-              delivered += v.loaded;
-              trips.add(Trip(v.region, v.loaded, Cfg.regionTrip[v.region]));
-              showToast('${Cfg.regionName[v.region]}행 ${v.type.name} 출발! 택배 ${v.loaded}건 +${fmt(pay)}원');
+            final u = v.unit;
+            if (u != null) {
+              if (v.loaded > 0) {
+                u.cargo = v.loaded;
+                u.full = v.loaded >= v.cap;
+                this.startTrunkTrip(u);
+                showToast('${Cfg.regionName[v.region]}행 ${u.driver} 출발! 택배 ${v.loaded}건');
+              } else {
+                u.state = 0; // 실을 게 없어 허브로 돌아감
+              }
             }
           }
           break;

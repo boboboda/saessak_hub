@@ -35,6 +35,7 @@ extension StaffSystem on HubGame {
     fast.carrier = true; // 걸음이 빠른 직원은 처음부터 운반 담당
     staff.add(fast);
     syncCarriers();
+    if (fleet.isEmpty) grantStarterUnits(0); // 기본 차량: 대형 트럭 + 오토바이
   }
 
   /// 새로 설치한 건물에 대기 중인 직원이 있으면 자동으로 한 명 배치

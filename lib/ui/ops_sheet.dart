@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
-import 'route_panel.dart';
 import 'theme.dart';
 
 /// 운영 시트: 피버 타임 / 배송 지역 / 목표
@@ -25,11 +24,32 @@ class OpsSheet extends StatelessWidget {
         children: [
           _fever(),
           const SizedBox(height: 16),
-          RoutePanel(g),
+          CardBox(
+            child: Row(
+              children: [
+                const Icon(Icons.map, color: C.blue, size: 28),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('노선 지도', style: Tx.h2),
+                      Text('명성 ${g.fame} · 차량 ${g.fleet.length}대', style: Tx.sub),
+                    ],
+                  ),
+                ),
+                AppButton('열기', small: true, color: C.blue, onTap: () {
+                  g.closeAll();
+                  g.showMap = true;
+                  g.ui();
+                }),
+              ],
+            ),
+          ),
           const SizedBox(height: 16),
           const Text('배송 지역', style: Tx.h2),
           const SizedBox(height: 4),
-          const Text('지역을 열면 그 지역 택배가 들어오고 수익이 더 커져요', style: Tx.sub),
+          const Text('명성이 쌓이면 새 지역이 열리고 수익이 더 커져요', style: Tx.sub),
           const SizedBox(height: 8),
           for (var i = 0; i < Cfg.regionName.length; i++) ...[
             _region(i),
@@ -104,7 +124,7 @@ class OpsSheet extends StatelessWidget {
           if (open)
             const Pill(Icons.check, '운영 중', color: C.good)
           else
-            AppButton('${g.fmt(Cfg.regionUnlock[i])}원',
+            AppButton('명성 ${Cfg.regionFame[i]}',
                 small: true,
                 color: C.good,
                 onTap: can ? () => g.unlockRegion(i) : null),

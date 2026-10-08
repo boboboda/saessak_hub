@@ -126,6 +126,24 @@ class Cfg {
   static const List<int> regionUnlock = [0, 8000, 25000, 60000, 150000];
   static const List<double> regionPay = [1.0, 1.3, 1.7, 2.2, 3.0]; // 수익 배수
 
+  static const List<int> regionFame = [0, 60, 250, 800, 2000]; // 지역을 여는 데 필요한 명성
+  static const List<double> deliverTime = [8, 12, 16, 22, 28]; // 지역센터→동네 배달 구간(초)
+
+  // ---- 차량(플릿) ----
+  static const List<int> unitCost = [12000, 8000, 3000]; // Cfg.vehicles 순서
+  static const List<String> skillName = ['', '초보', '보통', '숙련', '베테랑', '달인'];
+  static const List<String> driverFirst = ['김', '이', '박', '최', '정', '강', '조', '윤', '한', '오'];
+  static const List<String> driverLast = ['기사', '대리', '반장', '씨', '팀장', '사원'];
+  static const int maxLevel = 5;
+  static int upgradeCost(int type, int level) =>
+      ((unitCost[type] * 0.6) * level * (1 + level * 0.4)).round();
+  static int trainCost(int skill) => 1200 * skill * skill;
+  // 이벤트: 이름, 실패 시 지연(초)
+  static const List<String> evtName = ['교통 정체', '폭우', '타이어 펑크', '분실 위험'];
+  static const List<double> evtDelay = [6, 5, 8, 2];
+  static double evtChance(bool trunk, int region) => trunk ? 0.3 + 0.08 * region : 0.2;
+  static double evtSuccess(int skill) => 0.3 + 0.12 * skill;
+
   static const List<double> regionTrip = [15, 30, 50, 80, 120]; // 노선 지도에서 달리는 시간(초)
   static const List<double> waitOptions = [5, 15, 30];
 

@@ -24,6 +24,22 @@ extension SaveSystem on HubGame {
       'urgentOk': urgentOk,
       'nextStaffId': nextStaffId,
       'regions': regionOpen,
+      'fame': fame,
+      'cstock': centerStock,
+      'nextUnitId': nextUnitId,
+      'fleet': [
+        for (final u in fleet)
+          {
+            'id': u.id,
+            'ty': u.type,
+            'dr': u.driver,
+            'sk': u.skill,
+            'lv': u.level,
+            'rg': u.region,
+            // 운행 중 상태는 저장하지 않고, 불러오면 대기로 돌아감 (택배는 센터에 반환)
+            'cg': u.state == 1 && u.isTrunk ? u.cargo : 0,
+          }
+      ],
       'claimed': claimed.toList(),
       'routes': [
         for (final r in routes)
@@ -141,6 +157,34 @@ extension SaveSystem on HubGame {
           routes[i].prio = m['p'] as int;
         }
       }
+      fame = (j['fame'] as int?) ?? 0;
+      final cs = j['cstock'] as List?;
+      if (cs != null) {
+        for (var i = 0; i < centerStock.length && i < cs.length; i++) {
+          centerStock[i] = cs[i] as int;
+        }
+      }
+      nextUnitId = (j['nextUnitId'] as int?) ?? 1;
+      fleet.clear();
+      final fl = j['fleet'] as List?;
+      if (fl != null) {
+        for (final e in fl) {
+          final m = e as Map<String, dynamic>;
+          final u = FleetUnit(m['id'] as int, m['ty'] as int, m['dr'] as String,
+              m['sk'] as int, m['rg'] as int);
+          u.level = (m['lv'] as int?) ?? 1;
+          final cg = (m['cg'] as int?) ?? 0;
+          if (cg > 0) centerStock[u.region] += cg; // 가던 택배는 센터에 도착한 것으로 처리
+          fleet.add(u);
+          if (u.id >= nextUnitId) nextUnitId = u.id + 1;
+        }
+      }
+      if (fleet.isEmpty) {
+        // 예전 저장: 열린 지역마다 기본 차량 지급
+        for (var i = 0; i < regionOpen.length; i++) {
+          if (regionOpen[i]) grantStarterUnits(i);
+        }
+      }
       claimed
         ..clear()
         ..addAll(((j['claimed'] as List?) ?? const []).map((e) => e as int));
@@ -156,6 +200,7 @@ extension SaveSystem on HubGame {
       debugPrint('불러오기 실패: $e');
       staff.clear();
       buildings.clear();
+      fleet.clear();
       return false;
     }
   }
