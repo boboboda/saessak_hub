@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 import sys
-os_letters = sys.argv[1] if len(sys.argv) > 1 else "bcd"
+os_letters = sys.argv[1] if len(sys.argv) > 1 else "bcdgh"
 ROOT = Path(__file__).resolve().parents[2]
 ORDER = ["south", "west", "east", "north"]
 for n, k in enumerate(os_letters, start=1):
