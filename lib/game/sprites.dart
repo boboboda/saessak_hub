@@ -15,7 +15,7 @@ class Sprites {
   static final List<ui.Image?> custWalk = List.filled(custLooks, null);
   static ui.Image? box;
   static ui.Image? floor;
-  static ui.Image? counter, pack, shelf, van;
+  static ui.Image? counter, pack, shelf, van, truck, moto;
   static ui.Image? grass, asphalt, sidewalk, yard;
   static ui.Image? boxS, boxOpen, packEmpty;
 
@@ -47,6 +47,8 @@ class Sprites {
     pack = await _img('assets/sprites/props/pack.png');
     shelf = await _img('assets/sprites/props/shelf.png');
     van = await _img('assets/sprites/props/van.png');
+    truck = await _img('assets/sprites/props/truck.png');
+    moto = await _img('assets/sprites/props/moto.png');
     boxS = await _img('assets/sprites/props/box_s.png');
     boxOpen = await _img('assets/sprites/props/box_open.png');
     packEmpty = await _img('assets/sprites/props/pack_empty.png'); // 있으면 포장 상자가 동적으로 생김
@@ -174,6 +176,57 @@ class Sprites {
   }
 
   /// 칸 안에 비율을 유지하며 가운데에 맞춘다.
+  /// 차량 종류 이름 → 그림 (없으면 null)
+  static ui.Image? vehicleImg(String typeName) {
+    switch (typeName) {
+      case '대형 트럭':
+        return truck;
+      case '소형 트럭':
+        return van;
+      case '오토바이':
+        return moto;
+    }
+    return null;
+  }
+
+  /// 짐칸 위치 (그림 픽셀 기준): [왼, 위, 오른, 아래, 상자 한 변, 가로 칸 수, 세로 칸 수]
+  static const Map<String, List<double>> cargoSpec = {
+    '대형 트럭': [9, 12, 31, 44, 10, 2, 3],
+    '소형 트럭': [10, 26, 60, 44, 12, 4, 2],
+    '오토바이': [3, 3, 25, 16, 10, 2, 1],
+  };
+
+  /// drawContain 이 실제로 그리는 영역
+  static ui.Rect containRect(ui.Image img, ui.Rect r) {
+    final k = (r.width / img.width) < (r.height / img.height)
+        ? r.width / img.width
+        : r.height / img.height;
+    final w = img.width * k, h = img.height * k;
+    return ui.Rect.fromLTWH(r.center.dx - w / 2, r.center.dy - h / 2, w, h);
+  }
+
+  /// 차량 짐칸에 실린 만큼 상자를 쌓아 그림 (아래 칸부터)
+  static void drawCargo(
+      ui.Canvas c, String typeName, ui.Image img, ui.Rect drawn, int loaded, int cap) {
+    final sp = cargoSpec[typeName];
+    final bx = boxS;
+    if (sp == null || bx == null || loaded <= 0) return;
+    final k = drawn.width / img.width;
+    final cols = sp[5].toInt(), rows = sp[6].toInt();
+    final slots = (loaded / cap * cols * rows).ceil().clamp(1, cols * rows);
+    final side = sp[4] * k;
+    for (var i = 0; i < slots; i++) {
+      final row = i ~/ cols, col = i % cols;
+      final dst = ui.Rect.fromLTWH(drawn.left + sp[0] * k + col * side,
+          drawn.top + sp[3] * k - (row + 1) * side, side, side);
+      c.drawImageRect(
+          bx,
+          ui.Rect.fromLTWH(0, 0, bx.width.toDouble(), bx.height.toDouble()),
+          dst,
+          ui.Paint()..filterQuality = ui.FilterQuality.none);
+    }
+  }
+
   static void drawContain(ui.Canvas c, ui.Image img, ui.Rect r) {
     final k = (r.width / img.width) < (r.height / img.height)
         ? r.width / img.width
