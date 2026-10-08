@@ -73,5 +73,47 @@
   },
   "staff_carry_walk": {
     "animation_group_id": "671f772d-ecab-4444-ac13-521867a30879"
+  },
+  "cust_a_base": {
+    "character_id": "defd8d58-465b-4c2c-b1d6-186806c59eaa"
+  },
+  "cust_a_walk": {
+    "animation_group_id": "e1fbad84-e8d1-456e-b5f3-1eec71edfd5c",
+    "for_character": "defd8d58-465b-4c2c-b1d6-186806c59eaa"
+  },
+  "cust_b_base": {
+    "character_id": "aa8043dc-a6f6-4fc9-b5b3-944ae1833442"
+  },
+  "cust_b_walk": {
+    "animation_group_id": "949f1bcb-a213-4051-bb22-47cf83b1bdc6",
+    "for_character": "aa8043dc-a6f6-4fc9-b5b3-944ae1833442"
+  },
+  "cust_c_base": {
+    "character_id": "ce000dd1-2069-4087-b8b3-a7a06f20a6ce"
+  },
+  "cust_c_walk": {
+    "animation_group_id": "cbe01789-a07a-4cc1-8088-8f5f3f76f5da",
+    "for_character": "ce000dd1-2069-4087-b8b3-a7a06f20a6ce"
+  },
+  "cust_d_base": {
+    "character_id": "6dd11db6-985c-44a9-89bf-476886810af1"
+  },
+  "cust_d_walk": {
+    "animation_group_id": "c5ccf2b7-1897-439a-ba74-363e26d8991f",
+    "for_character": "6dd11db6-985c-44a9-89bf-476886810af1"
+  },
+  "cust_e_base": {
+    "character_id": "569f99ef-7b0b-4f3e-ab0b-b76a28c4bd66"
+  },
+  "cust_e_walk": {
+    "animation_group_id": "de021590-249e-478b-a28f-5d714b5b5bb4",
+    "for_character": "569f99ef-7b0b-4f3e-ab0b-b76a28c4bd66"
+  },
+  "cust_f_base": {
+    "character_id": "595ad63b-7ddc-4417-8bec-efef2ea4c2fc"
+  },
+  "cust_f_walk": {
+    "animation_group_id": "20a85b7d-b62d-4cd4-b79e-cd3b20689a28",
+    "for_character": "595ad63b-7ddc-4417-8bec-efef2ea4c2fc"
   }
 }

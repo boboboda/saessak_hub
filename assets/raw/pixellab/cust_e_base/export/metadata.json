@@ -1,0 +1,36 @@
+{
+  "group_id": "692bb6a5-f631-4018-9064-32f3d123c59f",
+  "states": [
+    {
+      "character": {
+        "id": "569f99ef-7b0b-4f3e-ab0b-b76a28c4bd66",
+        "name": "Idle",
+        "prompt": "elderly woman customer, purple shawl, white curly hair, long skirt, brown shoes, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-08T05:34:55.239449+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-08T05:39:23.806262"
+}

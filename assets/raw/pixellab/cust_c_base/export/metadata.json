@@ -1,0 +1,36 @@
+{
+  "group_id": "e10bfd74-93ac-410b-a514-75341417bdef",
+  "states": [
+    {
+      "character": {
+        "id": "ce000dd1-2069-4087-b8b3-a7a06f20a6ce",
+        "name": "Idle",
+        "prompt": "small child customer, yellow raincoat, red boots, blue backpack, short brown hair, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-08T04:37:05.404248+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-08T04:41:21.410168"
+}

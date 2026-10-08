@@ -1,0 +1,36 @@
+{
+  "group_id": "bd3572df-80bb-41af-bee8-e0b11ab2d20d",
+  "states": [
+    {
+      "character": {
+        "id": "6dd11db6-985c-44a9-89bf-476886810af1",
+        "name": "Idle",
+        "prompt": "office worker man customer, gray suit, red tie, short black hair, carrying nothing, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-08T04:51:33.300902+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-08T04:56:03.497793"
+}
