@@ -221,5 +221,35 @@
   },
   "map_tiles_walk": {
     "tileset_id": "22229594-65d4-41ab-af74-e63a48777008"
+  },
+  "prop_mailbox": {
+    "object_id": "3e597fbb-14f2-4030-9952-11c904060eb9"
+  },
+  "prop_vending": {
+    "object_id": "0ab5364b-d309-4062-aea1-4122994db61a"
+  },
+  "prop_busstop": {
+    "object_id": "739910bb-4ccb-49fc-9fe4-0ed28bd3adc1"
+  },
+  "prop_billboard": {
+    "object_id": "2b60f44e-5f19-4521-83c8-0d38be9cbad9"
+  },
+  "prop_haystack": {
+    "object_id": "37e48d78-fcc9-4819-a021-7a2fba4dc46b"
+  },
+  "prop_fence": {
+    "object_id": "8c95dda5-c5eb-45e0-8c6b-209b60edd554"
+  },
+  "prop_crops": {
+    "object_id": "3e7225d1-0f83-430e-b2a1-6cda925ff93b"
+  },
+  "prop_fountain": {
+    "object_id": "31449601-a06b-4749-8017-30d5220c264c"
+  },
+  "prop_gas": {
+    "object_id": "3e59d2a3-bab7-47a0-b09f-a46ee5ee2ff4"
+  },
+  "prop_hwsign": {
+    "object_id": "2dcef405-1919-405d-bc1b-56d0cbc8f846"
   }
 }

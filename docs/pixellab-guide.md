@@ -51,6 +51,8 @@ Base URL `https://api.pixellab.ai/v2`, 헤더 `Authorization: Bearer <token>`. �
 - **"top-down"이라고 써도 3/4 쿼터뷰(비스듬)로 나온다.** 정면이 필요하면 `front view, straight on, symmetrical`을 명시 (선반이 대각선으로 나와서 정면으로 다시 뽑음).
 - 한 가지만 그리도록 구체적으로: `empty ... nothing on the shelves`, `single closed cardboard box` 등.
 - **바닥 타일(seamless tile)은 이 엔드포인트로 안 된다** (조각난 타일이 나옴). 바닥/잔디/아스팔트는 **직접 코드(PIL)로 절차 생성**했다 (`assets/sprites/tiles/*.png`).
+- 이음매 있는 땅 타일은 **`POST /create-tileset`** 으로 만든다 (Wang 코너 16장, 1건 약 2~4회로 저렴). `lower_description`/`upper_description`, `tile_size{32,32}`, `view: high top-down`, `outline/shading/detail`은 정해진 문자열(openapi 참고). 결과 이미지는 작업 응답이 아니라 `GET /tilesets/{tileset_id}`에 있다 → 스크립트가 `tileset.json`으로 저장, `tools/pixellab/tileset_sheet.py`로 코너 번호(NW*8+NE*4+SW*2+SE) 순 시트로 변환. 색이 튀면 `lower_reference_image`/`upper_reference_image`에 기존 타일을 넣으면 톤이 맞는다.
+- 64 크기 오브젝트 후보 중 일부는 **옆 후보 조각이 캔버스 가장자리에 붙어** 온다 → 빈 열로 나뉜 덩어리 중 가장 넓은 것만 남기고 자른다.
 - 배경이 투명 PNG로 오며, 후보 이미지는 캔버스에 여백이 있다 → **bbox로 잘라서(`im.crop(im.getbbox())`) 저장**.
 - 캐릭터는 한 번 만든 `character_id`를 기준으로 애니메이션을 붙여야 외형이 일관된다.
 

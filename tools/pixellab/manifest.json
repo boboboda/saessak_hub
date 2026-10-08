@@ -856,5 +856,85 @@
         "format": "png"
       }
     }
+  },
+  "prop_mailbox": {
+    "endpoint": "/create-1-direction-object",
+    "note": "동네 소품: 빨간 우체통",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single small red post mailbox on a short pole",
+      "size": 64
+    }
+  },
+  "prop_vending": {
+    "endpoint": "/create-1-direction-object",
+    "note": "동네 소품: 음료 자판기",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single drink vending machine, bright front panel with bottles",
+      "size": 64
+    }
+  },
+  "prop_busstop": {
+    "endpoint": "/create-1-direction-object",
+    "note": "시내 소품: 버스 정류장",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single small city bus stop shelter with bench and roof, sign pole",
+      "size": 64
+    }
+  },
+  "prop_billboard": {
+    "endpoint": "/create-1-direction-object",
+    "note": "시내 소품: 광고판",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single roadside billboard on two posts, colorful advertisement",
+      "size": 64
+    }
+  },
+  "prop_haystack": {
+    "endpoint": "/create-1-direction-object",
+    "note": "근교 소품: 건초 더미",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single round golden hay bale",
+      "size": 64
+    }
+  },
+  "prop_fence": {
+    "endpoint": "/create-1-direction-object",
+    "note": "근교 소품: 나무 울타리",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, short wooden farm fence segment, three posts, horizontal rails",
+      "size": 64
+    }
+  },
+  "prop_crops": {
+    "endpoint": "/create-1-direction-object",
+    "note": "근교 소품: 채소 밭",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, small vegetable garden patch, rows of green cabbages on brown soil",
+      "size": 64
+    }
+  },
+  "prop_fountain": {
+    "endpoint": "/create-1-direction-object",
+    "note": "타도시 소품: 분수",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single small stone plaza water fountain with blue water",
+      "size": 64
+    }
+  },
+  "prop_gas": {
+    "endpoint": "/create-1-direction-object",
+    "note": "전국 소품: 주유소",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, small highway gas station with canopy roof and two fuel pumps",
+      "size": 128
+    }
+  },
+  "prop_hwsign": {
+    "endpoint": "/create-1-direction-object",
+    "note": "전국 소품: 고속도로 표지판",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single green highway direction sign on two posts, white arrow",
+      "size": 64
+    }
   }
 }

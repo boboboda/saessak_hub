@@ -762,6 +762,35 @@ class _MapPainter extends CustomPainter {
     ['d6', 'v2', 'd4', 'house1', 'd9', 'v0'], // 전국
   ];
 
+  /// 지역별 소품 ('p:이름'은 assets/sprites/map/prop_<이름>.png, 나머지는 장식 폴더)
+  static const List<List<String>> roadside = [
+    ['lamp', 'p:mailbox', 'lamp', 'bench'], // 동네
+    ['lamp', 'p:busstop', 'light', 'p:billboard'], // 시내
+    ['p:fence', 'lamp', 'p:haystack', 'p:fence'], // 근교
+    ['lamp', 'p:billboard', 'light', 'sign'], // 타도시
+    ['p:hwsign', 'lamp', 'lamp', 'p:billboard'], // 전국
+  ];
+  static const List<List<String>> townProps = [
+    ['p:mailbox', 'p:vending', 'bench', 'flower'],
+    ['p:vending', 'bench', 'lamp', 'p:busstop'],
+    ['p:crops', 'p:haystack', 'p:crops', 'p:fence'],
+    ['bench', 'lamp', 'p:vending', 'flower'],
+    ['p:vending', 'lamp', 'bench', 'p:mailbox'],
+  ];
+  static const List<List<String>> decorKinds = [
+    ['tree', 'tree2', 'bush', 'flower', 'tree', 'bush', 'tree'],
+    ['tree2', 'bush', 'bush', 'flower', 'tree', 'lamp'],
+    ['tree', 'tree', 'tree2', 'bush', 'flower', 'tree'],
+    ['tree2', 'bush', 'flower', 'tree', 'bush'],
+    ['tree', 'tree2', 'bush', 'tree', 'flower', 'bush'],
+  ];
+
+  /// 소품 배율 (64 캔버스로 뽑아 원본이 커서 집 크기에 맞게 줄임)
+  static const Map<String, double> propScale = {
+    'mailbox': 0.55, 'vending': 0.6, 'busstop': 0.85, 'billboard': 0.8, 'haystack': 0.5,
+    'fence': 0.6, 'crops': 0.9, 'fountain': 0.9, 'hwsign': 0.75, 'gas': 1.0,
+  };
+
   static final Map<int, _Layout> _cache = {};
 
   static _Layout layout(int r) {
@@ -866,7 +895,64 @@ class _MapPainter extends CustomPainter {
       return true;
     }
 
-    const kinds = ['tree', 'tree2', 'bush', 'flower', 'tree', 'bush', 'tree'];
+    // 크기가 있는 소품: 차지하는 칸에 길·건물·다른 장식이 없을 때만 놓음
+    bool place(String key, double x, double y, {double w = 1.0, double h = 1.0, int pad = 1}) {
+      for (var cy = (y - h).floor(); cy <= y.floor(); cy++) {
+        for (var cx = (x - w / 2).floor() - pad; cx <= (x + w / 2).floor() + pad; cx++) {
+          if (l.at(cx, cy) != 0 || cy < 1 || cy >= gh) return false;
+        }
+      }
+      final area = Rect.fromLTRB(x - w / 2, y - h, x + w / 2, y);
+      for (final b in blocked) {
+        if (b.overlaps(area)) return false;
+      }
+      for (final d in l.decor) {
+        if ((d.x - x).abs() < (w + 1) / 2 && (d.y - y).abs() < 0.9) return false;
+      }
+      l.decor.add(_Dec(key, x, y));
+      return true;
+    }
+
+    if (r == 4) {
+      // 간선 가운데쯤, 위쪽 굽이 아래(두 세로 구간 사이)에 주유소
+      for (var i = pts.length ~/ 2; i + 1 < pts.length; i++) {
+        final a = pts[i], b = pts[i + 1];
+        if (a.dy != 4 || b.dy != 4) continue;
+        if (place('p:gas', (a.dx + b.dx) / 2, 9.0, w: 3.4, h: 3.2, pad: 0)) break;
+      }
+    }
+    // 간선 도로변: 6칸마다 가로등·지역 소품 (가로 구간은 길 위쪽, 세로 구간은 길 오른쪽)
+    final road = roadside[r % roadside.length];
+    var ri = 0;
+    for (var i = 0; i + 1 < pts.length; i++) {
+      final a = pts[i], b = pts[i + 1];
+      final len = (b - a).distance;
+      for (var d = 3.0; d < len - 1; d += 6) {
+        final q = Offset.lerp(a, b, d / len)!;
+        final key = road[ri % road.length];
+        final ok = a.dy == b.dy ? place(key, q.dx, q.dy - 1.15) : place(key, q.dx + 2.8, q.dy + 0.5);
+        if (ok) ri++;
+      }
+    }
+    // 동네: 골목 아래쪽(집 건너편) 4칸마다 생활 소품
+    final town = townProps[r % townProps.length];
+    var ti = 0;
+    for (final st in streets) {
+      for (var x = l.mx + 3.0; x < gw - 1.5; x += 4) {
+        if (place(town[ti % town.length], x, st + 2.2)) ti++;
+      }
+    }
+    // 지역 특색: 근교 들판의 밭·건초, 타도시 동네 광장 분수, 전국 도로변 주유소
+    if (r == 2) {
+      for (var k = 0; k < 40; k++) {
+        place(rnd.nextBool() ? 'p:crops' : 'p:haystack', 2 + rnd.nextDouble() * (cx0 - 4),
+            3 + rnd.nextDouble() * (gh - 4),
+            w: 1.8);
+      }
+    }
+    if (r == 3) place('p:fountain', l.mx + (gw - l.mx) / 2, 18.2, w: 2.0, h: 1.6);
+
+    final kinds = decorKinds[r % decorKinds.length];
     final want = gw * gh ~/ 11;
     var tries = 0;
     while (l.decor.length < want && tries < want * 25) {
@@ -876,6 +962,8 @@ class _MapPainter extends CustomPainter {
       if (!free(x, y)) continue;
       l.decor.add(_Dec(kinds[rnd.nextInt(kinds.length)], x, y));
     }
+    // 아래쪽 순서로 그릴 때 매번 정렬하지 않아도 되게 미리 정렬
+    l.decor.sort((a, b) => a.y.compareTo(b.y));
     _cache[r] = l;
     return l;
   }
@@ -1078,7 +1166,12 @@ class _MapPainter extends CustomPainter {
   }
 
   void _decor(Canvas c, _Dec d) {
-    final img = Sprites.decor[d.key];
+    final img = d.key.startsWith('p:') ? Sprites.mapProps[d.key.substring(2)] : Sprites.decor[d.key];
+    if (img == null && d.key.startsWith('p:')) return; // 소품 그림이 없으면 생략
+    if (img != null && d.key.startsWith('p:')) {
+      _sprite(c, img, d.x, d.y, propScale[d.key.substring(2)] ?? 1);
+      return;
+    }
     if (img == null) {
       c.drawCircle(_px(Offset(d.x, d.y - 0.5)), t * 0.4, Paint()..color = const Color(0xFF2F6B35));
       return;
