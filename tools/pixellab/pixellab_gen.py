@@ -53,6 +53,12 @@ def call(method, path, body=None, raw=False, ok409=False):
             msg = e.read().decode(errors="replace")
             if e.code == 409 and ok409:
                 return {"_conflict": msg}
+            if e.code >= 500 and method == "GET" and attempt < 2:
+                # 파일 서버 일시 오류(520 등): 읽기 요청만 다시 시도
+                last = f"HTTP {e.code}"
+                print(f"  (서버 일시 오류 {e.code}, 다시 시도 {attempt + 1}/3)")
+                time.sleep(4)
+                continue
             sys.exit(f"[HTTP {e.code}] {method} {path}\n{msg[:2000]}")
         except (TimeoutError, urllib.error.URLError, ConnectionError, OSError) as e:
             last = e
