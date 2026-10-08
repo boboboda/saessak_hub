@@ -78,14 +78,15 @@ class Sprites {
 
   /// 손님/행인 한 명. 전용 시트가 있으면 그것을, 없으면 직원 시트를 색만 바꿔 그림.
   static void drawPerson(ui.Canvas c, double x, double y, int dir, bool moving,
-      double clock, int look,
-      {double size = 52}) {
+      double clock, int look) {
     final own = custWalk[look % custLooks];
     final img = own ?? staffWalk;
     if (img == null) return;
+    // 시트마다 한 칸 크기가 다를 수 있어 가로 7칸 기준으로 계산 (1:1 크기로 그림)
+    final cw = img.width / frames, ch = img.height / 4;
     final f = moving ? 1 + (clock * 9 + look * 3).floor() % (frames - 1) : 0;
-    final src = ui.Rect.fromLTWH(f * cell, dir * cell, cell, cell);
-    final dst = ui.Rect.fromLTWH(x - size / 2, y - size * 0.86, size, size);
+    final src = ui.Rect.fromLTWH(f * cw, dir * ch, cw, ch);
+    final dst = ui.Rect.fromLTWH(x - cw / 2, y - ch * 0.86, cw, ch);
     final p = ui.Paint()..filterQuality = ui.FilterQuality.none;
     if (own == null) {
       const hues = [70.0, 140.0, 200.0, 260.0, 310.0, 30.0];
