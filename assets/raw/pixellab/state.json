@@ -182,5 +182,11 @@
   },
   "veh_moto_full": {
     "object_id": "9e8c5bfe-7b1f-4cec-846b-6b5c9a28ac91"
+  },
+  "veh_truck_side_empty": {
+    "object_id": "7906cd65-57fd-4fae-9da9-a15ced9cf03c"
+  },
+  "veh_truck_side_full": {
+    "object_id": "87ebf6bc-f469-4c9c-bf7b-cd07965ba7c1"
   }
 }
