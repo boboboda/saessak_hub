@@ -16,6 +16,7 @@ class Sprites {
   static ui.Image? box;
   static ui.Image? floor;
   static ui.Image? counter, pack, shelf, van, truck, moto;
+  static final ui.Paint _np = ui.Paint()..filterQuality = ui.FilterQuality.none;
   static ui.Image? vanFull, truckFull, motoFull; // 상자 가득 찬 모습 (없으면 null)
   static ui.Image? grass, asphalt, sidewalk, yard;
   static ui.Image? boxS, boxOpen, packEmpty;
@@ -142,7 +143,7 @@ class Sprites {
         img,
         ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
         r,
-        ui.Paint()..filterQuality = ui.FilterQuality.none);
+        _np);
     final s = r.width * 0.3;
     c.drawRect(ui.Rect.fromLTWH(r.center.dx - s / 2, r.center.dy - s * 0.1, s, s * 0.8),
         ui.Paint()..color = ui.Color(stickerColor));
@@ -157,7 +158,7 @@ class Sprites {
         img,
         ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
         ui.Rect.fromLTWH(x, y, t, t),
-        ui.Paint()..filterQuality = ui.FilterQuality.none);
+        _np);
     return true;
   }
 
@@ -240,7 +241,7 @@ class Sprites {
           bx,
           ui.Rect.fromLTWH(0, 0, bx.width.toDouble(), bx.height.toDouble()),
           dst,
-          ui.Paint()..filterQuality = ui.FilterQuality.none);
+          _np);
     }
   }
 
@@ -258,7 +259,7 @@ class Sprites {
         img,
         ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
         dst,
-        ui.Paint()..filterQuality = ui.FilterQuality.none);
+        _np);
   }
 
   /// 32x32 바닥 한 칸. variants>1이면 가로로 이어진 시트에서 v번째를 그림.
@@ -270,7 +271,7 @@ class Sprites {
         img,
         ui.Rect.fromLTWH(w * v, 0, w, img.height.toDouble()),
         ui.Rect.fromLTWH(x, y, t, t),
-        ui.Paint()..filterQuality = ui.FilterQuality.none);
+        _np);
     return true;
   }
 
@@ -282,7 +283,7 @@ class Sprites {
         img,
         ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
         ui.Rect.fromLTWH(x, y, img.width.toDouble(), img.height.toDouble()),
-        ui.Paint()..filterQuality = ui.FilterQuality.none);
+        _np);
     return true;
   }
 }
