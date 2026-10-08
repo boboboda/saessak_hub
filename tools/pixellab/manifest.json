@@ -590,5 +590,69 @@
       "mode": "v3"
     },
     "per_direction": true
+  },
+  "staff_g_base": {
+    "endpoint": "/create-character-v3",
+    "note": "직원 외형 변형 g (e/f 재시도: 전신, 빈손)",
+    "body": {
+      "description": "friendly parcel delivery hub worker, young man, curly black hair, dark skin, round glasses, navy cap, full body visible head to feet, arms relaxed at sides, empty hands, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "staff_g_walk": {
+    "endpoint": "/animate-character",
+    "note": "직원 g 걷기",
+    "character_of": "staff_g_base",
+    "body": {
+      "character_id": "{staff_g_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "staff_h_base": {
+    "endpoint": "/create-character-v3",
+    "note": "직원 외형 변형 h (e/f 재시도: 전신, 빈손)",
+    "body": {
+      "description": "friendly parcel delivery hub worker, woman, long red braid, freckles, navy cap, full body visible head to feet, arms relaxed at sides, empty hands, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "staff_h_walk": {
+    "endpoint": "/animate-character",
+    "note": "직원 h 걷기",
+    "character_of": "staff_h_base",
+    "body": {
+      "character_id": "{staff_h_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
   }
 }
