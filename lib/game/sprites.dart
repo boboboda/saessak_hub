@@ -13,7 +13,7 @@ class Sprites {
   /// 배경 장식 도트 (assets/sprites/decor/<이름>.png). 없는 건 null.
   static final Map<String, ui.Image> decor = {};
   static const List<String> decorNames = [
-    'tree', 'bush', 'lamp', 'light', 'bench', 'cone', 'sign',
+    'tree', 'tree2', 'bush', 'lamp', 'light', 'bench', 'cone', 'sign',
     'house1', 'house2', 'house3', 'pallet', 'flower',
   ];
 

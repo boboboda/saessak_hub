@@ -27,8 +27,7 @@ extension WorldView on HubGame {
       final img = Sprites.decor[d.key];
       if (img == null) continue;
       if (a.contains(Offset(d.x, d.y - 1))) continue; // 확장한 창고가 덮는 자리
-      final w = d.wTiles * t;
-      final h = w * img.height / img.width;
+      final w = img.width.toDouble(), h = img.height.toDouble(); // 도트 원본 크기 그대로
       final r = Rect.fromLTWH(d.x * t - w / 2, d.y * t - h, w, h);
       if (!r.overlaps(view)) continue;
       Sprites.drawContain(c, img, r);

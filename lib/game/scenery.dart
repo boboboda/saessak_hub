@@ -63,7 +63,7 @@ class Scenery {
         if (busy(x, y, 0.2)) continue;
         final r = rnd.nextDouble();
         if (r < 0.05) {
-          out.add(Deco('tree', x, y, 2));
+          out.add(Deco(rnd.nextBool() ? 'tree' : 'tree2', x, y, 2));
         } else if (r < 0.10) {
           out.add(Deco('bush', x, y, 1));
         } else if (r < 0.13) {
