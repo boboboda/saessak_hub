@@ -58,7 +58,8 @@ class Cfg {
   static const double fullBonus = 1.2; // 차량을 가득 채워 보내면 수익 배수
   static const double vehicleMove = 1.5; // 차량이 들어오고 나가는 시간(초)
   static const double vehicleWait = 5; // 더 실을 게 없을 때 기다리는 시간(초)
-  // 택배가 쌓인 양에 맞춰 알아서 오는 차량 (큰 것부터 검사)
+  static const int hubTruckMin = 8; // 한 지역 택배가 이만큼 쌓이면 허브 도크에 대형 트럭이 옴
+  // 차량 종류 (허브 도크는 [0] 대형 트럭만 사용, 나머지는 지역→동네 배송용으로 예정)
   static const List<VehicleType> vehicles = [
     VehicleType('대형 트럭', 40, 30, 3.0, 1.5, 1.0, 0.85),
     VehicleType('소형 트럭', 16, 12, 2.0, 1.2, 0.7, 0.65),

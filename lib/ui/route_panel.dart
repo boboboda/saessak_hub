@@ -74,12 +74,6 @@ class RoutePanel extends StatelessWidget {
               ),
             ],
           ),
-          _row('차량', [
-            _chip('자동', rt.vehicle == -1, () => _set(() => rt.vehicle = -1)),
-            for (var k = Cfg.vehicles.length - 1; k >= 0; k--)
-              _chip(Cfg.vehicles[k].name, rt.vehicle == k,
-                  () => _set(() => rt.vehicle = k)),
-          ]),
           _row('대기', [
             for (final w in Cfg.waitOptions)
               _chip('${w.round()}초', rt.wait == w, () => _set(() => rt.wait = w)),
@@ -89,13 +83,6 @@ class RoutePanel extends StatelessWidget {
               _chip(p == 1 ? '보통' : (p == 2 ? '높음' : '최우선'), rt.prio == p,
                   () => _set(() => rt.prio = p)),
           ]),
-          if (rt.vehicle >= 0)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                  '${Cfg.vehicles[rt.vehicle].name}은 이 지역 택배가 ${Cfg.vehicles[rt.vehicle].minStock}건 이상 쌓여야 와요',
-                  style: Tx.sub),
-            ),
         ],
       ),
     );

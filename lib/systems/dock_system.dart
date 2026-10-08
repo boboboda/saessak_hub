@@ -39,18 +39,8 @@ extension DockSystem on HubGame {
       if (!rt.on) continue;
       final n = regionStock(r);
       if (n <= 0) continue;
-      VehicleType? t;
-      if (rt.vehicle >= 0) {
-        final f = Cfg.vehicles[rt.vehicle];
-        if (n >= f.minStock) t = f;
-      } else {
-        for (final c in Cfg.vehicles) {
-          if (n >= c.minStock) {
-            t = c;
-            break;
-          }
-        }
-      }
+      // 허브 도크에는 간선 대형 트럭만 온다 (동네 배송 차량은 지역센터 단계)
+      final VehicleType? t = n >= Cfg.hubTruckMin ? Cfg.vehicles[0] : null;
       if (t == null) continue;
       if (rt.prio > bestPrio || (rt.prio == bestPrio && n > most)) {
         bestPrio = rt.prio;
