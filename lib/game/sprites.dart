@@ -24,6 +24,8 @@ class Sprites {
   /// 노선 지도 지역센터 건물 (assets/sprites/map/center_<지역>.png). 없으면 null → 도형으로 그림.
   static final List<ui.Image?> centers = List.filled(5, null);
   static ui.Image? hub; // 노선 지도 허브 외관
+  /// 노선 지도 Wang 타일 시트 (가로 16칸, 칸 번호 = NW*8+NE*4+SW*2+SE). 잔디/도로, 잔디/동네 길
+  static ui.Image? wangRoad, wangWalk;
 
   /// 노선 지도 배달지 집 (assets/sprites/map/house_<이름>.png). d0~d11 단독주택, v0~v2 빌라
   static final Map<String, ui.Image> mapHouses = {};
@@ -73,6 +75,8 @@ class Sprites {
     sidewalk = await _img('assets/sprites/tiles/sidewalk.png');
     yard = await _img('assets/sprites/tiles/yard.png');
     hub = await _img('assets/sprites/map/hub.png');
+    wangRoad = await _img('assets/sprites/map/wang_road.png');
+    wangWalk = await _img('assets/sprites/map/wang_walk.png');
     for (final n in mapHouseNames) {
       final im = await _img('assets/sprites/map/house_$n.png');
       if (im != null) mapHouses[n] = im;

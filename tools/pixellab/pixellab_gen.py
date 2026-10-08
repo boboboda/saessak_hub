@@ -227,6 +227,13 @@ def run_asset(name, spec, st):
             dump_raw(f"{tag}_job_{jid}", j)
             harvest(j, folder / (d or "job"), "job")
         save_state(st)
+    # 타일셋이면 타일 16장과 코너 정보를 받아 둔다 (tileset_sheet.py 로 시트를 만든다)
+    if spec["endpoint"] in ("/create-tileset", "/tilesets") and entry.get("tileset_id"):
+        ts = call("GET", f"/tilesets/{entry['tileset_id']}")
+        dump_raw(f"{name}_tileset", ts)
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "tileset.json").write_text(json.dumps(ts, ensure_ascii=False, indent=2), encoding="utf-8")
+        print("  타일셋 저장:", (folder / "tileset.json").relative_to(ROOT))
     # 캐릭터면 최종 정보와 전체 내보내기(zip)도 받는다
     cid = entry.get("character_id") or (st.get(spec.get("character_of", ""), {}) or {}).get("character_id")
     if cid and spec["endpoint"] in ("/create-character-v3", "/animate-character", "/characters/animations"):

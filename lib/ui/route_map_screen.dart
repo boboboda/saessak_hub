@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'theme.dart';
 
 /// 전체화면 노선 지도. 한 번에 한 지역만 보여 준다: 허브 → (도로) → 지역센터 → 동네 집들.
 /// 차량이 달리는 걸 실시간으로 보고, 노선·차량 배정·업그레이드·구입을 여기서 한다.
+/// 지도는 화면보다 크고(타일 고정 크기), 드래그로 움직이거나 차량을 따라가며 본다.
 class RouteMapScreen extends StatefulWidget {
   final HubGame g;
   const RouteMapScreen(this.g, {super.key});
@@ -23,6 +25,9 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _anim;
   int sel = 0; // 보고 있는 지역
+  final _Cam cam = _Cam();
+  final Stopwatch _sw = Stopwatch()..start();
+  double _last = 0;
 
   HubGame get g => widget.g;
 
@@ -30,7 +35,53 @@ class _RouteMapScreenState extends State<RouteMapScreen>
   void initState() {
     super.initState();
     _anim = AnimationController(vsync: this, duration: const Duration(seconds: 1))
+      ..addListener(_tick)
       ..repeat();
+  }
+
+  /// 매 프레임: 관성 스크롤 / 차량 따라가기 / 지도 경계
+  void _tick() {
+    final now = _sw.elapsedMicroseconds / 1e6;
+    final dt = (now - _last).clamp(0.0, 0.05).toDouble();
+    _last = now;
+    final v = cam.view;
+    if (v.isEmpty) return;
+    const T = _MapPainter.T;
+    final l = _MapPainter.layout(sel);
+    final half = Offset(v.width / 2, v.height / 2);
+    if (cam.reset) {
+      // 처음 들어올 때·지역을 바꿀 때: 허브와 출발 도로가 보이게
+      cam.reset = false;
+      cam.vel = Offset.zero;
+      cam.pos = const Offset(5.5 * T, 15.5 * T) - half;
+    } else if (cam.follow != null) {
+      Offset? target;
+      for (final (u, pos) in _MapPainter.units(g, sel)) {
+        if (u.id == cam.follow) target = pos * T - half;
+      }
+      if (target == null) {
+        cam.follow = null;
+      } else {
+        cam.pos += (target - cam.pos) * min(1.0, dt * 6);
+      }
+    } else if (cam.vel.distance > 8) {
+      cam.pos += cam.vel * dt;
+      cam.vel *= pow(0.03, dt).toDouble();
+    } else {
+      cam.vel = Offset.zero;
+    }
+    double fit(double p, double world, double view) =>
+        world <= view ? (world - view) / 2 : p.clamp(0.0, world - view).toDouble();
+    final nx = fit(cam.pos.dx, l.gw * T, v.width), ny = fit(cam.pos.dy, l.gh * T, v.height);
+    // 가장자리에 닿으면 그 방향 관성은 멈춤
+    cam.vel = Offset(nx == cam.pos.dx ? cam.vel.dx : 0, ny == cam.pos.dy ? cam.vel.dy : 0);
+    cam.pos = Offset(nx, ny);
+  }
+
+  void _select(int i) {
+    setState(() => sel = i);
+    cam.reset = true;
+    cam.follow = null;
   }
 
   @override
@@ -54,16 +105,28 @@ class _RouteMapScreenState extends State<RouteMapScreen>
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(14),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    CustomPaint(painter: _MapPainter(g, _anim, sel)),
-                    ValueListenableBuilder<int>(
-                      valueListenable: g.tick,
-                      builder: (context, _, __) => _mapHud(),
+                child: LayoutBuilder(builder: (context, box) {
+                  cam.view = box.biggest;
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onPanDown: (_) => cam.vel = Offset.zero,
+                    onPanUpdate: (d) {
+                      cam.follow = null;
+                      cam.pos -= d.delta;
+                    },
+                    onPanEnd: (d) => cam.vel = -d.velocity.pixelsPerSecond,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CustomPaint(painter: _MapPainter(g, _anim, sel, cam, mq.devicePixelRatio)),
+                        ValueListenableBuilder<int>(
+                          valueListenable: g.tick,
+                          builder: (context, _, __) => _mapHud(),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                }),
               ),
             ),
           ),
@@ -120,7 +183,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
             for (var i = 0; i < Cfg.regionName.length; i++)
               Expanded(
                 child: GestureDetector(
-                  onTap: () => setState(() => sel = i),
+                  onTap: () => _select(i),
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
                     decoration: BoxDecoration(
@@ -192,6 +255,8 @@ class _RouteMapScreenState extends State<RouteMapScreen>
               ],
             ),
           ),
+        Positioned(left: 8, bottom: 8, child: _camButtons()),
+        Positioned(right: 8, bottom: 8, child: _miniMap()),
         if (!open)
           Positioned.fill(
             child: Container(
@@ -223,6 +288,79 @@ class _RouteMapScreenState extends State<RouteMapScreen>
             ),
           ),
       ],
+    );
+  }
+
+  /// 허브로 돌아가기 + 차량 따라가기 (탭할 때마다 다음 차량, 끝나면 끔)
+  Widget _camButtons() {
+    final list = [for (final (u, _) in _MapPainter.units(g, sel)) u];
+    FleetUnit? cur;
+    for (final u in list) {
+      if (u.id == cam.follow) cur = u;
+    }
+    Widget btn(IconData icon, String text, bool on, VoidCallback f) => GestureDetector(
+          onTap: f,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+            decoration: BoxDecoration(
+              color: on ? C.accent : const Color(0xCC1E1B2E),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icon, size: 14, color: Colors.white),
+              const SizedBox(width: 4),
+              Text(text,
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+            ]),
+          ),
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        btn(Icons.home_work, '허브', false, () {
+          cam.follow = null;
+          cam.reset = true;
+        }),
+        const SizedBox(height: 6),
+        if (g.regionOpen[sel] && list.isNotEmpty)
+          btn(Icons.my_location, cur == null ? '차량 따라가기' : '${cur.name} #${cur.id} 따라가는 중',
+              cur != null, () {
+            final moving = list.where((u) => u.busy).toList();
+            final pick = moving.isEmpty ? list : moving;
+            final i = cur == null ? 0 : pick.indexOf(cur) + 1;
+            cam.follow = i < pick.length ? pick[i].id : null;
+            cam.vel = Offset.zero;
+            g.ui();
+          }),
+      ],
+    );
+  }
+
+  /// 미니맵: 탭하거나 끌어서 그 곳으로 이동
+  Widget _miniMap() {
+    final l = _MapPainter.layout(sel);
+    const w = 132.0;
+    final h = w * l.gh / l.gw;
+    void jump(Offset p) {
+      const T = _MapPainter.T;
+      final tile = p / (w / l.gw);
+      cam.follow = null;
+      cam.vel = Offset.zero;
+      cam.pos = tile * T - Offset(cam.view.width / 2, cam.view.height / 2);
+    }
+
+    return GestureDetector(
+      onTapDown: (d) => jump(d.localPosition),
+      onPanUpdate: (d) => jump(d.localPosition),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xCC1E1B2E), width: 2),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: CustomPaint(size: Size(w, h), painter: _MiniMap(g, _anim, sel, cam)),
+      ),
     );
   }
 
@@ -549,157 +687,194 @@ class _RouteMapScreenState extends State<RouteMapScreen>
 //                              지도 그리기
 // ======================================================================
 
-/// 지역마다 한 번 만들어 두는 지도 정보 (길 칸, 장식)
+/// 카메라: 지도 중 화면에 보이는 영역 (dp). 드래그·관성·차량 따라가기를 여기서 처리.
+class _Cam {
+  Offset pos = Offset.zero; // 보이는 영역 왼쪽 위
+  Offset vel = Offset.zero; // 손을 뗀 뒤 관성 속도 (dp/초)
+  Size view = Size.zero;
+  int? follow; // 따라가는 차량 id (null 이면 자유 드래그)
+  bool reset = true; // 다음 프레임에 허브 쪽으로 이동
+}
+
+/// 지역마다 한 번 만들어 두는 지도 정보. 좌표는 칸 단위.
 class _Layout {
-  final List<Offset> trunk; // 허브 → 센터 도로 (칸 중심 좌표)
-  final Set<int> roadCells = {};
-  final Set<int> walkCells = {};
+  final int gw, gh;
+  final Uint8List cell; // 0 잔디, 1 도로(아스팔트), 2 동네 길(보도블록)
+  final double cx0; // 센터 건물 왼쪽 x
+  final double mx; // 동네 큰길 x (칸 번호)
+  final List<Offset> trunk = []; // 허브 → 센터 간선도로 중심선
+  final List<_House> houses = [];
+  final List<int> deliver = []; // 배달 번호(0~5) → houses 번호
+  final List<List<Offset>> courier = []; // 배달 번호별 센터 → 집 앞 길
   final List<_Dec> decor = [];
-  _Layout(this.trunk);
+  _Layout(this.gw, this.gh, this.cx0, this.mx) : cell = Uint8List(gw * gh);
+
+  int at(int x, int y) => (x < 0 || y < 0 || x >= gw || y >= gh) ? 0 : cell[y * gw + x];
+  void set(int x, int y, int v) {
+    if (x >= 0 && y >= 0 && x < gw && y < gh) cell[y * gw + x] = v;
+  }
+
+  bool nearPath(double x, double y) {
+    final cx = x.floor(), cy = y.floor();
+    for (var dy = -1; dy <= 0; dy++) {
+      for (var dx = -1; dx <= 1; dx++) {
+        if (at(cx + dx, cy + dy) != 0) return true;
+      }
+    }
+    return false;
+  }
+}
+
+class _House {
+  final double x, y; // 발 밑(아래 가운데)
+  final String key;
+  _House(this.x, this.y, this.key);
 }
 
 class _Dec {
   final String key;
   final double x, y; // 발 밑(아래 가운데) 칸 좌표
-  final double w; // 칸 단위 너비
-  _Dec(this.key, this.x, this.y, this.w);
+  _Dec(this.key, this.x, this.y);
 }
 
 class _MapPainter extends CustomPainter {
   final HubGame g;
   final int sel;
-  _MapPainter(this.g, Listenable repaint, this.sel) : super(repaint: repaint);
+  final _Cam cam;
+  final double dpr;
+  _MapPainter(this.g, Listenable repaint, this.sel, this.cam, this.dpr) : super(repaint: repaint);
 
-  static const int gw = 18, gh = 14; // 지도 칸 수
+  /// 한 칸 = 32dp. 도트 1px = 1dp 로 그려서 화면에 맞추려고 줄이지 않는다.
+  static const double T = 32;
+  static const int gh = 30;
+  static const List<int> widths = [44, 52, 64, 76, 88]; // 먼 지역일수록 길이 길다
+  static const double hubX = 1.4, footY = 18; // 허브 건물 왼쪽, 허브·센터 바닥
+  static const double roadY = 17; // 간선 도로 중심선 (칸 경계)
+  static const double bigScale = 1.25; // 허브·센터 건물 배율
+  static const List<int> streets = [5, 11, 23]; // 동네 골목 줄 (집은 그 위에 붙음)
 
-  // 허브 / 센터 / 거리
-  static const Rect hubR = Rect.fromLTRB(0.3, 8.6, 3.0, 12.4);
-  static const Rect centerR = Rect.fromLTRB(10.0, 9.0, 15.6, 12.2);
-  static const double door = 12.5; // 센터 위쪽 문 x
-  static const double s1 = 4.5, s2 = 7.5; // 동네 거리 y
-  // 집: 발 밑 좌표. 0~2 윗줄(거리 s1 앞), 3~5 아랫줄(거리 s2 앞)
-  static const List<Offset> houseFoot = [
-    Offset(10.5, 4.0),
-    Offset(12.5, 4.0),
-    Offset(14.5, 4.0),
-    Offset(10.5, 7.0),
-    Offset(14.5, 7.0),
-    Offset(16.5, 7.0),
+  /// 지역마다 배달지 집 모양. 'house1~3'은 가게(장식 폴더), 나머지는 지도 전용 집
+  static const List<List<String>> housePool = [
+    ['d0', 'd1', 'd2', 'd3', 'd4', 'd7'], // 동네: 알록달록 단독주택
+    ['v0', 'house1', 'v1', 'v2', 'house3', 'house2'], // 시내: 빌라·가게
+    ['d8', 'd9', 'd10', 'd11', 'd6', 'd5'], // 근교: 나무·돌집
+    ['v1', 'd5', 'v2', 'd3', 'v0', 'house3'], // 타도시
+    ['d6', 'v2', 'd4', 'house1', 'd9', 'v0'], // 전국
   ];
-  static const double houseW = 2.0;
-  static const double houseMaxH = 2.3;
-
-  static Offset _n(double x, double y) =>
-      Offset(x.floorToDouble() + 0.5, y.floorToDouble() + 0.5);
-
-  static List<Offset> _trunkPath(int r) {
-    // 지역마다 멀수록 길이 꼬불꼬불 길어진다
-    final List<List<double>> w;
-    switch (r) {
-      case 0:
-        w = [[3.6, 10.5], [9.8, 10.5]];
-        break;
-      case 1:
-        w = [[3.6, 10.5], [6, 10.5], [6, 6.5], [8.4, 6.5], [8.4, 10.5], [9.8, 10.5]];
-        break;
-      case 2:
-        w = [[3.6, 10.5], [5.2, 10.5], [5.2, 2.5], [8.4, 2.5], [8.4, 10.5], [9.8, 10.5]];
-        break;
-      case 3:
-        w = [[3.6, 10.5], [5, 10.5], [5, 2.5], [6.7, 2.5], [6.7, 12.9], [8.4, 12.9], [8.4, 10.5], [9.8, 10.5]];
-        break;
-      default:
-        w = [[3.6, 10.5], [4.4, 10.5], [4.4, 2.5], [6, 2.5], [6, 12.9], [7.6, 12.9], [7.6, 2.5], [8.8, 2.5], [8.8, 10.5], [9.8, 10.5]];
-    }
-    return [for (final p in w) _n(p[0], p[1])];
-  }
-
-  /// 센터 문 → 집 앞 (동네 길)
-  static List<Offset> courierPath(int k) {
-    final hf = houseFoot[k];
-    final dx = door.floorToDouble() + 0.5;
-    if (k < 3) {
-      return [
-        Offset(dx, 8.5),
-        Offset(dx, s1),
-        Offset(_n(hf.dx, 0).dx, s1),
-        Offset(_n(hf.dx, 0).dx, 4.15),
-      ];
-    }
-    return [
-      Offset(dx, 8.5),
-      Offset(dx, s2),
-      Offset(_n(hf.dx, 0).dx, s2),
-      Offset(_n(hf.dx, 0).dx, 7.15),
-    ];
-  }
 
   static final Map<int, _Layout> _cache = {};
 
   static _Layout layout(int r) {
     final cached = _cache[r];
     if (cached != null) return cached;
-    final l = _Layout(_trunkPath(r));
-    void mark(Set<int> set, List<Offset> path) {
-      for (var i = 0; i + 1 < path.length; i++) {
-        final a = path[i], b = path[i + 1];
-        if (a.dx == b.dx) {
-          final x = a.dx.floor();
-          final y0 = min(a.dy, b.dy).floor(), y1 = max(a.dy, b.dy).floor();
-          for (var y = y0; y <= y1; y++) {
-            set.add(y * 100 + x);
-          }
-        } else {
-          final y = a.dy.floor();
-          final x0 = min(a.dx, b.dx).floor(), x1 = max(a.dx, b.dx).floor();
-          for (var x = x0; x <= x1; x++) {
-            set.add(y * 100 + x);
-          }
+    final gw = widths[r];
+    final cx0 = (gw - 22).toDouble();
+    final l = _Layout(gw, gh, cx0, cx0 + 7);
+
+    // 허브 앞마당 (트럭 도크)
+    for (var y = 15; y < 19; y++) {
+      for (var x = 5; x < 7; x++) {
+        l.set(x, y, 1);
+      }
+    }
+    // 간선 도로: 허브 → (지역이 멀수록 위아래로 굽이침) → 센터
+    final pts = <Offset>[const Offset(5, roadY)];
+    if (r > 0) {
+      final legs = 2 * r;
+      const x0 = 8.0;
+      final dx = (cx0 - 4 - x0) / legs;
+      var x = x0;
+      pts.add(const Offset(x0, roadY));
+      for (var i = 0; i < legs; i++) {
+        final ty = i.isEven ? 4.0 : 26.0;
+        pts.add(Offset(x, ty));
+        x = (x0 + dx * (i + 1)).roundToDouble();
+        pts.add(Offset(x, ty));
+      }
+      pts.add(Offset(x, roadY));
+    }
+    pts.add(Offset(cx0, roadY));
+    l.trunk.addAll(pts);
+    // 중심선 양옆 한 칸씩 = 2칸 폭
+    for (var i = 0; i + 1 < pts.length; i++) {
+      final a = pts[i], b = pts[i + 1];
+      if (a.dy == b.dy) {
+        final y = a.dy.toInt();
+        for (var x = min(a.dx, b.dx).toInt() - 1; x <= max(a.dx, b.dx).toInt(); x++) {
+          l.set(x, y - 1, 1);
+          l.set(x, y, 1);
+        }
+      } else {
+        final x = a.dx.toInt();
+        for (var y = min(a.dy, b.dy).toInt() - 1; y <= max(a.dy, b.dy).toInt(); y++) {
+          l.set(x - 1, y, 1);
+          l.set(x, y, 1);
         }
       }
     }
 
-    mark(l.roadCells, l.trunk);
-    for (var k = 0; k < houseFoot.length; k++) {
-      mark(l.walkCells, courierPath(k));
+    // 동네: 센터 오른쪽 연결길 → 큰길(세로) → 골목 3줄, 골목 위에 집
+    final mxi = l.mx.toInt();
+    for (var x = cx0.toInt() + 4; x <= mxi; x++) {
+      l.set(x, 17, 2);
     }
-    // 장식: 길·건물이 없는 빈 곳에 나무·덤불·꽃·가로등을 흩뿌림 (지역마다 다른 모양)
+    for (var y = streets.first; y <= streets.last; y++) {
+      l.set(mxi, y, 2);
+    }
+    for (final s in streets) {
+      for (var x = mxi; x < gw - 1; x++) {
+        l.set(x, s, 2);
+      }
+    }
     final rnd = Random(r * 977 + 13);
+    final pool = housePool[r % housePool.length];
+    var hi = rnd.nextInt(6);
+    for (final s in streets) {
+      for (var hx = l.mx + 2.4; hx < gw - 1.4; hx += 2.6) {
+        l.houses.add(_House(hx, s.toDouble(), pool[hi++ % pool.length]));
+      }
+    }
+    // 배달지 6채: 골목마다 고르게
+    final n = l.houses.length;
+    for (var k = 0; k < 6; k++) {
+      l.deliver.add(((k + 0.5) * n / 6).floor().clamp(0, n - 1));
+    }
+    for (final hiK in l.deliver) {
+      final h = l.houses[hiK];
+      l.courier.add([
+        Offset(cx0 + 4.5, 17.5),
+        Offset(l.mx + 0.5, 17.5),
+        Offset(l.mx + 0.5, h.y + 0.5),
+        Offset(h.x, h.y + 0.5),
+      ]);
+    }
+
+    // 장식: 길·건물이 없는 빈 곳에 흩뿌림 (지역마다 다른 모양)
     final blocked = <Rect>[
-      // 허브: 지붕 위와, 앞에서 대형 트럭이 기다리는 자리까지 비움
-      Rect.fromLTRB(hubR.left - 0.3, hubR.top - 0.8, hubR.right + 3.0, hubR.bottom + 1.4),
-      // 센터 건물: 위로 넘치는 지붕·이름표와, 앞(아래)에 선 나무가 건물을 가리는 자리까지 비움
-      Rect.fromLTRB(centerR.left - 0.6, centerR.top - 1.4, centerR.right + 0.4, centerR.bottom + 1.6),
-      for (final h in houseFoot)
-        Rect.fromLTRB(h.dx - houseW / 2 - 0.3, h.dy - houseW - 0.3, h.dx + houseW / 2 + 0.3, h.dy + 0.5),
+      Rect.fromLTRB(hubX - 0.6, footY - 5.4, 8.5, footY + 3.2), // 허브 + 앞에서 기다리는 트럭
+      Rect.fromLTRB(cx0 - 2.5, footY - 5.4, cx0 + 5.5, footY + 2.6), // 센터 + 택배 더미 + 배달 차 대기
+      for (final h in l.houses) Rect.fromLTRB(h.x - 1.4, h.y - 3.0, h.x + 1.4, h.y + 0.2),
     ];
     bool free(double x, double y) {
-      final cx = x.floor(), cy = y.floor();
-      for (var dy = -1; dy <= 0; dy++) {
-        for (var dx = -1; dx <= 1; dx++) {
-          final key = (cy + dy) * 100 + (cx + dx);
-          if (l.roadCells.contains(key) || l.walkCells.contains(key)) return false;
-        }
-      }
+      if (l.nearPath(x, y)) return false;
       for (final b in blocked) {
         if (b.contains(Offset(x, y)) || b.contains(Offset(x, y - 1))) return false;
       }
       for (final d in l.decor) {
-        if ((d.x - x).abs() < 1.1 && (d.y - y).abs() < 0.9) return false;
+        if ((d.x - x).abs() < 1.2 && (d.y - y).abs() < 0.9) return false;
       }
       return true;
     }
 
-    const kinds = ['tree', 'tree2', 'bush', 'flower', 'tree', 'bush'];
-    const widths = {'tree': 1.5, 'tree2': 1.5, 'bush': 0.9, 'flower': 0.9};
+    const kinds = ['tree', 'tree2', 'bush', 'flower', 'tree', 'bush', 'tree'];
+    final want = gw * gh ~/ 11;
     var tries = 0;
-    while (l.decor.length < 26 && tries < 500) {
+    while (l.decor.length < want && tries < want * 25) {
       tries++;
       final x = 0.6 + rnd.nextDouble() * (gw - 1.2);
-      final y = 1.2 + rnd.nextDouble() * (gh - 1.4);
+      final y = 1.6 + rnd.nextDouble() * (gh - 1.8);
       if (!free(x, y)) continue;
-      final k = kinds[rnd.nextInt(kinds.length)];
-      l.decor.add(_Dec(k, x, y, widths[k]!));
+      l.decor.add(_Dec(kinds[rnd.nextInt(kinds.length)], x, y));
     }
     _cache[r] = l;
     return l;
@@ -727,158 +902,202 @@ class _MapPainter extends CustomPainter {
     return p.last;
   }
 
+  static List<Offset> _path(FleetUnit u, _Layout l) =>
+      u.isTrunk ? l.trunk : l.courier[u.house % l.courier.length];
+
+  /// 차량의 지도 위 위치(칸 좌표). slot 은 대기 줄 순서.
+  static Offset unitPos(FleetUnit u, _Layout l, int slot) {
+    final path = _path(u, l);
+    final len = _len(path);
+    switch (u.state) {
+      case 1:
+        final p = (u.t / (u.dur + u.delay)).clamp(0.0, 1.0).toDouble();
+        return _pointAt(path, len * p);
+      case 2:
+        final p = (u.t / u.dur).clamp(0.0, 1.0).toDouble();
+        return _pointAt(path, len * (1 - p));
+      default:
+        // 대형 트럭은 허브 도크 앞, 배달 차량은 센터 오른쪽 아래에서 대기
+        return u.isTrunk
+            ? Offset(2.6 + (slot % 3) * 2.7, 19.9)
+            : Offset(l.cx0 + 5.8 + (slot % 3) * 1.4, 19.6);
+    }
+  }
+
+  /// 지역 sel 의 차량별 위치 (그리기·따라가기·미니맵이 같이 씀)
+  static List<(FleetUnit, Offset)> units(HubGame g, int sel) {
+    final l = layout(sel);
+    var tw = 0, cr = 0;
+    return [
+      for (final u in g.fleet)
+        if (u.region == sel) (u, unitPos(u, l, u.isTrunk ? tw++ : cr++)),
+    ];
+  }
+
   static final Map<int, bool> _faceRight = {};
 
   // ---- 그리기 ----
-  late double t; // 한 칸 픽셀 크기
-  late Offset org; // 지도 왼쪽 위
+  final double t = T;
+  late _Layout l;
+  late Rect view; // 보이는 영역 (칸 좌표)
 
-  Offset _px(Offset tile) => Offset(org.dx + tile.dx * t, org.dy + tile.dy * t);
-  Rect _pr(Rect r) => Rect.fromLTRB(
-      org.dx + r.left * t, org.dy + r.top * t, org.dx + r.right * t, org.dy + r.bottom * t);
+  Offset _px(Offset tile) => tile * t;
 
   @override
   void paint(Canvas c, Size s) {
-    t = min(s.width / gw, s.height / gh).floorToDouble();
-    if (t < 8) t = 8;
-    org = Offset(((s.width - gw * t) / 2).floorToDouble(),
-        ((s.height - gh * t) / 2).floorToDouble());
     c.drawRect(Offset.zero & s, Paint()..color = const Color(0xFF4F8A43));
     final open = g.regionOpen[sel];
-    final l = layout(sel);
+    l = layout(sel);
+    // 기기 픽셀에 맞춰 이동 (타일 사이 틈 방지)
+    final ox = (cam.pos.dx * dpr).roundToDouble() / dpr;
+    final oy = (cam.pos.dy * dpr).roundToDouble() / dpr;
+    view = Rect.fromLTWH(ox / t, oy / t, s.width / t, s.height / t);
+    c.save();
+    c.translate(-ox, -oy);
 
-    // 1) 땅: 잔디
-    for (var y = 0; y < gh; y++) {
-      for (var x = 0; x < gw; x++) {
-        final v = (x * 7 + y * 13 + sel) % 4;
-        _tile(c, Sprites.grass, x, y, 4, v, const Color(0xFF69A857));
-      }
-    }
-    // 2) 길: 허브 앞 마당 + 인도 + 도로
-    _yard(c, Rect.fromLTRB(3.0, 9.0, 4.0, 12.0));
-    for (final key in l.walkCells) {
-      _tile(c, Sprites.sidewalk, key % 100, key ~/ 100, 1, 0, const Color(0xFFB9B5A8));
-    }
-    for (final key in l.roadCells) {
-      _tile(c, Sprites.asphalt, key % 100, key ~/ 100, 1, 0, const Color(0xFF3A3A48));
-    }
+    // 1) 땅: 잔디 + 도로 + 동네 길 (보이는 칸만)
+    _ground(c);
     _roadMarks(c, l.trunk);
 
-    // 3) 세워진 것들을 아래쪽 순서대로 그림 (앞에 있는 게 위에 오도록)
+    // 2) 세워진 것들을 아래쪽 순서대로 그림 (앞에 있는 게 위에 오도록). 화면 밖은 건너뜀
+    final cull = view.inflate(3);
     final items = <_Item>[];
     for (final d in l.decor) {
-      items.add(_Item(d.y, (cv) => _decor(cv, d)));
+      if (cull.contains(Offset(d.x, d.y))) items.add(_Item(d.y, (cv) => _decor(cv, d)));
     }
-    for (var k = 0; k < houseFoot.length; k++) {
-      final kk = k;
-      items.add(_Item(houseFoot[k].dy, (cv) => _house(cv, kk)));
+    for (var k = 0; k < l.houses.length; k++) {
+      final h = l.houses[k];
+      if (cull.contains(Offset(h.x, h.y))) items.add(_Item(h.y, (cv) => _house(cv, h)));
     }
-    items.add(_Item(hubR.bottom, (cv) => _hub(cv)));
-    items.add(_Item(centerR.bottom, (cv) => _center(cv, open)));
+    if (cull.overlaps(const Rect.fromLTRB(0, 10, 8, 20))) {
+      items.add(_Item(footY, (cv) => _hub(cv)));
+    }
+    if (cull.overlaps(Rect.fromLTRB(l.cx0 - 3, 10, l.cx0 + 6, 20))) {
+      items.add(_Item(footY, (cv) => _center(cv, open)));
+    }
     if (open) {
-      var tw = 0, cr = 0;
-      for (final u in g.fleet) {
-        if (u.region != sel) continue;
-        final slot = u.isTrunk ? tw++ : cr++;
-        final pos = _unitPos(u, l, slot);
-        items.add(_Item(pos.dy + 0.4, (cv) => _unit(cv, u, pos)));
+      for (final (u, pos) in units(g, sel)) {
+        if (cull.contains(pos)) items.add(_Item(pos.dy + 0.4, (cv) => _unit(cv, u, pos)));
       }
     }
     items.sort((a, b) => a.y.compareTo(b.y));
     for (final it in items) {
       it.draw(c);
     }
+    if (open) _effects(c);
+    c.restore();
 
-    // 4) 효과 (떠오르는 글자, 비)
-    if (open) {
-      _effects(c);
-      _rain(c, s);
+    // 3) 화면 효과 (비)
+    if (open) _rain(c, s);
+  }
+
+  static final Paint _tp = Paint()
+    ..filterQuality = FilterQuality.none
+    ..isAntiAlias = false;
+
+  /// 이중 격자: 그리는 칸(i,j)은 지도 칸 (i-1..i, j-1..j) 네 칸의 중심을 꼭짓점으로 써서
+  /// Wang 코너 타일을 고른다. 그래서 길이 정확히 칸 폭으로 나오고 가장자리가 자연스럽다.
+  void _ground(Canvas c) {
+    final road = Sprites.wangRoad, walk = Sprites.wangWalk;
+    final x0 = max(0, view.left.floor()), x1 = min(l.gw, view.right.ceil() + 1);
+    final y0 = max(0, view.top.floor()), y1 = min(l.gh, view.bottom.ceil() + 1);
+    for (var j = y0; j <= y1; j++) {
+      for (var i = x0; i <= x1; i++) {
+        final nw = l.at(i - 1, j - 1), ne = l.at(i, j - 1), sw = l.at(i - 1, j), se = l.at(i, j);
+        int mask(int v) =>
+            (nw == v ? 8 : 0) | (ne == v ? 4 : 0) | (sw == v ? 2 : 0) | (se == v ? 1 : 0);
+        final dst = Rect.fromLTWH((i - 0.5) * t, (j - 0.5) * t, t, t);
+        final mr = mask(1), mw = mask(2);
+        if (road == null || walk == null) {
+          // 타일셋이 없으면 단색
+          final v = mr != 0 ? 1 : (mw != 0 ? 2 : 0);
+          c.drawRect(dst, Paint()..color = const [Color(0xFF69A857), Color(0xFF3A3A48), Color(0xFFB9B5A8)][v]);
+          continue;
+        }
+        if (mr != 0) {
+          _wang(c, road, mr, dst);
+        } else if (mw != 0) {
+          _wang(c, walk, mw, dst);
+        } else {
+          _grass(c, i, j, dst);
+        }
+      }
     }
   }
 
-  void _tile(Canvas c, ui.Image? img, int x, int y, int variants, int v, Color fallback) {
-    final dst = Rect.fromLTWH(org.dx + x * t, org.dy + y * t, t, t);
-    if (img == null) {
-      c.drawRect(dst, Paint()..color = fallback);
+  void _wang(Canvas c, ui.Image sheet, int idx, Rect dst) {
+    final w = sheet.width / 16;
+    c.drawImageRect(sheet, Rect.fromLTWH(w * idx, 0, w, sheet.height.toDouble()), dst, _tp);
+  }
+
+  /// 잔디는 여러 장을 섞어 반복 무늬가 덜 보이게
+  void _grass(Canvas c, int i, int j, Rect dst) {
+    final h = ((i * 73856093) ^ (j * 19349663) ^ (sel * 83492791)) & 0x7fffffff;
+    final v = h % 7;
+    if (v < 2) {
+      _wang(c, v == 0 ? Sprites.wangRoad! : Sprites.wangWalk!, 0, dst);
       return;
     }
-    final w = img.width / variants;
-    c.drawImageRect(img, Rect.fromLTWH(w * v, 0, w, img.height.toDouble()), dst,
-        Paint()..filterQuality = FilterQuality.none);
+    final img = Sprites.grass;
+    if (img == null) {
+      _wang(c, Sprites.wangRoad!, 0, dst);
+      return;
+    }
+    final w = img.width / 4;
+    c.drawImageRect(img, Rect.fromLTWH(w * ((v - 2) % 4), 0, w, img.height.toDouble()), dst, _tp);
   }
 
   void _roadMarks(Canvas c, List<Offset> path) {
     final p = Paint()
       ..color = const Color(0xCCFFD166)
-      ..strokeWidth = max(2.0, t * 0.1);
+      ..strokeWidth = 2;
+    final vis = view.inflate(1);
     for (var i = 0; i + 1 < path.length; i++) {
-      final a = _px(path[i]), b = _px(path[i + 1]);
-      final len = (b - a).distance;
+      final a = path[i], b = path[i + 1];
+      if (!vis.overlaps(Rect.fromPoints(a, b).inflate(0.1))) continue;
+      final pa = _px(a), pb = _px(b);
+      final len = (pb - pa).distance;
       if (len < 1) continue;
-      final dir = (b - a) / len;
+      final dir = (pb - pa) / len;
       final step = t * 0.7;
       for (var d = t * 0.15; d < len; d += step) {
-        c.drawLine(a + dir * d, a + dir * min(d + step * 0.4, len), p);
+        c.drawLine(pa + dir * d, pa + dir * min(d + step * 0.4, len), p);
       }
     }
   }
 
-  void _yard(Canvas c, Rect r) {
-    for (var y = r.top.floor(); y < r.bottom.floor(); y++) {
-      for (var x = r.left.floor(); x < r.right.floor(); x++) {
-        _tile(c, Sprites.yard, x, y, 1, 0, const Color(0xFF8E8A7C));
-      }
-    }
+  /// 스프라이트를 발 밑 기준으로 도트 1px = 1dp × scale 로 그림
+  Rect _sprite(Canvas c, ui.Image img, double footX, double footY, double scale,
+      {Paint? paint, bool leftAlign = false}) {
+    final w = img.width * scale * t / 32, h = img.height * scale * t / 32;
+    final left = leftAlign ? footX * t : footX * t - w / 2;
+    final dst = Rect.fromLTWH(left, footY * t - h, w, h);
+    c.drawImageRect(img, Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()), dst,
+        paint ?? _tp);
+    return dst;
   }
 
   void _decor(Canvas c, _Dec d) {
     final img = Sprites.decor[d.key];
-    final foot = _px(Offset(d.x, d.y));
     if (img == null) {
-      c.drawCircle(foot.translate(0, -t * 0.5), t * 0.4, Paint()..color = const Color(0xFF2F6B35));
+      c.drawCircle(_px(Offset(d.x, d.y - 0.5)), t * 0.4, Paint()..color = const Color(0xFF2F6B35));
       return;
     }
-    final w = d.w * t;
-    final h = w * img.height / img.width;
-    c.drawImageRect(
-        img,
-        Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-        Rect.fromLTWH(foot.dx - w / 2, foot.dy - h, w, h),
-        Paint()..filterQuality = FilterQuality.low);
+    _sprite(c, img, d.x, d.y, 1);
   }
 
-  /// 지역마다 배달지 집 모양 (집 칸 0~5 순서). 'house1~3'은 가게(장식 폴더), 나머지는 지도 전용 집
-  static const List<List<String>> housePool = [
-    ['d0', 'd1', 'd2', 'd3', 'd4', 'd7'], // 동네: 알록달록 단독주택
-    ['v0', 'house1', 'v1', 'v2', 'house3', 'house2'], // 시내: 빌라·가게
-    ['d8', 'd9', 'd10', 'd11', 'd6', 'd5'], // 근교: 나무·돌집
-    ['v1', 'd5', 'v2', 'd3', 'v0', 'house3'], // 타도시
-    ['d6', 'v2', 'd4', 'house1', 'd9', 'v0'], // 전국
-  ];
-
-  void _house(Canvas c, int k) {
-    final foot = _px(houseFoot[k]);
-    final key = housePool[sel % housePool.length][k % 6];
-    final img = Sprites.mapHouses[key] ??
-        Sprites.decor[key.startsWith('house') ? key : ['house1', 'house2', 'house3'][(k + sel) % 3]];
-    var w = houseW * t;
-    if (img != null && w * img.height / img.width > houseMaxH * t) {
-      // 키 큰 빌라는 높이에 맞춰 폭을 줄임 (윗줄 집이 아랫길을 덮지 않게)
-      w = houseMaxH * t * img.width / img.height;
-    }
+  void _house(Canvas c, _House hs) {
+    final img = Sprites.mapHouses[hs.key] ?? Sprites.decor[hs.key] ?? Sprites.decor['house1'];
     if (img == null) {
-      final r = Rect.fromLTWH(foot.dx - w / 2, foot.dy - w * 0.8, w, w * 0.8);
+      final r = Rect.fromLTWH((hs.x - 1) * t, (hs.y - 1.6) * t, 2 * t, 1.6 * t);
       c.drawRect(r, Paint()..color = const Color(0xFFE8D9B5));
       c.drawRect(Rect.fromLTWH(r.left, r.top, r.width, r.height * 0.35),
           Paint()..color = const Color(0xFFB5523B));
-    } else {
-      final h = w * img.height / img.width;
-      c.drawImageRect(
-          img,
-          Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-          Rect.fromLTWH(foot.dx - w / 2, foot.dy - h, w, h),
-          Paint()..filterQuality = FilterQuality.none);
+      return;
     }
+    // 지도 전용 집은 원본 크기, 가게(128 캔버스)는 집 폭에 맞게 줄임
+    final scale = min(1.0, 2.4 * 32 / img.width);
+    _sprite(c, img, hs.x, hs.y, scale);
   }
 
   /// 도트풍 사각형 (검은 테두리)
@@ -889,129 +1108,95 @@ class _MapPainter extends CustomPainter {
     c.drawRect(rr.deflate(max(1.0, t * 0.06)), Paint()..color = fill);
   }
 
+  /// 건물 위 이름표
+  void _tag(Canvas c, Rect building, String name, Color bg, Color fg) {
+    final tp = TextPainter(
+      text: TextSpan(
+          text: name, style: TextStyle(color: fg, fontSize: t * 0.44, fontWeight: FontWeight.w900)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final tag = Rect.fromCenter(
+        center: Offset(building.center.dx, building.top - tp.height * 0.2),
+        width: tp.width + t * 0.5,
+        height: tp.height + t * 0.12);
+    c.drawRRect(RRect.fromRectAndRadius(tag, Radius.circular(t * 0.2)), Paint()..color = bg);
+    tp.paint(c, Offset(tag.center.dx - tp.width / 2, tag.center.dy - tp.height / 2));
+  }
+
+  void _shadow(Canvas c, Rect dst) {
+    c.drawOval(Rect.fromLTWH(dst.left + dst.width * 0.04, dst.bottom - t * 0.22, dst.width * 0.96, t * 0.4),
+        Paint()..color = const Color(0x33000000));
+  }
+
   void _hub(Canvas c) {
     final img = Sprites.hub;
     if (img != null) {
-      // 허브는 칸보다 조금 크게, 바닥은 앞(y 13)에서 기다리는 대형 트럭 지붕선 위에 맞춰 도크 문이 보이게
-      _buildingSprite(c, img, Rect.fromLTRB(0.1, 7.6, 3.5, 11.9),
-          '허브', C.accent, Colors.white,
-          center: true);
+      final w = img.width * bigScale * t / 32, h = img.height * bigScale * t / 32;
+      final dst = Rect.fromLTWH(hubX * t, footY * t - h, w, h);
+      _shadow(c, dst);
+      _sprite(c, img, hubX, footY, bigScale, leftAlign: true);
+      _tag(c, dst, '허브', C.accent, Colors.white);
       return;
     }
-    final r = _pr(hubR);
-    // 그림자
-    c.drawRect(r.shift(Offset(t * 0.15, t * 0.15)), Paint()..color = const Color(0x33000000));
+    final r = Rect.fromLTRB(hubX * t, (footY - 3.6) * t, (hubX + 3.6) * t, footY * t);
     _block(c, r, const Color(0xFFD9CFC0));
-    // 지붕
     _block(c, Rect.fromLTRB(r.left - t * 0.1, r.top - t * 0.1, r.right + t * 0.1, r.top + t * 0.9),
         C.accent);
-    // 도크 문 두 개
     for (var i = 0; i < 2; i++) {
-      final x = r.left + t * (0.45 + i * 1.2);
-      _block(c, Rect.fromLTWH(x, r.bottom - t * 1.5, t * 0.95, t * 1.5), const Color(0xFF55506E));
-      c.drawRect(Rect.fromLTWH(x + t * 0.1, r.bottom - t * 1.35, t * 0.75, t * 0.12),
-          Paint()..color = const Color(0xFF7C779A));
+      final x = r.left + t * (0.45 + i * 1.6);
+      _block(c, Rect.fromLTWH(x, r.bottom - t * 1.5, t * 1.2, t * 1.5), const Color(0xFF55506E));
     }
-    _label(c, '허브', Offset(r.center.dx, r.top + t * 0.45), t * 0.62, Colors.white);
+    _tag(c, r, '허브', C.accent, Colors.white);
   }
 
   void _center(Canvas c, bool open) {
-    final r = _pr(centerR);
     final col = Color(Cfg.regionColor[sel]);
+    final name = '${Cfg.regionName[sel]} 센터';
+    final tagBg = open ? col : const Color(0xFF8A8799);
+    final tagFg = open ? Colors.black : Colors.white70;
     final img = Sprites.centers[sel];
     if (img != null) {
-      _buildingSprite(
-          c,
-          img,
-          Rect.fromLTRB(centerR.left, centerR.top - 0.8, centerR.right, centerR.bottom),
-          '${Cfg.regionName[sel]} 센터',
-          open ? col : const Color(0xFF8A8799),
-          open ? Colors.black : Colors.white70,
-          grey: !open);
+      final w = img.width * bigScale * t / 32, h = img.height * bigScale * t / 32;
+      final dst = Rect.fromLTWH(l.cx0 * t, footY * t - h, w, h);
+      _shadow(c, dst);
+      final p = Paint()..filterQuality = FilterQuality.none;
+      if (!open) {
+        p.colorFilter = const ColorFilter.matrix(<double>[
+          0.25, 0.45, 0.1, 0, 10, //
+          0.25, 0.45, 0.1, 0, 10, //
+          0.25, 0.45, 0.1, 0, 14, //
+          0, 0, 0, 1, 0,
+        ]);
+      }
+      _sprite(c, img, l.cx0, footY, bigScale, paint: p, leftAlign: true);
+      _tag(c, dst, name, tagBg, tagFg);
     } else {
-      _centerShape(c, r, open, col);
+      final r = Rect.fromLTRB(l.cx0 * t, (footY - 3.2) * t, (l.cx0 + 4.5) * t, footY * t);
+      _block(c, r, open ? const Color(0xFFE6DDCF) : const Color(0xFFB9B5A8));
+      _block(c, Rect.fromLTRB(r.left - t * 0.1, r.top - t * 0.1, r.right + t * 0.1, r.top + t * 0.95),
+          tagBg);
+      _tag(c, r, name, tagBg, tagFg);
     }
-    // 내려둔 택배 더미
+    // 내려둔 택배 더미 (센터 왼쪽 앞, 도로 끝)
     final n = g.centerStock[sel];
     if (n > 0) {
-      final base = _px(const Offset(9.0, 11.0));
+      final base = _px(Offset(l.cx0 - 1.6, footY + 0.2));
       final img = Sprites.boxS;
       final cnt = min(n, 9);
-      final bs = t * 0.32;
+      final bs = t * 0.4;
       for (var i = 0; i < cnt; i++) {
-        final cx = base.dx + (i % 3) * bs * 1.05 + t * 0.1;
+        final cx = base.dx + (i % 3) * bs * 1.05;
         final cy = base.dy + t * 0.95 - (i ~/ 3) * bs * 0.95 - bs;
         final dst = Rect.fromLTWH(cx, cy, bs, bs);
         if (img != null) {
           c.drawImageRect(img, Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-              dst, Paint()..filterQuality = FilterQuality.none);
+              dst, _tp);
         } else {
           c.drawRect(dst, Paint()..color = const Color(0xFFC89B5E));
         }
       }
-      if (n > 9) _label(c, '$n', base.translate(t * 0.55, t * 0.2), t * 0.4, Colors.white);
+      if (n > 9) _label(c, '$n', base.translate(t * 0.65, t * 0.1), t * 0.4, Colors.white);
     }
-  }
-
-  /// 도트 건물: 칸(타일 좌표) 안에 비율 유지로 맞추고 아래에 붙임. 기본은 왼쪽 정렬(센터는 도로가 왼쪽에서 닿음)
-  void _buildingSprite(Canvas c, ui.Image img, Rect tiles, String name, Color tagColor,
-      Color textColor,
-      {bool grey = false, bool center = false}) {
-    final box = _pr(tiles);
-    final k = min(box.width / img.width, box.height / img.height);
-    final w = img.width * k, h = img.height * k;
-    final left = center ? box.center.dx - w / 2 : box.left;
-    final dst = Rect.fromLTWH(left, box.bottom - h, w, h);
-    c.drawOval(Rect.fromLTWH(dst.left + w * 0.04, dst.bottom - t * 0.22, w * 0.96, t * 0.4),
-        Paint()..color = const Color(0x33000000));
-    final p = Paint()..filterQuality = FilterQuality.none;
-    if (grey) {
-      p.colorFilter = const ColorFilter.matrix(<double>[
-        0.25, 0.45, 0.1, 0, 10, //
-        0.25, 0.45, 0.1, 0, 10, //
-        0.25, 0.45, 0.1, 0, 14, //
-        0, 0, 0, 1, 0,
-      ]);
-    }
-    c.drawImageRect(img, Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()), dst, p);
-    // 이름표 (지붕 위)
-    final tp = TextPainter(
-      text: TextSpan(
-          text: name,
-          style: TextStyle(
-              color: textColor,
-              fontSize: max(9.0, t * 0.48),
-              fontWeight: FontWeight.w900)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    final tag = Rect.fromCenter(
-        center: Offset(dst.center.dx, dst.top - tp.height * 0.2),
-        width: tp.width + t * 0.5,
-        height: tp.height + t * 0.12);
-    c.drawRRect(RRect.fromRectAndRadius(tag, Radius.circular(t * 0.2)),
-        Paint()..color = tagColor);
-    tp.paint(c, Offset(tag.center.dx - tp.width / 2, tag.center.dy - tp.height / 2));
-  }
-
-  void _centerShape(Canvas c, Rect r, bool open, Color col) {
-    c.drawRect(r.shift(Offset(t * 0.15, t * 0.15)), Paint()..color = const Color(0x33000000));
-    _block(c, r, open ? const Color(0xFFE6DDCF) : const Color(0xFFB9B5A8));
-    _block(c, Rect.fromLTRB(r.left - t * 0.1, r.top - t * 0.1, r.right + t * 0.1, r.top + t * 0.95),
-        open ? col : const Color(0xFF8A8799));
-    // 왼쪽 하역구 (도로가 들어오는 곳)
-    _block(c, Rect.fromLTWH(r.left - t * 0.05, r.top + t * 1.15, t * 0.9, t * 1.5),
-        const Color(0xFF55506E));
-    // 위쪽 문 (배달 차량이 나가는 곳)
-    final dx = _px(Offset(door.floorToDouble() + 0.5, 0)).dx;
-    _block(c, Rect.fromLTWH(dx - t * 0.55, r.top + t * 1.0, t * 1.1, t * 0.95),
-        const Color(0xFF55506E));
-    // 창문
-    for (var i = 0; i < 2; i++) {
-      _block(c, Rect.fromLTWH(r.left + t * (1.5 + i * 3.2), r.top + t * 1.15, t * 0.9, t * 0.7),
-          const Color(0xFF9CC8E8));
-    }
-    _label(c, '${Cfg.regionName[sel]} 센터', Offset(r.center.dx, r.top + t * 0.48), t * 0.58,
-        open ? Colors.black : Colors.white70);
   }
 
   void _label(Canvas c, String text, Offset center, double size, Color color) {
@@ -1022,36 +1207,6 @@ class _MapPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     )..layout();
     tp.paint(c, Offset(center.dx - tp.width / 2, center.dy - tp.height / 2));
-  }
-
-  /// 차량의 지도 위 위치(칸 좌표)
-  Offset _unitPos(FleetUnit u, _Layout l, int slot) {
-    if (u.isTrunk) {
-      final len = _len(l.trunk);
-      switch (u.state) {
-        case 1:
-          final p = (u.t / (u.dur + u.delay)).clamp(0.0, 1.0).toDouble();
-          return _pointAt(l.trunk, len * p);
-        case 2:
-          final p = (u.t / u.dur).clamp(0.0, 1.0).toDouble();
-          return _pointAt(l.trunk, len * (1 - p));
-        default:
-          // 허브 앞에서 대기 (도크에서 싣는 중이면 도크 문 앞)
-          return Offset(1.4 + (slot % 3) * 1.5, 13.0);
-      }
-    }
-    final path = courierPath(u.house);
-    final len = _len(path);
-    switch (u.state) {
-      case 1:
-        final p = (u.t / (u.dur + u.delay)).clamp(0.0, 1.0).toDouble();
-        return _pointAt(path, len * p);
-      case 2:
-        final p = (u.t / u.dur).clamp(0.0, 1.0).toDouble();
-        return _pointAt(path, len * (1 - p));
-      default:
-        return Offset(16.6, 9.7 + (slot % 3) * 0.9);
-    }
   }
 
   void _unit(Canvas c, FleetUnit u, Offset tilePos) {
@@ -1066,6 +1221,14 @@ class _MapPainter extends CustomPainter {
       if (ahead.abs() > 0.01) _faceRight[u.id] = ahead > 0;
     }
     final right = _faceRight[u.id] ?? true;
+    // 따라가는 차량 표시
+    if (cam.follow == u.id) {
+      c.drawOval(Rect.fromCenter(center: foot.translate(0, -t * 0.05), width: w * 1.1, height: t * 0.5),
+          Paint()
+            ..color = const Color(0xCCFFD166)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2);
+    }
     // 그림자
     c.drawOval(Rect.fromCenter(center: foot.translate(0, -t * 0.05), width: w * 0.9, height: t * 0.32),
         Paint()..color = const Color(0x44000000));
@@ -1113,8 +1276,7 @@ class _MapPainter extends CustomPainter {
       final tp = TextPainter(
         text: TextSpan(
             text: u.evtText,
-            style: TextStyle(
-                color: Colors.white, fontSize: max(10.0, t * 0.46), fontWeight: FontWeight.w800)),
+            style: TextStyle(color: Colors.white, fontSize: t * 0.42, fontWeight: FontWeight.w800)),
         textDirection: TextDirection.ltr,
       )..layout();
       final r = Rect.fromCenter(
@@ -1133,8 +1295,7 @@ class _MapPainter extends CustomPainter {
 
   /// 차량이 지금 가는 방향의 좌우 성분 (오른쪽 +, 왼쪽 -)
   double _heading(FleetUnit u) {
-    final l = layout(sel);
-    final path = u.isTrunk ? l.trunk : courierPath(u.house);
+    final path = _path(u, l);
     final len = _len(path);
     final p = (u.t / (u.state == 1 ? (u.dur + u.delay) : u.dur)).clamp(0.0, 1.0).toDouble();
     final f = u.state == 1 ? p : 1 - p;
@@ -1148,10 +1309,10 @@ class _MapPainter extends CustomPainter {
       if (f.region != sel) continue;
       final Offset base;
       if (f.atCenter) {
-        base = _px(Offset(door.floorToDouble() + 0.5, 8.3));
+        base = _px(Offset(l.cx0 + 2.4, footY - 4.2));
       } else {
-        final hf = houseFoot[f.house % houseFoot.length];
-        base = _px(Offset(hf.dx, hf.dy - houseW * 0.9));
+        final h = l.houses[l.deliver[f.house % l.deliver.length]];
+        base = _px(Offset(h.x, h.y - 2.2));
       }
       final p = (f.t / 2.2).clamp(0.0, 1.0).toDouble();
       final pos = base.translate(0, -p * t * 1.6);
@@ -1161,7 +1322,7 @@ class _MapPainter extends CustomPainter {
             text: f.text,
             style: TextStyle(
                 color: Color(f.color).withOpacity(alpha),
-                fontSize: max(11.0, t * 0.55),
+                fontSize: t * 0.55,
                 fontWeight: FontWeight.w900,
                 shadows: [Shadow(color: Colors.black.withOpacity(alpha * 0.8), blurRadius: 2)])),
         textDirection: TextDirection.ltr,
@@ -1196,4 +1357,64 @@ class _Item {
   final double y;
   final void Function(Canvas) draw;
   _Item(this.y, this.draw);
+}
+
+/// 미니맵: 지역 전체를 작게 그리고 지금 보이는 영역을 네모로 표시
+class _MiniMap extends CustomPainter {
+  final HubGame g;
+  final int sel;
+  final _Cam cam;
+  _MiniMap(this.g, Listenable repaint, this.sel, this.cam) : super(repaint: repaint);
+
+  static final Map<int, ui.Picture> _bg = {};
+
+  @override
+  void paint(Canvas c, Size s) {
+    final l = _MapPainter.layout(sel);
+    final k = s.width / l.gw; // 칸 하나의 미니맵 크기
+    final bg = _bg[sel] ??= _drawBg(l, k, s);
+    c.drawPicture(bg);
+    // 허브·센터
+    c.drawRect(Rect.fromLTWH(_MapPainter.hubX * k, 14.5 * k, 4 * k, 3.5 * k), Paint()..color = C.accent);
+    c.drawRect(Rect.fromLTWH(l.cx0 * k, 14.5 * k, 4.5 * k, 3.5 * k),
+        Paint()..color = Color(Cfg.regionColor[sel]));
+    // 차량
+    if (g.regionOpen[sel]) {
+      for (final (u, pos) in _MapPainter.units(g, sel)) {
+        c.drawCircle(pos * k, u.id == cam.follow ? 3 : 2,
+            Paint()..color = u.id == cam.follow ? const Color(0xFFFFD166) : Colors.white);
+      }
+    }
+    // 보이는 영역
+    const T = _MapPainter.T;
+    c.drawRect(
+        Rect.fromLTWH(cam.pos.dx / T * k, cam.pos.dy / T * k, cam.view.width / T * k, cam.view.height / T * k)
+            .intersect(Offset.zero & s),
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5);
+  }
+
+  ui.Picture _drawBg(_Layout l, double k, Size s) {
+    final rec = ui.PictureRecorder();
+    final c = Canvas(rec);
+    c.drawRect(Offset.zero & s, Paint()..color = const Color(0xFF4F8A43));
+    final road = Paint()..color = const Color(0xFF3A3A48);
+    final walk = Paint()..color = const Color(0xFFCFC8B4);
+    for (var y = 0; y < l.gh; y++) {
+      for (var x = 0; x < l.gw; x++) {
+        final v = l.at(x, y);
+        if (v != 0) c.drawRect(Rect.fromLTWH(x * k, y * k, k + 0.3, k + 0.3), v == 1 ? road : walk);
+      }
+    }
+    final house = Paint()..color = const Color(0xFFE8D9B5);
+    for (final h in l.houses) {
+      c.drawRect(Rect.fromLTWH((h.x - 0.9) * k, (h.y - 1.6) * k, 1.8 * k, 1.6 * k), house);
+    }
+    return rec.endRecording();
+  }
+
+  @override
+  bool shouldRepaint(covariant _MiniMap old) => true;
 }

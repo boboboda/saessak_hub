@@ -212,5 +212,14 @@
   },
   "map_house_b": {
     "object_id": "c5477334-304d-4cf5-827c-651f07beca35"
+  },
+  "map_tiles_road": {
+    "tileset_id": "0395916e-ddcd-47e1-8f1d-f7459ac9eccc"
+  },
+  "map_tiles_road2": {
+    "tileset_id": "b5b215aa-2028-4531-82eb-3a71728e5573"
+  },
+  "map_tiles_walk": {
+    "tileset_id": "22229594-65d4-41ab-af74-e63a48777008"
   }
 }

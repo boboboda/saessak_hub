@@ -782,5 +782,79 @@
       "description": "pixel art, black outline, front view, flat orthographic, no perspective, single small three-story city apartment villa building, flat roof, rows of windows, entrance door, balconies",
       "size": 64
     }
+  },
+  "map_tiles_road": {
+    "endpoint": "/create-tileset",
+    "note": "노선 지도 타일셋: 잔디(아래) / 아스팔트 도로(위), Wang 코너 16장",
+    "body": {
+      "lower_description": "lush green grass lawn, short grass with small tufts",
+      "upper_description": "dark grey asphalt road surface, smooth",
+      "transition_description": "light grey concrete curb edge",
+      "transition_size": 0.25,
+      "tile_size": {
+        "width": 32,
+        "height": 32
+      },
+      "view": "high top-down",
+      "outline": "lineless",
+      "detail": "medium detail",
+      "shading": "basic shading"
+    }
+  },
+  "map_tiles_road2": {
+    "endpoint": "/create-tileset",
+    "note": "노선 지도 타일셋 2차: 기존 잔디·아스팔트 타일을 참조로 톤 맞춤",
+    "body": {
+      "lower_description": "soft green grass lawn, muted natural green, small darker tufts",
+      "upper_description": "medium grey asphalt road surface, slight noise texture",
+      "transition_description": "light grey concrete curb edge",
+      "transition_size": 0.25,
+      "tile_size": {
+        "width": 32,
+        "height": 32
+      },
+      "view": "high top-down",
+      "outline": "lineless",
+      "detail": "medium detail",
+      "shading": "basic shading",
+      "lower_reference_image": {
+        "type": "base64",
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACO0lEQVR4nJ1Xu04DMRA8rBSJTlQgQUnBX/ER/BlfREEJElToFDrQRhlrMjdr+1jplPN5vZ59b66eX55+pw10XH6m2/ubafleTu+HeV9/mYfXQfP1fDqjVII5nuwyFhBPCIagAMIgQFgHPwiAVwAmQzjIWoQA1SDWqikIVtJvKwCHeV+FAKEzFfZZKwasQJyMz/evlZKFGTJteL8neJQgp4wwO9+pz0FqIV5roKYAVIiLaHxTXrUQrMOAOUt2DoAzM9JIrZHFi4LLAJeeefWiXpz0wOFbdcHBCOSsYMQKLPayGtIj3FF6TKyFS7XMIi1grFRxec1CICgTmJ1vuYrdUFqoQwiX25aw/1DILIjs7JLMzFkPafWWt9ePi74StMsKSaYZ0nFLNuDyh8e7KhsKF3dxy6ytPgFlNOe1CIEvqLBgpBUOwmQj5AoNqmDshfba3k8AtGfjl02m6BlYqzKqm9g6tRktdAA13hWcoMgIBZaV2NH0LryhJnOWGSEdvzQWQpEaA8fzx0wDDSAAa5me34PPTVKgAiQ6VOjQCeRbiePApW7h+S8e10I1cLRoZf52ZXzVjhdjnl4A6WSj1tNcZ/7gvWhGkyGA4JLJQtVKmgmtKskddtWMVINA6waRLBu2NKZaio8mC2IjLteg6w0fLnOy8wjugkt03nMjuJo2S8XMBRq4tR2P+K4n0GmtIxu/X/wvWM4LdkMrE9wsuGWWYCrZZewSZ2rNhhGyhYhLpdYAl8cMSGOkNyW7vT/lKvEwHRzTuQAAAABJRU5ErkJggg==",
+        "format": "png"
+      },
+      "upper_reference_image": {
+        "type": "base64",
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACIElEQVR4nJVXW24DMQjcotUq/UlvlBP0/vdofhr5pxWRJhpPB7xF2iRrMAyYh/N2u33+XC7v2+PxvTHx2hhjO45j4ucaCDzIOX26D3v2/HDCvKbGeY2NYc3pg5zqCocuhdnDju73L+uhcyh5zE87gR/5VB4kz32z1/quxpx82gn8YE/0zAFIvzvK/Q4cg08KZmqCOA/gGT/KZ2KDyVPwuyKs3l3Wq2Hn9SqZ489K4Q2Us5IuF8BzUeQkj85wZQzU5YKWpvKwHm5ztckRA3MgHXFUQjetkqoDppV0hkIbiRKXjst67g3cHbUfVPkSWnJd+DkJIc8RQHJp5ufDa9MRbAbVmfCxtwCC5FrtnyIwTEi7yafyXSV0QAB8rzznI2EZJ181MESjO9aoOpzrakoVf9U1OXGjaqsQcLUNPnvHsivg0zQcpEyVIrEYNRvQiXlmSiZx6Ycqw7lpPvD1TCfcilSGSznYO5d4Lok4KjrjV5cQXQ8OySrD+dLJ+7TxoCHx1KvmRGhIKtQciTTM75pHfHNy17ypEw4xWoVTb0xasnpUq1H+AnCIF+kdlxMnpLtwItRd6Wl1TK14E9LB0SWQk++8dmuxMrT6J/Qfwn8DC2A0yqq2fL1+WIAwVuli+XAt1U1IB1D7gQOiezVnglFBqWYwz/kOCHSxDPZyYjPwqJTy7aYqP/UYuvSyoiAh+xxG2nbdpZTPmgEmMU8BuqTTfb9ETBuT91AAUQAAAABJRU5ErkJggg==",
+        "format": "png"
+      }
+    }
+  },
+  "map_tiles_walk": {
+    "endpoint": "/create-tileset",
+    "note": "노선 지도 타일셋: 잔디 / 보도블록 (동네 길)",
+    "body": {
+      "lower_description": "soft green grass lawn, muted natural green, small darker tufts",
+      "upper_description": "light beige grey square paving stone sidewalk, small tiles grid",
+      "transition_description": "low stone curb edge",
+      "transition_size": 0.25,
+      "tile_size": {
+        "width": 32,
+        "height": 32
+      },
+      "view": "high top-down",
+      "outline": "lineless",
+      "detail": "medium detail",
+      "shading": "basic shading",
+      "lower_reference_image": {
+        "type": "base64",
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACO0lEQVR4nJ1Xu04DMRA8rBSJTlQgQUnBX/ER/BlfREEJElToFDrQRhlrMjdr+1jplPN5vZ59b66eX55+pw10XH6m2/ubafleTu+HeV9/mYfXQfP1fDqjVII5nuwyFhBPCIagAMIgQFgHPwiAVwAmQzjIWoQA1SDWqikIVtJvKwCHeV+FAKEzFfZZKwasQJyMz/evlZKFGTJteL8neJQgp4wwO9+pz0FqIV5roKYAVIiLaHxTXrUQrMOAOUt2DoAzM9JIrZHFi4LLAJeeefWiXpz0wOFbdcHBCOSsYMQKLPayGtIj3FF6TKyFS7XMIi1grFRxec1CICgTmJ1vuYrdUFqoQwiX25aw/1DILIjs7JLMzFkPafWWt9ePi74StMsKSaYZ0nFLNuDyh8e7KhsKF3dxy6ytPgFlNOe1CIEvqLBgpBUOwmQj5AoNqmDshfba3k8AtGfjl02m6BlYqzKqm9g6tRktdAA13hWcoMgIBZaV2NH0LryhJnOWGSEdvzQWQpEaA8fzx0wDDSAAa5me34PPTVKgAiQ6VOjQCeRbiePApW7h+S8e10I1cLRoZf52ZXzVjhdjnl4A6WSj1tNcZ/7gvWhGkyGA4JLJQtVKmgmtKskddtWMVINA6waRLBu2NKZaio8mC2IjLteg6w0fLnOy8wjugkt03nMjuJo2S8XMBRq4tR2P+K4n0GmtIxu/X/wvWM4LdkMrE9wsuGWWYCrZZewSZ2rNhhGyhYhLpdYAl8cMSGOkNyW7vT/lKvEwHRzTuQAAAABJRU5ErkJggg==",
+        "format": "png"
+      },
+      "upper_reference_image": {
+        "type": "base64",
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACGElEQVR4nMVXPW9CMQykFkMLY1krfnD3Dv2N0A3o1spPuqfr9eykLD0JeCSOv3J28h7e316/Nv+IbX4djy+t0O32uXl6epxSuN/vN5fL5ddzhWAjqig/CTaOcZUH2GA+Q66S3+IBRipBZOF0Oi+/+dHMuEyNMheIihfoIlbMcyPlHAwc5rG0uzig+6RZGGWncqj6j4DT7uKA7lMV2SwRGU43BxwzBkaR8xbqGrd1loQVeP9dWVXOOYPKicTiQMdkfnY13W3LTBbCKRylvDOmukb64h6ycZMCDofndU5llf3cyMIp75pRIpsRuhyXFP9CnrthPoNHcCrUCE8qXPfrer3qcSQOjkyB6Bx7/3JAQc45G6qUgQUznXCGuK5fbPPrfP5YB67Xa6uE51V2tJbt/HBgt9stUWKPMppk9egsr7aC97rbqpz7sQWccjbOXNAq0RKDnupc4VLMIKM7PLTE4JiLKEuTgYwqoAulHCqAhgJh11jYUQd1HGMuc6HKlPnKA51nhdxwGGhIWk0rBzhqXtQB83qb0jEHyFkOQLmekG4ekSm0TVdVsHKAS2bmYtkdr9hrrSSeY4QqdmnkaDQTLqqq9JQHKwf4tuqIpNF0d0cXpa7l9cFGVGl33aqIhii7tZzpYKNVrVaGukqBk06Gx4IH8NYzC/cCo046fVz2wYruufdXDnXZse8F3TXM3QE7cCmDdPpaBnwD+YLdL1fo8NcAAAAASUVORK5CYII=",
+        "format": "png"
+      }
+    }
   }
 }
