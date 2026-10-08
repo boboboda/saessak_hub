@@ -474,7 +474,9 @@ extension WorldView on HubGame {
         final k = (0.45 + prog * 6).clamp(0.45, 1.0);
         final w = 20 * k, h = 20 * k;
         // 포장 중엔 상자가 살짝 들썩임
-        final jx = sin(clock * 22) * 0.8 * k, jy = (sin(clock * 14) * 0.5 + 0.5) * -1.2;
+        final live = b.active.isNotEmpty; // 직원이 자리에 없으면 작업이 멈춘 상태
+        final jx = live ? sin(clock * 22) * 0.8 * k : 0.0;
+        final jy = live ? (sin(clock * 14) * 0.5 + 0.5) * -1.2 : 0.0;
         final br = Rect.fromLTWH(r.center.dx - w / 2 + jx, r.top + 21 - h + jy, w, h);
         Sprites.drawContain(c, Sprites.boxOpen!, br);
         // 테이프가 위로 붙어 나가는 선 (진행도만큼)
@@ -483,7 +485,7 @@ extension WorldView on HubGame {
           box(c, br.left + 2, br.top + h * 0.28, (w - 4) * tp, 2.5, 0xFFE8C98A);
         }
         // 작업 먼지/반짝임
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < (live ? 3 : 0); i++) {
           final ph = (clock * 3 + i * 0.37) % 1.0;
           final sx = br.center.dx + (i - 1) * 9 + sin(i * 5 + clock * 4) * 3;
           box(c, sx, br.top + 4 - ph * 9, 2, 2,
