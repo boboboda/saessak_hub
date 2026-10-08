@@ -197,7 +197,8 @@ def run_asset(name, spec, st):
     else:
         bodies.append((None, body))
     for d, b in bodies:
-        if d and entry.get("animation_group_id"):
+        # 같은 캐릭터로 만든 애니메이션 그룹만 이어 쓴다 (기본 캐릭터를 새로 만들었으면 무시)
+        if d and entry.get("animation_group_id") and entry.get("for_character") == b.get("character_id"):
             b["animation_group_id"] = entry["animation_group_id"]
         resp = call(spec.get("method", "POST"), spec["endpoint"], b)
         tag = f"{name}_{d}" if d else name
@@ -206,6 +207,8 @@ def run_asset(name, spec, st):
         for k in ("character_id", "object_id", "tileset_id", "animation_id", "animation_group_id", "id"):
             if isinstance(resp.get(k), str):
                 entry[k] = resp[k]
+        if b.get("character_id") and isinstance(resp.get("animation_group_id"), str):
+            entry["for_character"] = b["character_id"]
         for jid in job_ids(resp):
             j = wait_job(jid)
             dump_raw(f"{tag}_job_{jid}", j)
