@@ -22,5 +22,44 @@
   },
   "veh_van": {
     "object_id": "f90d98d1-5838-44e4-87f2-0dfd45a8fa02"
+  },
+  "obj_shelf2": {
+    "object_id": "8db72c65-abae-414d-800b-e0bdcd03d2e9"
+  },
+  "decor_tree": {
+    "object_id": "3f79eace-6ec3-4184-8ecb-be18261c7f8c"
+  },
+  "decor_bush": {
+    "object_id": "1ffb9ef3-c581-40d8-b0c3-b9f61d242175"
+  },
+  "decor_lamp": {
+    "object_id": "51b0596e-7047-4e62-8244-79db2e7dc4df"
+  },
+  "decor_light": {
+    "object_id": "97de1681-93b3-43ef-bf5b-63f375e424f7"
+  },
+  "decor_bench": {
+    "object_id": "6cb4212e-45d0-4111-8026-108440bff05b"
+  },
+  "decor_cone": {
+    "object_id": "d4383aaf-faf9-4974-a5b2-69384bdb4b8a"
+  },
+  "decor_sign": {
+    "object_id": "ad8a950a-5b26-4e8d-aeec-be45960e870a"
+  },
+  "decor_house1": {
+    "object_id": "f6aaf48b-887b-4661-8989-cbafe8144bce"
+  },
+  "decor_house2": {
+    "object_id": "89e1e0a5-6704-445e-9233-d44cdfedc427"
+  },
+  "decor_house3": {
+    "object_id": "ee7cad16-a0ca-46df-a865-f0a34dfddb6b"
+  },
+  "decor_pallet": {
+    "object_id": "714d2cf8-5a9b-44a3-99ed-3c8f71496ad4"
+  },
+  "decor_flower": {
+    "object_id": "9bdf7477-a6ed-44f4-b943-20ef0bcbd8bd"
   }
 }
