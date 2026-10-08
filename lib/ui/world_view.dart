@@ -6,6 +6,7 @@ import '../game/config.dart';
 import '../game/hub_game.dart';
 import '../game/scenery.dart';
 import '../game/sprites.dart';
+import '../models/building.dart';
 import 'draw_utils.dart';
 
 /// 게임 맵(캔버스). 메뉴·패널은 위젯이 따로 그림.
