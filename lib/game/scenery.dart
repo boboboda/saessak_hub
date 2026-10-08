@@ -45,19 +45,26 @@ class Scenery {
       reserved.add(Rect.fromLTRB(x - 2.2, y - 3.4, x + 2.2, y + 0.2));
     }
 
+    // 건물은 창고를 최대로 확장해도 안 겹치는 바깥(위쪽 블록)에만 둔다.
+    // 확장 가능한 자리는 아래의 나무·덤불·꽃으로만 채움 (확장하면 덮여서 사라짐)
     const houses = ['house1', 'house2', 'house3'];
-    // 위쪽 큰길 뒤 줄 (길 바로 위에 앞면이 닿게)
+    const wTiles = {'house1': 3.4, 'house2': 3.0, 'house3': 3.3};
+    // 위쪽 큰길을 따라 한 줄로 (길에 앞면이 닿게). 건물 사이 간격은 들쭉날쭉, 틈에는 작은 나무
+    var hx = 2.6;
     var i = 0;
-    for (var x = 2.8; x < Cfg.road.left - 1; x += 4.6) {
-      house(houses[i++ % 3], x, 6.0);
+    while (true) {
+      final k = houses[i++ % 3];
+      final w = wTiles[k]!;
+      if (hx + w > Cfg.road.left - 0.8) break;
+      house(k, hx + w / 2, 6.0);
+      hx += w + 0.4 + rnd.nextDouble() * 1.4;
+      if (rnd.nextBool() && hx + 1 < Cfg.road.left - 1) {
+        out.add(Deco(rnd.nextBool() ? 'bush' : 'flower', hx - 0.5, 6.0, 1));
+      }
     }
-    // 아래쪽 큰길 아래 줄
-    for (var x = 4.0; x < Cfg.road.left - 1; x += 4.6) {
-      house(houses[i++ % 3], x, Cfg.rows - 0.4);
-    }
-    // 창고 위쪽 동네 (창고를 확장하면 이 자리부터 덮여서 사라짐)
-    for (var x = 5.0; x < Cfg.yard.left - 2; x += 5.2) {
-      house(houses[i++ % 3], x, 11.4);
+    // 건물 뒤(맨 위)는 나무 울타리처럼
+    for (var tx = 1.0; tx < Cfg.road.left; tx += 1.8 + rnd.nextDouble() * 1.5) {
+      out.add(Deco(rnd.nextBool() ? 'tree' : 'tree2', tx, 2.4 + rnd.nextDouble() * 0.8, 2));
     }
 
     // 가로등: 큰길·왼쪽 길·도로 인도를 따라
@@ -85,11 +92,12 @@ class Scenery {
         final x = gx + 0.5, y = gy + 1.0;
         if (busy(x, y, 0.2)) continue;
         final r = rnd.nextDouble();
-        if (r < 0.04) {
+        final park = gy >= 30; // 아래쪽은 공원처럼 빽빽하게
+        if (r < (park ? 0.10 : 0.04)) {
           out.add(Deco(rnd.nextBool() ? 'tree' : 'tree2', x, y, 2));
-        } else if (r < 0.08) {
+        } else if (r < (park ? 0.18 : 0.08)) {
           out.add(Deco('bush', x, y, 1));
-        } else if (r < 0.11) {
+        } else if (r < (park ? 0.26 : 0.11)) {
           out.add(Deco('flower', x, y, 1));
         }
       }

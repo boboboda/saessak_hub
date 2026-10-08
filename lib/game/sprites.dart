@@ -9,6 +9,7 @@ class Sprites {
   static ui.Image? floor;
   static ui.Image? counter, pack, shelf, van;
   static ui.Image? grass, asphalt, sidewalk, yard;
+  static ui.Image? boxS, boxOpen, packEmpty;
 
   /// 배경 장식 도트 (assets/sprites/decor/<이름>.png). 없는 건 null.
   static final Map<String, ui.Image> decor = {};
@@ -29,6 +30,9 @@ class Sprites {
     pack = await _img('assets/sprites/props/pack.png');
     shelf = await _img('assets/sprites/props/shelf.png');
     van = await _img('assets/sprites/props/van.png');
+    boxS = await _img('assets/sprites/props/box_s.png');
+    boxOpen = await _img('assets/sprites/props/box_open.png');
+    packEmpty = await _img('assets/sprites/props/pack_empty.png'); // 있으면 포장 상자가 동적으로 생김
     grass = await _img('assets/sprites/tiles/grass.png');
     asphalt = await _img('assets/sprites/tiles/asphalt.png');
     sidewalk = await _img('assets/sprites/tiles/sidewalk.png');
@@ -96,7 +100,7 @@ class Sprites {
       case 'counter':
         return counter;
       case 'pack':
-        return pack;
+        return packEmpty ?? pack;
       case 'shelf':
         return shelf;
     }
@@ -136,6 +140,18 @@ class Sprites {
         img,
         ui.Rect.fromLTWH(w * v, 0, w, img.height.toDouble()),
         ui.Rect.fromLTWH(x, y, t, t),
+        ui.Paint()..filterQuality = ui.FilterQuality.none);
+    return true;
+  }
+
+  /// 작은 상자(선반 칸용). 이미지 없으면 false.
+  static bool drawSmallBox(ui.Canvas c, double x, double y) {
+    final img = boxS;
+    if (img == null) return false;
+    c.drawImageRect(
+        img,
+        ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+        ui.Rect.fromLTWH(x, y, img.width.toDouble(), img.height.toDouble()),
         ui.Paint()..filterQuality = ui.FilterQuality.none);
     return true;
   }

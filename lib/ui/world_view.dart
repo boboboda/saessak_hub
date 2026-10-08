@@ -249,24 +249,46 @@ extension WorldView on HubGame {
           break;
         case 'pack':
           final p = b.slot;
+          final dyn = Sprites.packEmpty != null; // 빈 포장대 그림이 있으면 상자를 동적으로 그림
           if (p != null) {
+            final prog = (b.progress / Cfg.packTime).clamp(0.0, 1.0);
             if (p.stage == 3) {
-              if (!Sprites.drawBox(
-                  c,
-                  Rect.fromLTWH(r.center.dx - 10, r.bottom - 25, 20, 20),
-                  Cfg.regionColor[p.region])) {
+              final rr = Rect.fromLTWH(r.center.dx - 11, r.top + 11, 22, 22);
+              if (!Sprites.drawBox(c, rr, Cfg.regionColor[p.region])) {
                 box(c, r.center.dx - 7, r.bottom - 20, 14, 14,
                     Cfg.regionColor[p.region]);
               }
             } else {
+              if (dyn && p.stage == 2 && Sprites.boxOpen != null) {
+                // 포장을 시작하면 열린 상자가 나타나고, 포장이 끝나면 닫힌 상자가 됨
+                final k = (0.45 + prog * 6).clamp(0.45, 1.0);
+                final w = 22 * k, h = 22 * k;
+                Sprites.drawContain(c, Sprites.boxOpen!,
+                    Rect.fromLTWH(r.center.dx - w / 2, r.top + 33 - h, w, h));
+              }
               box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
-              box(c, r.left + 4, r.bottom - 10,
-                  (r.width - 8) * (b.progress / Cfg.packTime).clamp(0.0, 1.0),
-                  6, 0xFFFFD166);
+              box(c, r.left + 4, r.bottom - 10, (r.width - 8) * prog, 6,
+                  0xFFFFD166);
             }
           }
           break;
         case 'shelf':
+          // 들어온 택배 수만큼 선반 칸에 상자가 쌓임 (아래 칸부터)
+          if (Sprites.shelf != null && Sprites.boxS != null) {
+            final sh = Sprites.shelf!;
+            final k = r.width / sh.width; // 선반 그림 배율
+            final top = r.bottom - sh.height * k;
+            const tierBase = [64.0, 37.0, 11.0]; // 각 칸 바닥(그림 기준 픽셀)
+            const perTier = 4;
+            final slots = (b.stored / b.cap * perTier * 3).ceil().clamp(0, perTier * 3);
+            for (var i = 0; i < slots; i++) {
+              final tier = i ~/ perTier, col = i % perTier;
+              Sprites.drawSmallBox(
+                  c,
+                  r.left + 10 * k + col * 12.5 * k + 1,
+                  top + tierBase[tier] * k - 11);
+            }
+          }
           box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
           box(c, r.left + 4, r.bottom - 10,
               (r.width - 8) * (b.stored / b.cap).clamp(0.0, 1.0), 6,

@@ -182,5 +182,61 @@
       "description": "pixel art, black outline, front view, flat orthographic, no perspective, small flower patch, colorful flowers on grass",
       "size": 32
     }
+  },
+  "obj_pack2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "포장대(빈 것) - 위에 상자 없음",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, empty green metal packing table, only a small tape dispenser on the corner, nothing else on top, clear flat tabletop",
+      "size": 64
+    }
+  },
+  "staff_work_counter": {
+    "endpoint": "/animate-character",
+    "note": "접수 작업(정면)",
+    "character_of": "staff_base",
+    "body": {
+      "character_id": "{staff_base.character_id}",
+      "action_description": "standing and typing on a cash register keyboard with both hands, looking down at the counter",
+      "frame_count": 8,
+      "directions": [
+        "south"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "staff_work_pack": {
+    "endpoint": "/animate-character",
+    "note": "포장 작업(정면)",
+    "character_of": "staff_base",
+    "body": {
+      "character_id": "{staff_base.character_id}",
+      "action_description": "standing and taping a cardboard box on a table, arms moving to wrap tape",
+      "frame_count": 8,
+      "directions": [
+        "south"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "staff_carry_walk": {
+    "endpoint": "/animate-character",
+    "note": "박스 들고 걷기(4방향)",
+    "character_of": "staff_base",
+    "body": {
+      "character_id": "{staff_base.character_id}",
+      "action_description": "walking while carrying a cardboard box held in both arms in front of the chest",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
   }
 }
