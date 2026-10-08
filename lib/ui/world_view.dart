@@ -253,7 +253,7 @@ extension WorldView on HubGame {
           if (p != null) {
             final prog = (b.progress / Cfg.packTime).clamp(0.0, 1.0);
             if (p.stage == 3) {
-              final rr = Rect.fromLTWH(r.center.dx - 11, r.top + 11, 22, 22);
+              final rr = Rect.fromLTWH(r.center.dx - 15, r.top + 5, 22, 22);
               if (!Sprites.drawBox(c, rr, Cfg.regionColor[p.region])) {
                 box(c, r.center.dx - 7, r.bottom - 20, 14, 14,
                     Cfg.regionColor[p.region]);
@@ -264,7 +264,7 @@ extension WorldView on HubGame {
                 final k = (0.45 + prog * 6).clamp(0.45, 1.0);
                 final w = 22 * k, h = 22 * k;
                 Sprites.drawContain(c, Sprites.boxOpen!,
-                    Rect.fromLTWH(r.center.dx - w / 2, r.top + 33 - h, w, h));
+                    Rect.fromLTWH(r.center.dx - 4 - w / 2, r.top + 27 - h, w, h));
               }
               box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
               box(c, r.left + 4, r.bottom - 10, (r.width - 8) * prog, 6,
