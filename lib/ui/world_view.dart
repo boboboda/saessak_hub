@@ -644,19 +644,23 @@ extension WorldView on HubGame {
     for (final w in carriers) {
       if (w.staff.away) continue;
       final p = Offset(w.pos.dx * t, w.pos.dy * t);
-      _person(c, p, w.staff.initial, 0xFF8EC5FF, 0xFFFFFFFF,
-          tired: w.staff.tired, energy: w.staff.energyPct, key: w.staff);
-      if (w.carrying && w.job != null) {
-        if (!Sprites.drawBox(
-            c,
-            Rect.fromLTWH(p.dx - 10, p.dy - t * 0.95, 20, 20),
-            Cfg.regionColor[w.job!.region])) {
-          box(c, p.dx - 7, p.dy - t * 0.62, 14, 14,
-              Cfg.regionColor[w.job!.region]);
-          strokeBox(c, Rect.fromLTWH(p.dx - 7, p.dy - t * 0.62, 14, 14),
-              0xFF2A2438, 1.5);
+      final carrying = w.carrying && w.job != null;
+      final dir = _faces[w.staff]?.dir ?? 0; // 0 남, 1 서, 2 동, 3 북
+      void carried() {
+        // 상자를 가슴 앞에 안고 있는 모습 (머리 위가 아님)
+        final cx = p.dx + (dir == 1 ? -9 : (dir == 2 ? 9 : 0));
+        final cy = p.dy + (dir == 0 ? 3 : 0);
+        final r = Rect.fromCenter(center: Offset(cx, cy), width: 17, height: 17);
+        if (!Sprites.drawBox(c, r, Cfg.regionColor[w.job!.region])) {
+          box(c, r.left, r.top, r.width, r.height, Cfg.regionColor[w.job!.region]);
+          strokeBox(c, r, 0xFF2A2438, 1.5);
         }
       }
+
+      if (carrying && dir == 3) carried(); // 뒤돌아 걸을 땐 몸에 가려지게 먼저
+      _person(c, p, w.staff.initial, 0xFF8EC5FF, 0xFFFFFFFF,
+          tired: w.staff.tired, energy: w.staff.energyPct, key: w.staff);
+      if (carrying && dir != 3) carried();
     }
   }
 }
