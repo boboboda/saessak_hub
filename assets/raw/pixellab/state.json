@@ -173,5 +173,14 @@
   },
   "veh_moto": {
     "object_id": "46bf496e-c95b-4611-940f-32d59b70252d"
+  },
+  "veh_van_full": {
+    "object_id": "8b2cd196-1e5e-4738-bb21-d30ffa7a7b73"
+  },
+  "veh_truck_full": {
+    "object_id": "fdcdcce4-f43d-403e-8768-66c0e7aba65f"
+  },
+  "veh_moto_full": {
+    "object_id": "9e8c5bfe-7b1f-4cec-846b-6b5c9a28ac91"
   }
 }
