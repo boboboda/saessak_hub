@@ -16,6 +16,7 @@ class Sprites {
   static ui.Image? box;
   static ui.Image? floor;
   static ui.Image? counter, pack, shelf, van, truck, moto;
+  static ui.Image? vanFull, truckFull, motoFull; // 상자 가득 찬 모습 (없으면 null)
   static ui.Image? grass, asphalt, sidewalk, yard;
   static ui.Image? boxS, boxOpen, packEmpty;
 
@@ -49,6 +50,9 @@ class Sprites {
     van = await _img('assets/sprites/props/van.png');
     truck = await _img('assets/sprites/props/truck.png');
     moto = await _img('assets/sprites/props/moto.png');
+    vanFull = await _img('assets/sprites/props/van_full.png');
+    truckFull = await _img('assets/sprites/props/truck_full.png');
+    motoFull = await _img('assets/sprites/props/moto_full.png');
     boxS = await _img('assets/sprites/props/box_s.png');
     boxOpen = await _img('assets/sprites/props/box_open.png');
     packEmpty = await _img('assets/sprites/props/pack_empty.png'); // 있으면 포장 상자가 동적으로 생김
@@ -185,6 +189,19 @@ class Sprites {
         return van;
       case '오토바이':
         return moto;
+    }
+    return null;
+  }
+
+  /// 상자 가득 찬 차량 그림 (없으면 null)
+  static ui.Image? vehicleFullImg(String typeName) {
+    switch (typeName) {
+      case '대형 트럭':
+        return truckFull;
+      case '소형 트럭':
+        return vanFull;
+      case '오토바이':
+        return motoFull;
     }
     return null;
   }

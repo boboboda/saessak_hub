@@ -301,11 +301,26 @@ extension WorldView on HubGame {
             final vimg = Sprites.vehicleImg(v.type.name);
             if (vimg != null) {
               final vr = Rect.fromLTWH(vx, vy, vw, vh);
-              Sprites.drawContain(c, vimg, vr);
               final drawn = Sprites.containRect(vimg, vr);
-              // 싣은 만큼 짐칸에 상자가 쌓임
-              Sprites.drawCargo(
-                  c, v.type.name, vimg, drawn, v.loaded, v.type.cap);
+              final fimg = Sprites.vehicleFullImg(v.type.name);
+              if (fimg != null && v.loaded >= v.type.cap * 0.6) {
+                // 거의 찼으면 상자 가득 실린 그림 (빈 그림과 같은 배율, 바닥·오른쪽 맞춤)
+                final k = drawn.width / vimg.width;
+                final fw = fimg.width * k, fh = fimg.height * k;
+                final dst = Rect.fromLTWH(
+                    drawn.right - fw, drawn.bottom - fh, fw, fh);
+                c.drawImageRect(
+                    fimg,
+                    Rect.fromLTWH(
+                        0, 0, fimg.width.toDouble(), fimg.height.toDouble()),
+                    dst,
+                    Paint()..filterQuality = FilterQuality.none);
+              } else {
+                Sprites.drawContain(c, vimg, vr);
+                // 싣은 만큼 짐칸에 상자가 쌓임
+                Sprites.drawCargo(
+                    c, v.type.name, vimg, drawn, v.loaded, v.type.cap);
+              }
               // 구역 색 띠 + 적재 현황 (차량 위쪽)
               box(c, drawn.left + 2, drawn.top - 7, 22, 4,
                   Cfg.regionColor[v.region]);
