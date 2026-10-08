@@ -654,5 +654,29 @@
       "mode": "v3"
     },
     "per_direction": true
+  },
+  "veh_van_open": {
+    "endpoint": "/create-1-direction-object",
+    "note": "소형 트럭: 뒤가 열린 빈 짐칸(상자는 코드로 채움)",
+    "body": {
+      "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, small white delivery truck with open empty cargo bed at the rear, low side rails, orange stripe, cab on the right, nothing inside the cargo bed",
+      "size": 128
+    }
+  },
+  "veh_truck_big": {
+    "endpoint": "/create-1-direction-object",
+    "note": "대형 트럭: 뒤 문이 열린 빈 짐칸",
+    "body": {
+      "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, large white cargo truck with rear door open showing empty dark cargo area, blue stripe, cab on the right, nothing inside the cargo area",
+      "size": 128
+    }
+  },
+  "veh_moto": {
+    "endpoint": "/create-1-direction-object",
+    "note": "오토바이 배달: 뒤 짐받이 빈 상태",
+    "body": {
+      "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, delivery motorcycle scooter with empty rear cargo rack, orange body, rider not included",
+      "size": 64
+    }
   }
 }
