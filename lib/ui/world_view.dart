@@ -323,7 +323,7 @@ extension WorldView on HubGame {
   }
 
   void _person(Canvas c, Offset p, String initial, int fill, int stroke,
-      {bool tired = false, double energy = 1.0, Object? key}) {
+      {bool tired = false, double energy = 1.0, Object? key, bool work = false, double workHz = 7}) {
     const t = Cfg.tile;
     if (Sprites.staffWalk != null) {
       final f = _faces.putIfAbsent(key ?? initial, () => _Face(p));
@@ -336,7 +336,7 @@ extension WorldView on HubGame {
       if (!moved && clock > f.until + 0.3) f.dir = 0; // 멈춰 있으면 정면(남쪽)을 봄
       f.last = p;
       Sprites.drawStaff(c, p.dx, p.dy + t * 0.35, f.dir, clock < f.until, clock,
-          look: key is Staff ? key.id : 0);
+          look: key is Staff ? key.id : 0, work: work, workHz: workHz);
       if (tired) {
         label(c, 'Zz', p.dx + t * 0.18, p.dy - t * 0.7,
             size: 11, color: const Color(0xFF8EC5FF));
@@ -473,8 +473,22 @@ extension WorldView on HubGame {
       if (dyn && p.stage == 2 && Sprites.boxOpen != null) {
         final k = (0.45 + prog * 6).clamp(0.45, 1.0);
         final w = 20 * k, h = 20 * k;
-        Sprites.drawContain(c, Sprites.boxOpen!,
-            Rect.fromLTWH(r.center.dx - w / 2, r.top + 21 - h, w, h));
+        // 포장 중엔 상자가 살짝 들썩임
+        final jx = sin(clock * 22) * 0.8 * k, jy = (sin(clock * 14) * 0.5 + 0.5) * -1.2;
+        final br = Rect.fromLTWH(r.center.dx - w / 2 + jx, r.top + 21 - h + jy, w, h);
+        Sprites.drawContain(c, Sprites.boxOpen!, br);
+        // 테이프가 위로 붙어 나가는 선 (진행도만큼)
+        if (prog > 0.35) {
+          final tp = ((prog - 0.35) / 0.65).clamp(0.0, 1.0);
+          box(c, br.left + 2, br.top + h * 0.28, (w - 4) * tp, 2.5, 0xFFE8C98A);
+        }
+        // 작업 먼지/반짝임
+        for (var i = 0; i < 3; i++) {
+          final ph = (clock * 3 + i * 0.37) % 1.0;
+          final sx = br.center.dx + (i - 1) * 9 + sin(i * 5 + clock * 4) * 3;
+          box(c, sx, br.top + 4 - ph * 9, 2, 2,
+              ph < 0.8 ? 0xFFFFF3C4 : 0x00FFFFFF);
+        }
       }
       box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
       box(c, r.left + 4, r.bottom - 10, (r.width - 8) * prog, 6, 0xFFFFD166);
@@ -526,7 +540,11 @@ extension WorldView on HubGame {
         final p =
         Offset((b.tx + spots[i].dx) * t, (b.ty + spots[i].dy) * t + bob);
         _person(c, p, act[i].initial, 0xFFFFE0B2, 0xFF8B4A00,
-            tired: act[i].tired, energy: act[i].energyPct, key: act[i]);
+            tired: act[i].tired,
+            energy: act[i].energyPct,
+            key: act[i],
+            work: working,
+            workHz: 9); // 접수: 타이핑처럼 빠르고 작게
       }
     }
 
@@ -541,7 +559,11 @@ extension WorldView on HubGame {
         final p =
         Offset((b.tx + spots[i].dx) * t, (b.ty + spots[i].dy) * t + bob);
         _person(c, p, act[i].initial, 0xFFB9F6CA, 0xFF1B5E20,
-            tired: act[i].tired, energy: act[i].energyPct, key: act[i]);
+            tired: act[i].tired,
+            energy: act[i].energyPct,
+            key: act[i],
+            work: working,
+            workHz: 7);
       }
     }
 

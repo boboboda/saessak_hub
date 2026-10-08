@@ -73,7 +73,7 @@ class Sprites {
   /// 직원 한 명을 그린다. (x,y)는 발 위치. dir 0남 1서 2동 3북, moving이면 걷기 모션.
   static void drawStaff(ui.Canvas c, double x, double y, int dir, bool moving,
       double clock,
-      {int look = 0, double alpha = 1}) {
+      {int look = 0, double alpha = 1, bool work = false, double workHz = 7}) {
     if (staffLooks.isEmpty) return;
     final img = staffLooks[look % staffLooks.length];
     final cw = img.width / frames, ch = img.height / 4;
@@ -83,6 +83,19 @@ class Sprites {
     final p = ui.Paint()
       ..filterQuality = ui.FilterQuality.none
       ..color = ui.Color.fromARGB((alpha * 255).round(), 255, 255, 255);
+    if (work) {
+      // 작업 중 모션: 발을 기준으로 몸이 리듬 있게 숙였다 올라오고 살짝 흔들림
+      final ph = clock * workHz;
+      final dip = (math.sin(ph) * 0.5 + 0.5); // 0~1
+      c.save();
+      c.translate(x, y);
+      c.rotate(math.sin(ph * 0.5) * 0.05);
+      c.scale(1 + dip * 0.03, 1 - dip * 0.05);
+      c.translate(-x, -y);
+      c.drawImageRect(img, src, dst.translate(0, dip * 1.5), p);
+      c.restore();
+      return;
+    }
     c.drawImageRect(img, src, dst, p);
   }
 
