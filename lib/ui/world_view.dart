@@ -447,7 +447,7 @@ extension WorldView on HubGame {
     final dst = Rect.fromLTWH(p.dx - w / 2, p.dy + 9 - h, w, h);
     if (front) {
       c.save();
-      c.clipRect(Rect.fromLTRB(dst.left, dst.top + h * 0.5, dst.right, dst.bottom));
+      c.clipRect(Rect.fromLTRB(dst.left, dst.top + h * 9 / 21, dst.right, dst.bottom)); // 좌판·다리만 사람 앞에
     }
     c.drawImageRect(
         img,
@@ -513,7 +513,6 @@ extension WorldView on HubGame {
     for (final s in staff) {
       if (!s.away) continue;
       var p = Offset(s.pos.dx * t, s.pos.dy * t);
-      if (s.rest == 2) p = p.translate(0, 8); // 앉아서 쉬는 중: 엉덩이를 벤치에 맞춤
       if (s.carrier) {
         _person(c, p, s.initial, 0xFF8EC5FF, 0xFFFFFFFF,
             tired: true, energy: s.energyPct, key: s);

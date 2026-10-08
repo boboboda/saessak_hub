@@ -24,6 +24,10 @@ extension WorkerSystem on HubGame {
   void dropCarrier(Carrier c) {
     final p = c.job;
     if (p == null) return;
+    if (p.stage == 4) {
+      _abortLoad(c);
+      return;
+    }
     if (!c.carrying) {
       p.reserved = false;
       final d = c.dst;
@@ -36,6 +40,8 @@ extension WorkerSystem on HubGame {
   void _reserveDst(Building d) {
     if (d.type.id == 'pack') {
       d.reservedIn = true;
+    } else if (d.type.id == 'dock') {
+      d.vehicle?.incoming++;
     } else {
       d.incoming++;
     }
@@ -44,15 +50,75 @@ extension WorkerSystem on HubGame {
   void _release(Building d) {
     if (d.type.id == 'pack') {
       d.reservedIn = false;
+    } else if (d.type.id == 'dock') {
+      final v = d.vehicle;
+      if (v != null) v.incoming = max(0, v.incoming - 1);
     } else {
       d.incoming = max(0, d.incoming - 1);
     }
+  }
+
+  /// 적재 일 취소: 예약 풀기, 이미 들고 있으면 선반에 되돌려 놓음
+  void _abortLoad(Carrier c) {
+    final p = c.job;
+    if (p == null) return;
+    final src = c.src;
+    if (!c.carrying) {
+      if (src != null && buildings.contains(src)) {
+        src.pickRes[p.region] = max(0, src.pickRes[p.region] - 1);
+      }
+    } else {
+      final shelf = _nearest(
+          ofType('shelf').where((b) => b.stored < b.cap + 5), c.pos);
+      if (shelf != null) {
+        shelf.stored++;
+        shelf.regions[p.region]++;
+      }
+    }
+    final v = c.veh;
+    if (v != null) v.incoming = max(0, v.incoming - 1);
+    c.veh = null;
+    _clear(c);
+  }
+
+  /// 차량에 싣는 일 찾기: 선반(해당 지역 택배) → 도크의 차량
+  bool _assignLoad(Carrier c) {
+    Building? bestDock;
+    var bestD = 1e9;
+    for (final d in ofType('dock')) {
+      final v = d.vehicle;
+      if (v == null || v.state != 1) continue;
+      if (v.loaded + v.incoming >= v.type.cap) continue;
+      final dist = (frontOf(d) - c.pos).distance;
+      if (dist >= bestD) continue;
+      final shelf = _nearest(
+          ofType('shelf').where((b) => b.regions[v.region] - b.pickRes[v.region] > 0),
+          c.pos);
+      if (shelf == null) continue;
+      bestDock = d;
+      bestD = dist;
+    }
+    if (bestDock == null) return false;
+    final v = bestDock.vehicle!;
+    final shelf = _nearest(
+        ofType('shelf').where((b) => b.regions[v.region] - b.pickRes[v.region] > 0),
+        c.pos)!;
+    shelf.pickRes[v.region]++;
+    v.incoming++;
+    final p = Parcel(v.region)..stage = 4;
+    c.job = p;
+    c.src = shelf;
+    c.dst = bestDock;
+    c.veh = v;
+    c.carrying = false;
+    return true;
   }
 
   void _clear(Carrier c) {
     c.job = null;
     c.src = null;
     c.dst = null;
+    c.veh = null;
     c.carrying = false;
   }
 
@@ -85,6 +151,17 @@ extension WorkerSystem on HubGame {
   /// 건물이 철거됐는지 확인하고 일 정리
   void _validate(Carrier c) {
     if (c.job == null) return;
+    if (c.job!.stage == 4) {
+      final srcOk = c.carrying || (c.src != null && buildings.contains(c.src));
+      final dst = c.dst;
+      final vehOk = dst != null &&
+          buildings.contains(dst) &&
+          dst.vehicle != null &&
+          dst.vehicle == c.veh &&
+          dst.vehicle!.state == 1;
+      if (!srcOk || !vehOk) _abortLoad(c);
+      return;
+    }
     final srcOk = c.carrying || (c.src != null && buildings.contains(c.src));
     final dstOk = c.dst != null && buildings.contains(c.dst);
     if (srcOk && dstOk) return;
@@ -125,6 +202,8 @@ extension WorkerSystem on HubGame {
       bestD = d;
     }
 
+    if (bestSrc == null && _assignLoad(c)) return;
+
     if (bestSrc == null) {
       for (final b in ofType('counter')) {
         Parcel? p;
@@ -156,12 +235,40 @@ extension WorkerSystem on HubGame {
   void _move(Carrier c, double dt) {
     c.staff.working = true; // 걷는 동안 체력 소모
     final target = c.carrying ? frontOf(c.dst!) : frontOf(c.src!);
-    final slow = (c.carrying && c.job!.kind == 3) ? Cfg.bulkySlow : 1.0;
+    var slow = (c.carrying && c.job!.kind == 3) ? Cfg.bulkySlow : 1.0;
+    if (c.job!.stage == 4) slow *= c.dst!.loadMul; // 도크 업그레이드: 싣는 속도
     c.pos = stepToward(
         c.pos, target, Cfg.carrierSpeed * c.staff.walkMul * slow, dt);
     if ((c.pos - target).distance > 0.05) return;
 
     final p = c.job!;
+    if (p.stage == 4) {
+      if (!c.carrying) {
+        // 선반에서 집기
+        final sh = c.src!;
+        if (sh.regions[p.region] <= 0) {
+          _abortLoad(c);
+          return;
+        }
+        sh.regions[p.region]--;
+        sh.pickRes[p.region] = max(0, sh.pickRes[p.region] - 1);
+        sh.stored = max(0, sh.stored - 1);
+        c.carrying = true;
+      } else {
+        // 차량에 싣기
+        final v = c.dst!.vehicle;
+        if (v != null && v == c.veh && v.state == 1) {
+          v.loaded++;
+          v.incoming = max(0, v.incoming - 1);
+          v.idle = 0;
+        } else {
+          _abortLoad(c);
+          return;
+        }
+        _clear(c);
+      }
+      return;
+    }
     if (!c.carrying) {
       final s = c.src!;
       if (s.type.id == 'counter') {

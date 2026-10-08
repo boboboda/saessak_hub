@@ -35,6 +35,7 @@ class Building {
   int stored = 0; // 선반: 보관 수
   int incoming = 0; // 선반: 운반 중 예약 수
   final List<int> regions = List<int>.filled(5, 0); // 선반: 지역별 보관 수
+  final List<int> pickRes = List<int>.filled(5, 0); // 선반: 도크로 가져가려고 예약된 수
   Vehicle? vehicle; // 도크: 서 있는 차량
   final List<Staff> crew = []; // 배치된 직원 (쉬러 간 직원 포함)
   double flash = 0; // 포장 실수 표시 남은 시간(초)
