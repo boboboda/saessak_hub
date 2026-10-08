@@ -18,6 +18,27 @@ extension WorldView on HubGame {
   int y0Of(HubGame g) => max(0, (g.cam.dy / Cfg.tile).floor());
   int y1Of(HubGame g) => min(Cfg.rows, ((g.cam.dy + g.size.y) / Cfg.tile).ceil());
 
+  // ---------------- 인도(길) ----------------
+  /// 창고 입구(왼쪽 벽 가운데)에서 왼쪽 세로길까지 이어지는 길. 창고가 커지면 같이 이동.
+  Rect get entrancePath {
+    final a = area;
+    final cy = (a.center.dy - 1).floorToDouble();
+    return Rect.fromLTRB(1, cy, a.left + 0.15, cy + 2);
+  }
+
+  void _drawPaths(Canvas c) {
+    const t = Cfg.tile;
+    for (final r in [...Scenery.paths, entrancePath]) {
+      for (var y = r.top.toInt(); y < r.bottom.toInt(); y++) {
+        for (var x = r.left.toInt(); x < r.right.ceil(); x++) {
+          if (!Sprites.drawTile(c, Sprites.sidewalk, x * t, y * t, t)) {
+            box(c, x * t, y * t, t, t, 0xFFB9B5A8);
+          }
+        }
+      }
+    }
+  }
+
   // ---------------- 배경 장식 ----------------
   void _drawDecor(Canvas c) {
     const t = Cfg.tile;
@@ -29,6 +50,10 @@ extension WorldView on HubGame {
       final w = img.width.toDouble(), h = img.height.toDouble(); // 도트 원본 크기 그대로
       final r = Rect.fromLTWH(d.x * t - w / 2, d.y * t - h, w, h);
       if (!r.overlaps(view) || r.overlaps(a)) continue;
+      if (!Scenery.onPath.contains(d.key) &&
+          entrancePath.contains(Offset(d.x, d.y - 0.3))) {
+        continue; // 입구 길 위의 나무 등은 숨김
+      }
       Sprites.drawContain(c, img, r);
     }
   }
@@ -50,6 +75,7 @@ extension WorldView on HubGame {
       }
     }
 
+    _drawPaths(c);
     _drawDecor(c);
     _drawRoadAndYard(c);
     _drawWarehouse(c);
@@ -305,6 +331,7 @@ extension WorldView on HubGame {
         f.dir = dx.abs() > dy.abs() ? (dx < 0 ? 1 : 2) : (dy < 0 ? 3 : 0);
         f.until = clock + 0.15;
       }
+      if (!moved && clock > f.until + 0.3) f.dir = 0; // 멈춰 있으면 정면(남쪽)을 봄
       f.last = p;
       Sprites.drawStaff(c, p.dx, p.dy + t * 0.35, f.dir, clock < f.until, clock);
       if (tired) {
