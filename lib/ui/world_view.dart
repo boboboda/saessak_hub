@@ -524,10 +524,6 @@ extension WorldView on HubGame {
         _person(c, p, s.initial, 0xFFB9F6CA, 0xFF1B5E20,
             tired: true, energy: s.energyPct, key: s);
       }
-      // 자리 비움 표시는 그 직원 머리 위에
-      final bub = Rect.fromLTWH(p.dx - 25, p.dy - t * 1.75, 50, 14);
-      box(c, bub.left, bub.top, bub.width, bub.height, 0xFFD98B2B);
-      labelIn(c, '자리 비움', bub, size: 10);
     }
 
     // 접수 직원: 창구 뒤(위)에 서 있음. 자리에 있는 직원만 표시.
@@ -587,6 +583,25 @@ extension WorldView on HubGame {
     }
     for (final b in ofType('pack')) {
       _drawPackContent(c, b);
+    }
+
+    // 자리 비움 표시: 쉬러 간 직원을 따라가지 않고, 그 직원이 서 있던 자리(머리 위)에 표시
+    for (final b in [...ofType('counter'), ...ofType('pack')]) {
+      final w = b.type.w.toDouble();
+      final spots = b.type.id == 'counter'
+          ? [Offset(w - 0.5, -0.5), Offset(0.5, -0.5)]
+          : [Offset(w - 0.45, 0.12), Offset(0.45, 0.12)];
+      // 자리에 있는 직원이 앞 칸을 쓰므로, 빈자리는 그 다음 칸부터
+      final here = b.active.length;
+      final awayN = b.crew.where((s) => s.away).length;
+      for (var k = 0; k < awayN; k++) {
+        final i = here + k;
+        if (i >= spots.length) break;
+        final sx = (b.tx + spots[i].dx) * t, sy = (b.ty + spots[i].dy) * t;
+        final bub = Rect.fromLTWH(sx - 24, sy - 50, 48, 14);
+        box(c, bub.left, bub.top, bub.width, bub.height, 0xFFD98B2B);
+        labelIn(c, '자리 비움', bub, size: 10);
+      }
     }
 
     // 앉아서 쉬는 직원: 벤치 앞쪽을 다시 그려 '앉은' 느낌
