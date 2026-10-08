@@ -1,0 +1,103 @@
+{
+  "group_id": "edd56ec9-b5a2-440e-b3e3-b9a5ecca716a",
+  "states": [
+    {
+      "character": {
+        "id": "1e2aec48-2ce5-4963-ae8d-9336eefb7b5d",
+        "name": "Idle",
+        "prompt": "friendly parcel delivery hub worker, orange safety vest over white shirt, dark blue cap, brown hair, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-07T13:27:52.030296+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "walking": {
+            "south": [
+              "Idle/animations/walking/south/frame_000.png",
+              "Idle/animations/walking/south/frame_001.png",
+              "Idle/animations/walking/south/frame_002.png",
+              "Idle/animations/walking/south/frame_003.png",
+              "Idle/animations/walking/south/frame_004.png",
+              "Idle/animations/walking/south/frame_005.png",
+              "Idle/animations/walking/south/frame_006.png"
+            ]
+          },
+          "walking-9c4ae4a1": {
+            "east": [
+              "Idle/animations/walking-9c4ae4a1/east/frame_000.png",
+              "Idle/animations/walking-9c4ae4a1/east/frame_001.png",
+              "Idle/animations/walking-9c4ae4a1/east/frame_002.png",
+              "Idle/animations/walking-9c4ae4a1/east/frame_003.png",
+              "Idle/animations/walking-9c4ae4a1/east/frame_004.png",
+              "Idle/animations/walking-9c4ae4a1/east/frame_005.png",
+              "Idle/animations/walking-9c4ae4a1/east/frame_006.png"
+            ],
+            "north": [
+              "Idle/animations/walking-9c4ae4a1/north/frame_000.png",
+              "Idle/animations/walking-9c4ae4a1/north/frame_001.png",
+              "Idle/animations/walking-9c4ae4a1/north/frame_002.png",
+              "Idle/animations/walking-9c4ae4a1/north/frame_003.png",
+              "Idle/animations/walking-9c4ae4a1/north/frame_004.png",
+              "Idle/animations/walking-9c4ae4a1/north/frame_005.png",
+              "Idle/animations/walking-9c4ae4a1/north/frame_006.png"
+            ],
+            "west": [
+              "Idle/animations/walking-9c4ae4a1/west/frame_000.png",
+              "Idle/animations/walking-9c4ae4a1/west/frame_001.png",
+              "Idle/animations/walking-9c4ae4a1/west/frame_002.png",
+              "Idle/animations/walking-9c4ae4a1/west/frame_003.png",
+              "Idle/animations/walking-9c4ae4a1/west/frame_004.png",
+              "Idle/animations/walking-9c4ae4a1/west/frame_005.png",
+              "Idle/animations/walking-9c4ae4a1/west/frame_006.png"
+            ]
+          },
+          "standing_and_taping_a_cardboard_box_on_a_table_arm": {
+            "south": [
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_000.png",
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_001.png",
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_002.png",
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_003.png",
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_004.png",
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_005.png",
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_006.png",
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_007.png",
+              "Idle/animations/standing_and_taping_a_cardboard_box_on_a_table_arm/south/frame_008.png"
+            ]
+          },
+          "standing_and_typing_on_a_cash_register_keyboard_wi": {
+            "south": [
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_000.png",
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_001.png",
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_002.png",
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_003.png",
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_004.png",
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_005.png",
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_006.png",
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_007.png",
+              "Idle/animations/standing_and_typing_on_a_cash_register_keyboard_wi/south/frame_008.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-08T02:15:06.605570"
+}

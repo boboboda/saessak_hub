@@ -61,5 +61,17 @@
   },
   "decor_flower": {
     "object_id": "9bdf7477-a6ed-44f4-b943-20ef0bcbd8bd"
+  },
+  "obj_pack2": {
+    "object_id": "baa3811b-07ae-4e4b-aee9-4a4d35c6e1b1"
+  },
+  "staff_work_counter": {
+    "animation_group_id": "c9198527-22f2-43d7-a0eb-3efdfa79e1bf"
+  },
+  "staff_work_pack": {
+    "animation_group_id": "adc6d12d-b636-4444-a4df-fedff13dec85"
+  },
+  "staff_carry_walk": {
+    "animation_group_id": "671f772d-ecab-4444-ac13-521867a30879"
   }
 }
