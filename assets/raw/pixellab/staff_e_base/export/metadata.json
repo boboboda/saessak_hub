@@ -1,0 +1,36 @@
+{
+  "group_id": "c02f5f77-4cf0-48d9-9ae8-f3cc7405477d",
+  "states": [
+    {
+      "character": {
+        "id": "c0d431e2-d896-4c43-bdfa-1cb4d5501350",
+        "name": "Idle",
+        "prompt": "friendly parcel delivery hub worker, young man, curly black hair, dark skin, round glasses, no cap, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-08T06:56:31.822428+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-08T06:59:59.416060"
+}

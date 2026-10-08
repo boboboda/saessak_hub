@@ -1,0 +1,36 @@
+{
+  "group_id": "1ceee518-faa7-4145-85fe-dcc5e32a2f12",
+  "states": [
+    {
+      "character": {
+        "id": "496caf53-8f80-4c05-b3aa-3fbce88733cc",
+        "name": "Idle",
+        "prompt": "friendly parcel delivery hub worker, woman, long red braid, freckles, navy cap, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-08T07:09:23.370963+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-08T07:14:27.027036"
+}

@@ -115,5 +115,40 @@
   "cust_f_walk": {
     "animation_group_id": "20a85b7d-b62d-4cd4-b79e-cd3b20689a28",
     "for_character": "595ad63b-7ddc-4417-8bec-efef2ea4c2fc"
+  },
+  "staff_b_base": {
+    "character_id": "a3923abf-67f7-486e-b3c2-5623ad80fe7f"
+  },
+  "staff_b_walk": {
+    "animation_group_id": "2fdf074a-dc3d-44df-9f6e-0171c82f8721",
+    "for_character": "a3923abf-67f7-486e-b3c2-5623ad80fe7f"
+  },
+  "staff_c_base": {
+    "character_id": "34b3fa35-b25c-490a-8f2d-4a28a0721aed"
+  },
+  "staff_c_walk": {
+    "animation_group_id": "ce4cfc9d-c19c-4e2e-bf2a-e838887e30f0",
+    "for_character": "34b3fa35-b25c-490a-8f2d-4a28a0721aed"
+  },
+  "staff_d_base": {
+    "character_id": "de640a34-bd96-447e-899c-8d99d4ee3e51"
+  },
+  "staff_d_walk": {
+    "animation_group_id": "ad331bc4-c8c7-4ee2-9bb5-b9d631d4519a",
+    "for_character": "de640a34-bd96-447e-899c-8d99d4ee3e51"
+  },
+  "staff_e_base": {
+    "character_id": "c0d431e2-d896-4c43-bdfa-1cb4d5501350"
+  },
+  "staff_e_walk": {
+    "animation_group_id": "6d88a4df-28e8-4cc3-b72a-e9fe9eedf5aa",
+    "for_character": "c0d431e2-d896-4c43-bdfa-1cb4d5501350"
+  },
+  "staff_f_base": {
+    "character_id": "496caf53-8f80-4c05-b3aa-3fbce88733cc"
+  },
+  "staff_f_walk": {
+    "animation_group_id": "802e159b-36b2-4513-ae10-b780d01761e3",
+    "for_character": "496caf53-8f80-4c05-b3aa-3fbce88733cc"
   }
 }
