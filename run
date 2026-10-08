@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# 개발용 실행 스크립트.  사용법 (저장소 맨 위 폴더, Git Bash 에서):
+#   ./run setup        에뮬레이터 처음 한 번 만들기 (시스템 이미지 설치 + AVD 생성)
+#   ./run dev          에뮬레이터를 켜고(꺼져 있으면) 게임 실행 (핫 리로드: r, 종료: q)
+#   ./run dev profile  같은 방식, 단 profile 모드 (성능 확인용, 핫 리로드 없음)
+#   ./run emu          에뮬레이터만 켜기
+#   ./run win          에뮬레이터 없이 Windows 앱으로 실행
+#   ./run devices      연결된 기기 보기
+set -e
+cd "$(dirname "$0")"
+
+AVD="${AVD_NAME:-pixel}"
+IMG="system-images;android-35;google_apis;x86_64"
+
+# ---- Android SDK 위치 찾기 ----
+SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+if [ -z "$SDK" ]; then
+  for p in "$LOCALAPPDATA/Android/sdk" "$HOME/AppData/Local/Android/sdk" \
+           "$HOME/Library/Android/sdk" "$HOME/Android/Sdk"; do
+    if [ -d "$p" ]; then SDK="$p"; break; fi
+  done
+fi
+[ -d "$SDK" ] || { echo "Android SDK 를 못 찾았어요. ANDROID_HOME 을 지정해 주세요."; exit 1; }
+
+# 윈도우는 .bat/.exe, 맥·리눅스는 확장자 없음
+if [ -f "$SDK/cmdline-tools/latest/bin/sdkmanager.bat" ]; then
+  SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager.bat"
+  AVDMANAGER="$SDK/cmdline-tools/latest/bin/avdmanager.bat"
+else
+  SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
+  AVDMANAGER="$SDK/cmdline-tools/latest/bin/avdmanager"
+fi
+ADB="$SDK/platform-tools/adb"
+[ -f "$ADB" ] || ADB="$SDK/platform-tools/adb.exe"
+
+emulator_running() {
+  "$ADB" devices 2>/dev/null | grep -q "^emulator-.*device$"
+}
+
+cmd_setup() {
+  [ -e "$SDKMANAGER" ] || { echo "cmdline-tools 가 없어요. Android Studio 의 SDK Manager > SDK Tools 에서 'Android SDK Command-line Tools' 를 설치하세요."; exit 1; }
+  echo "== 시스템 이미지 설치 (몇 분 걸려요) =="
+  yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+  "$SDKMANAGER" "platform-tools" "platforms;android-35" "emulator" "$IMG"
+  echo "== 에뮬레이터($AVD) 만들기 =="
+  if "$AVDMANAGER" list avd 2>/dev/null | grep -q "Name: $AVD"; then
+    echo "이미 있어요: $AVD"
+  else
+    echo no | "$AVDMANAGER" create avd -n "$AVD" -k "$IMG" -d pixel_6
+  fi
+  echo "완료. 이제 ./run dev"
+}
+
+cmd_emu() {
+  if emulator_running; then
+    echo "에뮬레이터가 이미 켜져 있어요."
+    return
+  fi
+  echo "== 에뮬레이터($AVD) 켜는 중 =="
+  flutter emulators --launch "$AVD"
+  echo "부팅을 기다리는 중... (최대 3분)"
+  for _ in $(seq 1 90); do
+    if emulator_running; then
+      b=$("$ADB" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+      [ "$b" = "1" ] && { echo "부팅 완료"; return; }
+    fi
+    sleep 2
+  done
+  echo "에뮬레이터가 제때 안 켜졌어요. 하이퍼바이저(Windows 하이퍼바이저 플랫폼) 가속이 켜져 있는지 확인하세요."
+  exit 1
+}
+
+case "${1:-dev}" in
+  setup)   cmd_setup ;;
+  emu)     cmd_emu ;;
+  devices) flutter devices ;;
+  win)     flutter run -d windows --profile ;;
+  dev)
+    cmd_emu
+    if [ "${2:-}" = "profile" ]; then
+      flutter run --profile
+    else
+      flutter run
+    fi
+    ;;
+  *) sed -n 2,9p "$0"; exit 1 ;;
+esac
