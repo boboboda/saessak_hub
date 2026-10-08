@@ -678,5 +678,29 @@
       "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, delivery motorcycle scooter with empty rear cargo rack, orange body, rider not included",
       "size": 64
     }
+  },
+  "veh_van_full": {
+    "endpoint": "/create-1-direction-object",
+    "note": "소형 트럭: 갈색 택배 상자가 가득 쌓인 짐칸",
+    "body": {
+      "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, small white delivery truck, open cargo bed at the rear piled full with stacked brown cardboard parcel boxes clearly visible, orange stripe, cab on the right",
+      "size": 128
+    }
+  },
+  "veh_truck_full": {
+    "endpoint": "/create-1-direction-object",
+    "note": "대형 트럭: 뒤 문 열림, 상자 가득",
+    "body": {
+      "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, large white cargo truck, rear door open showing cargo area completely filled with stacked brown cardboard parcel boxes, blue stripe, cab on the right",
+      "size": 128
+    }
+  },
+  "veh_moto_full": {
+    "endpoint": "/create-1-direction-object",
+    "note": "오토바이: 짐받이에 상자 가득",
+    "body": {
+      "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, delivery motorcycle scooter with a large rear rack stacked with brown cardboard parcel boxes strapped on, orange body, rider not included",
+      "size": 64
+    }
   }
 }
