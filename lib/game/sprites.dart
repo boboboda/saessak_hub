@@ -77,7 +77,7 @@ class Sprites {
     if (staffLooks.isEmpty) return;
     final img = staffLooks[look % staffLooks.length];
     final cw = img.width / frames, ch = img.height / 4;
-    final f = moving ? 1 + (clock * 9).floor() % (frames - 1) : 0;
+    final f = moving ? 1 + (clock * 7).floor() % (frames - 1) : 0;
     final src = ui.Rect.fromLTWH(f * cw, dir * ch, cw, ch);
     final dst = ui.Rect.fromLTWH(x - cw / 2, y - ch * 0.86, cw, ch);
     final p = ui.Paint()
