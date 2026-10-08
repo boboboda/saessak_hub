@@ -18,13 +18,10 @@ class Scenery {
   static List<Deco> _build() {
     final rnd = Random(2024);
     final out = <Deco>[];
-    final big = Cfg.areas.last; // 최대로 확장한 창고 영역
     bool busy(double x, double y, [double pad = 0]) {
-      // 도로·마당·최대 창고 영역과 겹치면 장식을 두지 않는다
+      // 도로·마당과 겹치면 장식을 두지 않는다 (창고 자리는 그릴 때 현재 창고와 겹치면 빼서 처리)
       final r = Rect.fromLTWH(x - 1, y - 2, 2, 3).inflate(pad);
-      return r.overlaps(Cfg.road.inflate(1)) ||
-          r.overlaps(Cfg.yard) ||
-          r.overlaps(big.inflate(1));
+      return r.overlaps(Cfg.road.inflate(1)) || r.overlaps(Cfg.yard);
     }
 
     // 위쪽 줄: 이웃 가게/집 (북쪽 인도 뒤)

@@ -21,15 +21,14 @@ extension WorldView on HubGame {
   // ---------------- 배경 장식 ----------------
   void _drawDecor(Canvas c) {
     const t = Cfg.tile;
-    final a = area.inflate(0.5);
+    final a = _px(area.inflate(0.6)); // 지금 창고(+여백)와 겹치는 장식은 숨김
     final view = Rect.fromLTWH(cam.dx - 160, cam.dy - 160, size.x + 320, size.y + 320);
     for (final d in Scenery.items) {
       final img = Sprites.decor[d.key];
       if (img == null) continue;
-      if (a.contains(Offset(d.x, d.y - 1))) continue; // 확장한 창고가 덮는 자리
       final w = img.width.toDouble(), h = img.height.toDouble(); // 도트 원본 크기 그대로
       final r = Rect.fromLTWH(d.x * t - w / 2, d.y * t - h, w, h);
-      if (!r.overlaps(view)) continue;
+      if (!r.overlaps(view) || r.overlaps(a)) continue;
       Sprites.drawContain(c, img, r);
     }
   }
@@ -375,7 +374,7 @@ extension WorldView on HubGame {
       final working = customers
           .any((cu) => cu.counter == b && cu.state != 2 && cu.serveT > 0);
       final w = b.type.w.toDouble();
-      final spots = [Offset(w - 0.5, -0.15), Offset(0.5, -0.15)];
+      final spots = [Offset(w - 0.5, -0.5), Offset(0.5, -0.5)];
       final act = b.active;
       for (var i = 0; i < act.length && i < spots.length; i++) {
         const bob = 0.0;
@@ -412,7 +411,7 @@ extension WorldView on HubGame {
         final top = r.bottom - h;
         c.save();
         c.clipRect(Rect.fromLTRB(
-            r.left, top + h * (id == 'pack' ? 0.25 : 0.3), r.right, r.bottom));
+            r.left, top + h * (id == 'pack' ? 0.25 : 0.0), r.right, r.bottom));
         Sprites.drawFitWidth(c, sp, r);
         c.restore();
       }
