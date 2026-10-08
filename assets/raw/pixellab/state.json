@@ -164,5 +164,14 @@
   "staff_h_walk": {
     "animation_group_id": "aa2303ba-03ba-4ff5-8e26-4412619036bf",
     "for_character": "25c8cde9-0b8a-4a6a-acd1-9c0a09f5c601"
+  },
+  "veh_van_open": {
+    "object_id": "e30de1f8-067b-46f7-9990-305c864ce99b"
+  },
+  "veh_truck_big": {
+    "object_id": "eb076109-301c-4b12-8f25-2052bb4b45b6"
+  },
+  "veh_moto": {
+    "object_id": "46bf496e-c95b-4611-940f-32d59b70252d"
   }
 }
