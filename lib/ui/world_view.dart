@@ -7,6 +7,7 @@ import '../game/hub_game.dart';
 import '../game/scenery.dart';
 import '../game/sprites.dart';
 import '../models/building.dart';
+import '../models/staff.dart';
 import 'draw_utils.dart';
 
 /// 게임 맵(캔버스). 메뉴·패널은 위젯이 따로 그림.
@@ -334,7 +335,8 @@ extension WorldView on HubGame {
       }
       if (!moved && clock > f.until + 0.3) f.dir = 0; // 멈춰 있으면 정면(남쪽)을 봄
       f.last = p;
-      Sprites.drawStaff(c, p.dx, p.dy + t * 0.35, f.dir, clock < f.until, clock);
+      Sprites.drawStaff(c, p.dx, p.dy + t * 0.35, f.dir, clock < f.until, clock,
+          look: key is Staff ? key.id : 0);
       if (tired) {
         label(c, 'Zz', p.dx + t * 0.18, p.dy - t * 0.7,
             size: 11, color: const Color(0xFF8EC5FF));

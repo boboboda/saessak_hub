@@ -430,5 +430,165 @@
       "mode": "v3"
     },
     "per_direction": true
+  },
+  "staff_b_base": {
+    "endpoint": "/create-character-v3",
+    "note": "직원 외형 변형 b",
+    "body": {
+      "description": "friendly parcel delivery hub worker, young woman, black hair in a bun, navy cap, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "staff_b_walk": {
+    "endpoint": "/animate-character",
+    "note": "직원 b 걷기 (4방향, 6프레임)",
+    "character_of": "staff_b_base",
+    "body": {
+      "character_id": "{staff_b_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "staff_c_base": {
+    "endpoint": "/create-character-v3",
+    "note": "직원 외형 변형 c",
+    "body": {
+      "description": "friendly parcel delivery hub worker, middle-aged man, short gray hair, mustache, no cap, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "staff_c_walk": {
+    "endpoint": "/animate-character",
+    "note": "직원 c 걷기 (4방향, 6프레임)",
+    "character_of": "staff_c_base",
+    "body": {
+      "character_id": "{staff_c_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "staff_d_base": {
+    "endpoint": "/create-character-v3",
+    "note": "직원 외형 변형 d",
+    "body": {
+      "description": "friendly parcel delivery hub worker, young woman, short blonde hair, navy cap, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "staff_d_walk": {
+    "endpoint": "/animate-character",
+    "note": "직원 d 걷기 (4방향, 6프레임)",
+    "character_of": "staff_d_base",
+    "body": {
+      "character_id": "{staff_d_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "staff_e_base": {
+    "endpoint": "/create-character-v3",
+    "note": "직원 외형 변형 e",
+    "body": {
+      "description": "friendly parcel delivery hub worker, young man, curly black hair, dark skin, round glasses, no cap, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "staff_e_walk": {
+    "endpoint": "/animate-character",
+    "note": "직원 e 걷기 (4방향, 6프레임)",
+    "character_of": "staff_e_base",
+    "body": {
+      "character_id": "{staff_e_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "staff_f_base": {
+    "endpoint": "/create-character-v3",
+    "note": "직원 외형 변형 f",
+    "body": {
+      "description": "friendly parcel delivery hub worker, woman, long red braid, freckles, navy cap, orange safety vest over white shirt, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "staff_f_walk": {
+    "endpoint": "/animate-character",
+    "note": "직원 f 걷기 (4방향, 6프레임)",
+    "character_of": "staff_f_base",
+    "body": {
+      "character_id": "{staff_f_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
   }
 }

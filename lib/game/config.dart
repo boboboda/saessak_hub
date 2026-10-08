@@ -50,7 +50,7 @@ class Cfg {
   static const double serveTime = 5; // 접수 시간(초, 직원 1명 기준 ×1.0)
   static const double packTime = 5; // 포장 시간(초)
   static const double customerSpeed = 2.2; // 칸/초
-  static const double carrierSpeed = 3.0; // 칸/초 (걸음 능력치로 배수)
+  static const double carrierSpeed = 1.9; // 칸/초 (걸음 능력치로 배수)
   static const double patience = 45; // 손님 인내심(초)
   static const int shelfCap = 20; // 선반 1개 용량
   static const int outboxCap = 4; // 접수 창구 대기 택배 한도

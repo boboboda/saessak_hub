@@ -7,6 +7,9 @@ import 'package:flutter/services.dart';
 class Sprites {
   static ui.Image? staffWalk;
 
+  /// 직원 외형 변형 시트 (assets/sprites/staff/staff_walk_1..5.png). 있는 것만 모아 둠. 0번은 staffWalk.
+  static final List<ui.Image> staffLooks = [];
+
   /// 손님 걷기 시트 (assets/sprites/customer/cust_0..5.png, 직원 시트와 같은 배치). 없으면 null.
   static const int custLooks = 6;
   static final List<ui.Image?> custWalk = List.filled(custLooks, null);
@@ -29,6 +32,12 @@ class Sprites {
 
   static Future<void> load() async {
     staffWalk = await _img('assets/sprites/staff/staff_walk.png');
+    staffLooks.clear();
+    if (staffWalk != null) staffLooks.add(staffWalk!);
+    for (var i = 1; i <= 5; i++) {
+      final im = await _img('assets/sprites/staff/staff_walk_$i.png');
+      if (im != null) staffLooks.add(im);
+    }
     for (var i = 0; i < custLooks; i++) {
       custWalk[i] = await _img('assets/sprites/customer/cust_$i.png');
     }
@@ -64,12 +73,13 @@ class Sprites {
   /// 직원 한 명을 그린다. (x,y)는 발 위치. dir 0남 1서 2동 3북, moving이면 걷기 모션.
   static void drawStaff(ui.Canvas c, double x, double y, int dir, bool moving,
       double clock,
-      {double size = 56, double alpha = 1}) {
-    final img = staffWalk;
-    if (img == null) return;
+      {int look = 0, double alpha = 1}) {
+    if (staffLooks.isEmpty) return;
+    final img = staffLooks[look % staffLooks.length];
+    final cw = img.width / frames, ch = img.height / 4;
     final f = moving ? 1 + (clock * 9).floor() % (frames - 1) : 0;
-    final src = ui.Rect.fromLTWH(f * cell, dir * cell, cell, cell);
-    final dst = ui.Rect.fromLTWH(x - size / 2, y - size * 0.86, size, size);
+    final src = ui.Rect.fromLTWH(f * cw, dir * ch, cw, ch);
+    final dst = ui.Rect.fromLTWH(x - cw / 2, y - ch * 0.86, cw, ch);
     final p = ui.Paint()
       ..filterQuality = ui.FilterQuality.none
       ..color = ui.Color.fromARGB((alpha * 255).round(), 255, 255, 255);
