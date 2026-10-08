@@ -718,5 +718,45 @@
       "description": "pixel art, black outline, strict side view facing right, flat orthographic, no perspective, no rear view, large white flatbed cargo truck with tall open cargo bed, bed piled high with stacked brown cardboard parcel boxes, blue stripe, cab on the right",
       "size": 128
     }
+  },
+  "center_0": {
+    "endpoint": "/create-1-direction-object",
+    "note": "지역센터: 동네 (노란 지붕, 작은 동네 택배 영업소)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, wide one-story small neighborhood parcel delivery depot building, yellow roof, cream walls, one roll-up loading garage door, small office door and windows, cardboard boxes by the door, building twice as wide as tall",
+      "size": 128
+    }
+  },
+  "center_1": {
+    "endpoint": "/create-1-direction-object",
+    "note": "지역센터: 시내 (하늘색, 도심 현대식)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, wide two-story modern downtown parcel delivery center building, light blue glass windows, sky blue roof trim, white concrete walls, roll-up loading door, building twice as wide as tall",
+      "size": 128
+    }
+  },
+  "center_2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "지역센터: 근교 (초록, 교외 창고)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, wide one-story suburban parcel warehouse building, green metal gable roof, wooden and beige walls, big barn-like loading door, small windows, building twice as wide as tall",
+      "size": 128
+    }
+  },
+  "center_3": {
+    "endpoint": "/create-1-direction-object",
+    "note": "지역센터: 타도시 (빨강, 벽돌 물류센터)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, wide two-story red brick city logistics center building, red roof, two roll-up loading dock doors, rows of windows, building twice as wide as tall",
+      "size": 128
+    }
+  },
+  "center_4": {
+    "endpoint": "/create-1-direction-object",
+    "note": "지역센터: 전국 (보라, 대형 물류 허브)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, wide large national distribution center building, purple roof, grey corrugated metal walls, three roll-up loading dock doors, conveyor sign, building twice as wide as tall",
+      "size": 128
+    }
   }
 }

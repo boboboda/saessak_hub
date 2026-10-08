@@ -666,7 +666,8 @@ class _MapPainter extends CustomPainter {
     final rnd = Random(r * 977 + 13);
     final blocked = <Rect>[
       hubR.inflate(0.3),
-      centerR.inflate(0.4),
+      // 센터 건물: 위로 넘치는 지붕·이름표와, 앞(아래)에 선 나무가 건물을 가리는 자리까지 비움
+      Rect.fromLTRB(centerR.left - 0.6, centerR.top - 1.4, centerR.right + 0.4, centerR.bottom + 1.6),
       for (final h in houseFoot)
         Rect.fromLTRB(h.dx - houseW / 2 - 0.3, h.dy - houseW - 0.3, h.dx + houseW / 2 + 0.3, h.dy + 0.5),
     ];
@@ -893,24 +894,12 @@ class _MapPainter extends CustomPainter {
   void _center(Canvas c, bool open) {
     final r = _pr(centerR);
     final col = Color(Cfg.regionColor[sel]);
-    c.drawRect(r.shift(Offset(t * 0.15, t * 0.15)), Paint()..color = const Color(0x33000000));
-    _block(c, r, open ? const Color(0xFFE6DDCF) : const Color(0xFFB9B5A8));
-    _block(c, Rect.fromLTRB(r.left - t * 0.1, r.top - t * 0.1, r.right + t * 0.1, r.top + t * 0.95),
-        open ? col : const Color(0xFF8A8799));
-    // 왼쪽 하역구 (도로가 들어오는 곳)
-    _block(c, Rect.fromLTWH(r.left - t * 0.05, r.top + t * 1.15, t * 0.9, t * 1.5),
-        const Color(0xFF55506E));
-    // 위쪽 문 (배달 차량이 나가는 곳)
-    final dx = _px(Offset(door.floorToDouble() + 0.5, 0)).dx;
-    _block(c, Rect.fromLTWH(dx - t * 0.55, r.top + t * 1.0, t * 1.1, t * 0.95),
-        const Color(0xFF55506E));
-    // 창문
-    for (var i = 0; i < 2; i++) {
-      _block(c, Rect.fromLTWH(r.left + t * (1.5 + i * 3.2), r.top + t * 1.15, t * 0.9, t * 0.7),
-          const Color(0xFF9CC8E8));
+    final img = Sprites.centers[sel];
+    if (img != null) {
+      _centerSprite(c, img, open, col);
+    } else {
+      _centerShape(c, r, open, col);
     }
-    _label(c, '${Cfg.regionName[sel]} 센터', Offset(r.center.dx, r.top + t * 0.48), t * 0.58,
-        open ? Colors.black : Colors.white70);
     // 내려둔 택배 더미
     final n = g.centerStock[sel];
     if (n > 0) {
@@ -931,6 +920,64 @@ class _MapPainter extends CustomPainter {
       }
       if (n > 9) _label(c, '$n', base.translate(t * 0.55, t * 0.2), t * 0.4, Colors.white);
     }
+  }
+
+  /// 도트 건물: 센터 칸 왼쪽 아래에 붙이고(도로가 닿게), 위로 조금 넘쳐도 되는 칸 안에 비율 유지로 맞춤
+  void _centerSprite(Canvas c, ui.Image img, bool open, Color col) {
+    final box = _pr(Rect.fromLTRB(centerR.left, centerR.top - 0.8, centerR.right, centerR.bottom));
+    final k = min(box.width / img.width, box.height / img.height);
+    final w = img.width * k, h = img.height * k;
+    final dst = Rect.fromLTWH(box.left, box.bottom - h, w, h);
+    c.drawOval(Rect.fromLTWH(dst.left + w * 0.04, dst.bottom - t * 0.22, w * 0.96, t * 0.4),
+        Paint()..color = const Color(0x33000000));
+    final p = Paint()..filterQuality = FilterQuality.none;
+    if (!open) {
+      p.colorFilter = const ColorFilter.matrix(<double>[
+        0.25, 0.45, 0.1, 0, 10, //
+        0.25, 0.45, 0.1, 0, 10, //
+        0.25, 0.45, 0.1, 0, 14, //
+        0, 0, 0, 1, 0,
+      ]);
+    }
+    c.drawImageRect(img, Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()), dst, p);
+    // 이름표 (지붕 위)
+    final tp = TextPainter(
+      text: TextSpan(
+          text: '${Cfg.regionName[sel]} 센터',
+          style: TextStyle(
+              color: open ? Colors.black : Colors.white70,
+              fontSize: max(9.0, t * 0.48),
+              fontWeight: FontWeight.w900)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final tag = Rect.fromCenter(
+        center: Offset(dst.center.dx, dst.top - tp.height * 0.2),
+        width: tp.width + t * 0.5,
+        height: tp.height + t * 0.12);
+    c.drawRRect(RRect.fromRectAndRadius(tag, Radius.circular(t * 0.2)),
+        Paint()..color = open ? col : const Color(0xFF8A8799));
+    tp.paint(c, Offset(tag.center.dx - tp.width / 2, tag.center.dy - tp.height / 2));
+  }
+
+  void _centerShape(Canvas c, Rect r, bool open, Color col) {
+    c.drawRect(r.shift(Offset(t * 0.15, t * 0.15)), Paint()..color = const Color(0x33000000));
+    _block(c, r, open ? const Color(0xFFE6DDCF) : const Color(0xFFB9B5A8));
+    _block(c, Rect.fromLTRB(r.left - t * 0.1, r.top - t * 0.1, r.right + t * 0.1, r.top + t * 0.95),
+        open ? col : const Color(0xFF8A8799));
+    // 왼쪽 하역구 (도로가 들어오는 곳)
+    _block(c, Rect.fromLTWH(r.left - t * 0.05, r.top + t * 1.15, t * 0.9, t * 1.5),
+        const Color(0xFF55506E));
+    // 위쪽 문 (배달 차량이 나가는 곳)
+    final dx = _px(Offset(door.floorToDouble() + 0.5, 0)).dx;
+    _block(c, Rect.fromLTWH(dx - t * 0.55, r.top + t * 1.0, t * 1.1, t * 0.95),
+        const Color(0xFF55506E));
+    // 창문
+    for (var i = 0; i < 2; i++) {
+      _block(c, Rect.fromLTWH(r.left + t * (1.5 + i * 3.2), r.top + t * 1.15, t * 0.9, t * 0.7),
+          const Color(0xFF9CC8E8));
+    }
+    _label(c, '${Cfg.regionName[sel]} 센터', Offset(r.center.dx, r.top + t * 0.48), t * 0.58,
+        open ? Colors.black : Colors.white70);
   }
 
   void _label(Canvas c, String text, Offset center, double size, Color color) {

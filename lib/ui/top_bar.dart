@@ -66,6 +66,9 @@ class TopBar extends StatelessWidget {
                     case 4:
                       g.resetSave();
                       break;
+                    case 5:
+                      g.fame += 500;
+                      break;
                   }
                   g.ui();
                 },
@@ -74,6 +77,7 @@ class TopBar extends StatelessWidget {
                   PopupMenuItem(value: 1, child: Text('후보 새로고침 (무료)', style: Tx.body)),
                   PopupMenuItem(value: 2, child: Text('하루 넘기기 (월급)', style: Tx.body)),
                   PopupMenuItem(value: 3, child: Text('손님 +3', style: Tx.body)),
+                  PopupMenuItem(value: 5, child: Text('명성 +500', style: Tx.body)),
                   PopupMenuItem(value: 4, child: Text('저장 지우기 (다시 켜면 새로 시작)', style: Tx.body)),
                 ],
               ),

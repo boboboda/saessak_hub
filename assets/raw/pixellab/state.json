@@ -188,5 +188,20 @@
   },
   "veh_truck_side_full": {
     "object_id": "87ebf6bc-f469-4c9c-bf7b-cd07965ba7c1"
+  },
+  "center_0": {
+    "object_id": "64a503c0-bb4b-4f16-861a-1b14f0f7df2e"
+  },
+  "center_1": {
+    "object_id": "1e41c829-fa68-40cb-9258-46a46532b111"
+  },
+  "center_2": {
+    "object_id": "39579358-f019-4d9d-a2ba-f2d1d11e386b"
+  },
+  "center_3": {
+    "object_id": "4b965fda-f6b2-4cca-a993-03899b72bb2d"
+  },
+  "center_4": {
+    "object_id": "c8ea4995-7374-41ac-96c9-0768b96c905a"
   }
 }
