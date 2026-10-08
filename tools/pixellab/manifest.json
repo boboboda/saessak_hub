@@ -766,5 +766,21 @@
       "description": "pixel art, black outline, front view, flat orthographic, no perspective, large parcel sorting hub warehouse building, orange roof, cream concrete walls, two big roll-up truck loading dock doors, small office windows on top, logo sign with cardboard box icon, building slightly taller than wide",
       "size": 128
     }
+  },
+  "map_house_a": {
+    "endpoint": "/create-1-direction-object",
+    "note": "노선 지도 배달지: 단독주택 (동네·근교)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single small cozy detached family house, gable roof, front door, two windows, chimney, colorful roof",
+      "size": 64
+    }
+  },
+  "map_house_b": {
+    "endpoint": "/create-1-direction-object",
+    "note": "노선 지도 배달지: 도시형 빌라·연립 (시내·타도시·전국)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single small three-story city apartment villa building, flat roof, rows of windows, entrance door, balconies",
+      "size": 64
+    }
   }
 }

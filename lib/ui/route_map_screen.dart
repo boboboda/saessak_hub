@@ -587,6 +587,7 @@ class _MapPainter extends CustomPainter {
     Offset(16.5, 7.0),
   ];
   static const double houseW = 2.0;
+  static const double houseMaxH = 2.3;
 
   static Offset _n(double x, double y) =>
       Offset(x.floorToDouble() + 0.5, y.floorToDouble() + 0.5);
@@ -846,11 +847,25 @@ class _MapPainter extends CustomPainter {
         Paint()..filterQuality = FilterQuality.low);
   }
 
+  /// 지역마다 배달지 집 모양 (집 칸 0~5 순서). 'house1~3'은 가게(장식 폴더), 나머지는 지도 전용 집
+  static const List<List<String>> housePool = [
+    ['d0', 'd1', 'd2', 'd3', 'd4', 'd7'], // 동네: 알록달록 단독주택
+    ['v0', 'house1', 'v1', 'v2', 'house3', 'house2'], // 시내: 빌라·가게
+    ['d8', 'd9', 'd10', 'd11', 'd6', 'd5'], // 근교: 나무·돌집
+    ['v1', 'd5', 'v2', 'd3', 'v0', 'house3'], // 타도시
+    ['d6', 'v2', 'd4', 'house1', 'd9', 'v0'], // 전국
+  ];
+
   void _house(Canvas c, int k) {
     final foot = _px(houseFoot[k]);
-    final keys = ['house1', 'house2', 'house3'];
-    final img = Sprites.decor[keys[(k + sel) % 3]];
-    final w = houseW * t;
+    final key = housePool[sel % housePool.length][k % 6];
+    final img = Sprites.mapHouses[key] ??
+        Sprites.decor[key.startsWith('house') ? key : ['house1', 'house2', 'house3'][(k + sel) % 3]];
+    var w = houseW * t;
+    if (img != null && w * img.height / img.width > houseMaxH * t) {
+      // 키 큰 빌라는 높이에 맞춰 폭을 줄임 (윗줄 집이 아랫길을 덮지 않게)
+      w = houseMaxH * t * img.width / img.height;
+    }
     if (img == null) {
       final r = Rect.fromLTWH(foot.dx - w / 2, foot.dy - w * 0.8, w, w * 0.8);
       c.drawRect(r, Paint()..color = const Color(0xFFE8D9B5));
@@ -862,7 +877,7 @@ class _MapPainter extends CustomPainter {
           img,
           Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
           Rect.fromLTWH(foot.dx - w / 2, foot.dy - h, w, h),
-          Paint()..filterQuality = FilterQuality.low);
+          Paint()..filterQuality = FilterQuality.none);
     }
   }
 

@@ -206,5 +206,11 @@
   },
   "map_hub": {
     "object_id": "78cb1768-8656-496e-898b-95b780c1e61a"
+  },
+  "map_house_a": {
+    "object_id": "95b69f6b-afbe-4d6d-a1ef-10a9912ff7b1"
+  },
+  "map_house_b": {
+    "object_id": "c5477334-304d-4cf5-827c-651f07beca35"
   }
 }

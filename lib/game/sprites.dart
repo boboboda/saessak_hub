@@ -25,6 +25,13 @@ class Sprites {
   static final List<ui.Image?> centers = List.filled(5, null);
   static ui.Image? hub; // 노선 지도 허브 외관
 
+  /// 노선 지도 배달지 집 (assets/sprites/map/house_<이름>.png). d0~d11 단독주택, v0~v2 빌라
+  static final Map<String, ui.Image> mapHouses = {};
+  static const List<String> mapHouseNames = [
+    'd0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9', 'd10', 'd11',
+    'v0', 'v1', 'v2',
+  ];
+
   /// 배경 장식 도트 (assets/sprites/decor/<이름>.png). 없는 건 null.
   static final Map<String, ui.Image> decor = {};
   static const List<String> decorNames = [
@@ -66,6 +73,10 @@ class Sprites {
     sidewalk = await _img('assets/sprites/tiles/sidewalk.png');
     yard = await _img('assets/sprites/tiles/yard.png');
     hub = await _img('assets/sprites/map/hub.png');
+    for (final n in mapHouseNames) {
+      final im = await _img('assets/sprites/map/house_$n.png');
+      if (im != null) mapHouses[n] = im;
+    }
     for (var i = 0; i < centers.length; i++) {
       centers[i] = await _img('assets/sprites/map/center_$i.png');
     }
