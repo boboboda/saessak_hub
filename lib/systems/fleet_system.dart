@@ -125,6 +125,7 @@ extension FleetSystem on HubGame {
     u.evtDone = true;
     final k = rnd.nextInt(Cfg.evtName.length);
     final ok = rnd.nextDouble() < Cfg.evtSuccess(u.skill);
+    u.evtKind = k;
     u.evtOk = ok;
     u.evtT = 4;
     final who = '${u.driver}(${Cfg.skillName[u.skill]})';
@@ -154,6 +155,10 @@ extension FleetSystem on HubGame {
       n.t -= d;
     }
     notes.removeWhere((n) => n.t <= 0);
+    for (final f in mapFx) {
+      f.t += d;
+    }
+    mapFx.removeWhere((f) => f.t >= 2.2);
 
     for (final u in fleet) {
       if (u.evtT > 0) u.evtT -= d;
@@ -192,6 +197,7 @@ extension FleetSystem on HubGame {
     if (u.isTrunk) {
       centerStock[u.region] += u.cargo;
       note('${Cfg.regionName[u.region]} 센터에 ${u.cargo}건 도착', 0xFF56CCF2);
+      mapFx.add(MapFx(u.region, true, 0, '+${u.cargo}건', 0xFF56CCF2));
       u.cargo = 0;
       u.state = 2;
       u.t = 0;
@@ -210,6 +216,7 @@ extension FleetSystem on HubGame {
       delivered += n;
       fame += n;
       note('${u.driver} 배달 완료 ${n}건 +${fmt(pay)}원', 0xFFFFD166);
+      mapFx.add(MapFx(u.region, false, u.house, '+${fmt(pay)}', 0xFFFFD166));
       u.cargo = 0;
       u.state = 2;
       u.t = 0;

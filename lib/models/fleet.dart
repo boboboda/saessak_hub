@@ -22,6 +22,7 @@ class FleetUnit {
   bool evtDone = false;
   double evtAt = 0.5; // 구간 몇 % 지점에서 생길지
   double delay = 0; // 이벤트로 늘어난 시간
+  int evtKind = 0; // 0 정체, 1 폭우, 2 펑크, 3 분실
   String? evtText; // 지도에 띄우는 말풍선
   bool evtOk = true;
   double evtT = 0; // 말풍선 남은 시간
@@ -41,4 +42,15 @@ class MapNote {
   final int color;
   double t = 6;
   MapNote(this.text, this.color);
+}
+
+/// 지도 위에 떠오르는 효과 글자 (배달 완료 금액, 센터 도착 등)
+class MapFx {
+  final int region;
+  final bool atCenter; // true 센터 위, false 동네 집 위
+  final int house;
+  final String text;
+  final int color;
+  double t = 0;
+  MapFx(this.region, this.atCenter, this.house, this.text, this.color);
 }

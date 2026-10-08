@@ -60,6 +60,7 @@ class HubGame extends FlameGame {
   final List<FleetUnit> fleet = []; // 내 차량들
   final List<int> centerStock = List.filled(5, 0); // 지역센터에 내려진 택배
   final List<MapNote> notes = []; // 노선 지도 소식
+  final List<MapFx> mapFx = []; // 지도 위 떠오르는 효과
   int fame = 0; // 명성 (지역을 여는 조건)
   int nextUnitId = 1;
   bool showMap = false; // 전체화면 노선 지도
