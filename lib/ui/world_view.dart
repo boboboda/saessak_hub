@@ -202,7 +202,7 @@ extension WorldView on HubGame {
       } else {
         box(c, r.left, r.top, r.width, r.height, b.type.color);
         strokeBox(c, r, 0xFF2A2438, 2);
-        labelIn(c, b.type.name, r, size: 12);
+        if (b.type.id != 'lounge') labelIn(c, b.type.name, r, size: 12);
       }
 
       if (b.level > 1) {
@@ -248,30 +248,7 @@ extension WorldView on HubGame {
           }
           break;
         case 'pack':
-          final p = b.slot;
-          final dyn = Sprites.packEmpty != null; // 빈 포장대 그림이 있으면 상자를 동적으로 그림
-          if (p != null) {
-            final prog = (b.progress / Cfg.packTime).clamp(0.0, 1.0);
-            if (p.stage == 3) {
-              final rr = Rect.fromLTWH(r.center.dx - 15, r.top + 5, 22, 22);
-              if (!Sprites.drawBox(c, rr, Cfg.regionColor[p.region])) {
-                box(c, r.center.dx - 7, r.bottom - 20, 14, 14,
-                    Cfg.regionColor[p.region]);
-              }
-            } else {
-              if (dyn && p.stage == 2 && Sprites.boxOpen != null) {
-                // 포장을 시작하면 열린 상자가 나타나고, 포장이 끝나면 닫힌 상자가 됨
-                final k = (0.45 + prog * 6).clamp(0.45, 1.0);
-                final w = 22 * k, h = 22 * k;
-                Sprites.drawContain(c, Sprites.boxOpen!,
-                    Rect.fromLTWH(r.center.dx - 4 - w / 2, r.top + 27 - h, w, h));
-              }
-              box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
-              box(c, r.left + 4, r.bottom - 10, (r.width - 8) * prog, 6,
-                  0xFFFFD166);
-            }
-          }
-          break;
+          break; // 상자·진행 막대는 직원 뒤에 다시 그림 (_drawPackContent)
         case 'shelf':
           // 들어온 택배 수만큼 선반 칸에 상자가 쌓임 (아래 칸부터)
           if (Sprites.shelf != null && Sprites.boxS != null) {
@@ -297,10 +274,11 @@ extension WorldView on HubGame {
               size: 11);
           break;
         case 'lounge':
-          final n = staff.where((s) => s.rest == 2 && s.lounge == b).length;
-          label(c, '쉬는 중 $n/${Cfg.loungeSeats.length}', r.left + 5,
-              r.bottom - 16,
-              size: 10);
+          // 앉는 자리마다 벤치
+          for (final o in Cfg.loungeSeats) {
+            _bench(c, Offset((b.tx + o.dx) * Cfg.tile, (b.ty + o.dy) * Cfg.tile));
+          }
+          label(c, '휴게실', r.center.dx - 18, r.bottom - 15, size: 11);
           break;
         case 'dock':
         // 벽 쪽에 셔터, 바깥쪽에 주차선
@@ -393,14 +371,61 @@ extension WorldView on HubGame {
     }
   }
 
+  /// 벤치. 발 위치(p) 기준 가운데. front=true면 아래쪽 절반만 다시 그림(앉은 모습).
+  void _bench(Canvas c, Offset p, {bool front = false}) {
+    final img = Sprites.decor['bench'];
+    if (img == null) {
+      if (!front) box(c, p.dx - 18, p.dy - 4, 36, 10, 0xFF8B5E3C);
+      return;
+    }
+    const k = 1.5;
+    final w = img.width * k, h = img.height * k;
+    final dst = Rect.fromLTWH(p.dx - w / 2, p.dy + 9 - h, w, h);
+    if (front) {
+      c.save();
+      c.clipRect(Rect.fromLTRB(dst.left, dst.top + h * 0.5, dst.right, dst.bottom));
+    }
+    c.drawImageRect(
+        img,
+        Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+        dst,
+        Paint()..filterQuality = FilterQuality.none);
+    if (front) c.restore();
+  }
+
+  /// 포장대 위 상자(가운데)와 진행 막대. 직원·책상 앞면 위에 그린다.
+  void _drawPackContent(Canvas c, Building b) {
+    final p = b.slot;
+    if (p == null) return;
+    final r = _px(b.rect).deflate(1);
+    final dyn = Sprites.packEmpty != null;
+    final prog = (b.progress / Cfg.packTime).clamp(0.0, 1.0);
+    if (p.stage == 3) {
+      final rr = Rect.fromLTWH(r.center.dx - 10, r.top + 1, 20, 20);
+      if (!Sprites.drawBox(c, rr, Cfg.regionColor[p.region])) {
+        box(c, r.center.dx - 7, r.bottom - 20, 14, 14, Cfg.regionColor[p.region]);
+      }
+    } else {
+      if (dyn && p.stage == 2 && Sprites.boxOpen != null) {
+        final k = (0.45 + prog * 6).clamp(0.45, 1.0);
+        final w = 20 * k, h = 20 * k;
+        Sprites.drawContain(c, Sprites.boxOpen!,
+            Rect.fromLTWH(r.center.dx - w / 2, r.top + 21 - h, w, h));
+      }
+      box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
+      box(c, r.left + 4, r.bottom - 10, (r.width - 8) * prog, 6, 0xFFFFD166);
+    }
+  }
+
   // ---------------- 사람 (직원·손님) ----------------
   void _drawPeople(Canvas c) {
     const t = Cfg.tile;
 
     // 창고 밖 휴식 자리 (벤치)
     final bs = breakSpot;
-    box(c, bs.dx * t - 22, bs.dy * t + 12, 44, 8, 0xFF8B5E3C);
-    label(c, '휴식', bs.dx * t - 12, bs.dy * t + 22, size: 11);
+    final bsPos = Offset(bs.dx * t, bs.dy * t);
+    _bench(c, bsPos);
+    label(c, '휴식', bs.dx * t - 12, bs.dy * t + 14, size: 11);
 
     // 자리를 비운 직원 (쉬러 가는 중·쉬는 중·돌아오는 중)
     for (final s in staff) {
@@ -438,7 +463,7 @@ extension WorldView on HubGame {
     for (final b in ofType('pack')) {
       final working = b.slot != null && b.slot!.stage == 2;
       final w = b.type.w.toDouble();
-      final spots = [Offset(w - 0.6, 0.47), Offset(0.6, 0.47)];
+      final spots = [Offset(w - 0.45, 0.12), Offset(0.45, 0.12)];
       final act = b.active;
       for (var i = 0; i < act.length && i < spots.length; i++) {
         const bob = 0.0;
@@ -460,10 +485,29 @@ extension WorldView on HubGame {
         final top = r.bottom - h;
         c.save();
         c.clipRect(Rect.fromLTRB(
-            r.left, top + h * (id == 'pack' ? 0.25 : 0.0), r.right, r.bottom));
+            r.left, top, r.right, r.bottom));
         Sprites.drawFitWidth(c, sp, r);
         c.restore();
       }
+    }
+    for (final b in ofType('pack')) {
+      _drawPackContent(c, b);
+    }
+
+    // 앉아서 쉬는 직원: 벤치 앞쪽을 다시 그려 '앉은' 느낌
+    var sitAtBreak = false;
+    for (final s in staff) {
+      if (!s.away || s.rest != 2) continue;
+      final l = s.lounge;
+      if (l == null) {
+        sitAtBreak = true;
+      } else {
+        final o = Cfg.loungeSeats[s.seat];
+        _bench(c, Offset((l.tx + o.dx) * t, (l.ty + o.dy) * t), front: true);
+      }
+    }
+    if (sitAtBreak) {
+      _bench(c, Offset(breakSpot.dx * t, breakSpot.dy * t), front: true);
     }
 
     // 손님
