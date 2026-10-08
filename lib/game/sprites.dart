@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
@@ -5,6 +6,10 @@ import 'package:flutter/services.dart';
 /// 도트 스프라이트 모음. 로딩에 실패하면 null → 화면은 기존 도형으로 그려짐.
 class Sprites {
   static ui.Image? staffWalk;
+
+  /// 손님 걷기 시트 (assets/sprites/customer/cust_0..5.png, 직원 시트와 같은 배치). 없으면 null.
+  static const int custLooks = 6;
+  static final List<ui.Image?> custWalk = List.filled(custLooks, null);
   static ui.Image? box;
   static ui.Image? floor;
   static ui.Image? counter, pack, shelf, van;
@@ -24,6 +29,9 @@ class Sprites {
 
   static Future<void> load() async {
     staffWalk = await _img('assets/sprites/staff/staff_walk.png');
+    for (var i = 0; i < custLooks; i++) {
+      custWalk[i] = await _img('assets/sprites/customer/cust_$i.png');
+    }
     box = await _img('assets/sprites/props/box.png');
     floor = await _img('assets/sprites/tiles/floor.png');
     counter = await _img('assets/sprites/props/counter.png');
@@ -65,6 +73,34 @@ class Sprites {
     final p = ui.Paint()
       ..filterQuality = ui.FilterQuality.none
       ..color = ui.Color.fromARGB((alpha * 255).round(), 255, 255, 255);
+    c.drawImageRect(img, src, dst, p);
+  }
+
+  /// 손님/행인 한 명. 전용 시트가 있으면 그것을, 없으면 직원 시트를 색만 바꿔 그림.
+  static void drawPerson(ui.Canvas c, double x, double y, int dir, bool moving,
+      double clock, int look,
+      {double size = 52}) {
+    final own = custWalk[look % custLooks];
+    final img = own ?? staffWalk;
+    if (img == null) return;
+    final f = moving ? 1 + (clock * 9 + look * 3).floor() % (frames - 1) : 0;
+    final src = ui.Rect.fromLTWH(f * cell, dir * cell, cell, cell);
+    final dst = ui.Rect.fromLTWH(x - size / 2, y - size * 0.86, size, size);
+    final p = ui.Paint()..filterQuality = ui.FilterQuality.none;
+    if (own == null) {
+      const hues = [70.0, 140.0, 200.0, 260.0, 310.0, 30.0];
+      final a = hues[look % hues.length] * math.pi / 180;
+      final co = math.cos(a), si = math.sin(a);
+      p.colorFilter = ui.ColorFilter.matrix(<double>[
+        0.213 + co * 0.787 - si * 0.213, 0.715 - co * 0.715 - si * 0.715,
+        0.072 - co * 0.072 + si * 0.928, 0, 0,
+        0.213 - co * 0.213 + si * 0.143, 0.715 + co * 0.285 + si * 0.140,
+        0.072 - co * 0.072 - si * 0.283, 0, 0,
+        0.213 - co * 0.213 - si * 0.787, 0.715 - co * 0.715 + si * 0.715,
+        0.072 + co * 0.928 + si * 0.072, 0, 0,
+        0, 0, 0, 1, 0,
+      ]);
+    }
     c.drawImageRect(img, src, dst, p);
   }
 

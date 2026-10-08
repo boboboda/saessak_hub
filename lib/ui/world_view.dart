@@ -218,11 +218,11 @@ extension WorldView on HubGame {
         labelIn(c, '내 자리', Rect.fromLTWH(r.left + 2, r.bottom - 16, 40, 14),
             size: 10);
       }
-      if (b.type.slots > 0 && b.active.isEmpty && !(b.mine && b.crew.isEmpty)) {
-        final none = b.crew.isEmpty;
-        box(c, r.right - 46, r.top + 2, 44, 15, none ? 0xFFE5484D : 0xFFD98B2B);
-        labelIn(c, none ? '직원 필요' : '자리 비움',
-            Rect.fromLTWH(r.right - 46, r.top + 2, 44, 15), size: 10);
+      // 배치된 직원이 없으면 건물 위쪽 바깥에 표시. (자리 비움은 직원 머리 위에 표시)
+      if (b.type.slots > 0 && b.crew.isEmpty && !b.mine) {
+        box(c, r.center.dx - 22, r.top - 17, 44, 15, 0xFFE5484D);
+        labelIn(c, '직원 필요',
+            Rect.fromLTWH(r.center.dx - 22, r.top - 17, 44, 15), size: 10);
       }
 
       // 포장 실수 표시
@@ -372,6 +372,67 @@ extension WorldView on HubGame {
     }
   }
 
+  /// 길을 오가는 행인 (보기용). 시간만으로 위치가 정해지는 왕복 경로.
+  static final List<List<Offset>> _walkRoutes = [
+    // 윗길(가로) → 왼쪽 길(세로) → 아랫길(가로)
+    [Offset(31, 6.6), Offset(1, 6.6), Offset(1, 29.4), Offset(31, 29.4)],
+    // 오른쪽 인도(세로)
+    [Offset(35.5, 1.5), Offset(35.5, 34.5)],
+  ];
+  static const List<List<double>> _walkers = [
+    // [경로, 위상(칸), 속도(칸/초), 방향(+1/-1), 외형]
+    [0, 0, 1.1, 1, 0],
+    [0, 17, 0.9, -1, 1],
+    [0, 33, 1.3, 1, 2],
+    [0, 50, 1.0, -1, 3],
+    [0, 66, 1.2, 1, 4],
+    [1, 0, 1.0, 1, 5],
+    [1, 20, 1.2, -1, 2],
+    [1, 40, 0.9, 1, 0],
+  ];
+
+  void _drawPedestrians(Canvas c) {
+    const t = Cfg.tile;
+    if (Sprites.staffWalk == null) return;
+    final list = <(double, Offset, int, bool, int)>[];
+    for (final w in _walkers) {
+      final route = _walkRoutes[w[0].toInt()];
+      final seg = <double>[];
+      var total = 0.0;
+      for (var i = 0; i + 1 < route.length; i++) {
+        final d = (route[i + 1] - route[i]).distance;
+        seg.add(d);
+        total += d;
+      }
+      // 왕복: 0..2*total 를 오가며 위치를 구함
+      var u = (w[1] + w[2] * clock * w[3]) % (2 * total);
+      if (u < 0) u += 2 * total;
+      final back = u > total;
+      final d = back ? 2 * total - u : u;
+      var acc = 0.0;
+      var pos = route.last;
+      var dir = 0;
+      for (var i = 0; i < seg.length; i++) {
+        if (d <= acc + seg[i] || i == seg.length - 1) {
+          final a = route[i], b = route[i + 1];
+          final k = ((d - acc) / seg[i]).clamp(0.0, 1.0);
+          pos = Offset(a.dx + (b.dx - a.dx) * k, a.dy + (b.dy - a.dy) * k);
+          var v = b - a;
+          if (back) v = -v;
+          if (w[3] < 0) v = -v;
+          dir = v.dx.abs() > v.dy.abs() ? (v.dx < 0 ? 1 : 2) : (v.dy < 0 ? 3 : 0);
+          break;
+        }
+        acc += seg[i];
+      }
+      list.add((pos.dy, pos, dir, true, w[4].toInt()));
+    }
+    list.sort((a, b) => a.$1.compareTo(b.$1));
+    for (final e in list) {
+      Sprites.drawPerson(c, e.$2.dx * t, e.$2.dy * t, e.$3, true, clock, e.$5);
+    }
+  }
+
   /// 벤치. 발 위치(p) 기준 가운데. front=true면 아래쪽 절반만 다시 그림(앉은 모습).
   void _bench(Canvas c, Offset p, {bool front = false}) {
     final img = Sprites.decor['bench'];
@@ -422,6 +483,8 @@ extension WorldView on HubGame {
   void _drawPeople(Canvas c) {
     const t = Cfg.tile;
 
+    _drawPedestrians(c);
+
     // 창고 밖 휴식 자리 (벤치)
     final bs = breakSpot;
     final bsPos = Offset(bs.dx * t, bs.dy * t);
@@ -431,7 +494,8 @@ extension WorldView on HubGame {
     // 자리를 비운 직원 (쉬러 가는 중·쉬는 중·돌아오는 중)
     for (final s in staff) {
       if (!s.away) continue;
-      final p = Offset(s.pos.dx * t, s.pos.dy * t);
+      var p = Offset(s.pos.dx * t, s.pos.dy * t);
+      if (s.rest == 2) p = p.translate(0, 8); // 앉아서 쉬는 중: 엉덩이를 벤치에 맞춤
       if (s.carrier) {
         _person(c, p, s.initial, 0xFF8EC5FF, 0xFFFFFFFF,
             tired: true, energy: s.energyPct, key: s);
@@ -442,6 +506,10 @@ extension WorldView on HubGame {
         _person(c, p, s.initial, 0xFFB9F6CA, 0xFF1B5E20,
             tired: true, energy: s.energyPct, key: s);
       }
+      // 자리 비움 표시는 그 직원 머리 위에
+      final bub = Rect.fromLTWH(p.dx - 25, p.dy - t * 1.75, 50, 14);
+      box(c, bub.left, bub.top, bub.width, bub.height, 0xFFD98B2B);
+      labelIn(c, '자리 비움', bub, size: 10);
     }
 
     // 접수 직원: 창구 뒤(위)에 서 있음. 자리에 있는 직원만 표시.
@@ -514,15 +582,29 @@ extension WorldView on HubGame {
     // 손님
     for (final cu in customers) {
       final p = Offset(cu.pos.dx * t, cu.pos.dy * t);
-      c.drawCircle(p, t * 0.28, Paint()..color = const Color(0xFFE8B07A));
-      c.drawCircle(
-          p,
-          t * 0.28,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5
-            ..color = const Color(0xFF2A2438));
-      box(c, p.dx - 4, p.dy - t * 0.5, 8, 8, Cfg.regionColor[cu.region]);
+      if (Sprites.staffWalk != null) {
+        final f = _faces.putIfAbsent(cu, () => _Face(p));
+        final dx = p.dx - f.last.dx, dy = p.dy - f.last.dy;
+        final moved = dx * dx + dy * dy > 0.9;
+        if (moved) {
+          f.dir = dx.abs() > dy.abs() ? (dx < 0 ? 1 : 2) : (dy < 0 ? 3 : 0);
+          f.until = clock + 0.15;
+        }
+        if (!moved && clock > f.until + 0.3) f.dir = 3; // 서서 기다릴 땐 창구(위)를 봄
+        f.last = p;
+        Sprites.drawPerson(
+            c, p.dx, p.dy + t * 0.35, f.dir, clock < f.until, clock, cu.look);
+      } else {
+        c.drawCircle(p, t * 0.28, Paint()..color = const Color(0xFFE8B07A));
+        c.drawCircle(
+            p,
+            t * 0.28,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.5
+              ..color = const Color(0xFF2A2438));
+        box(c, p.dx - 4, p.dy - t * 0.5, 8, 8, Cfg.regionColor[cu.region]);
+      }
       if (cu.vip) {
         c.drawCircle(
             p,

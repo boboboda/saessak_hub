@@ -238,5 +238,197 @@
       "mode": "v3"
     },
     "per_direction": true
+  },
+  "cust_a_base": {
+    "endpoint": "/create-character-v3",
+    "note": "손님 기본 캐릭터 a",
+    "body": {
+      "description": "young woman customer, pink hoodie, blue jeans, long black ponytail, white sneakers, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_a_walk": {
+    "endpoint": "/animate-character",
+    "note": "손님 a 걷기 (4방향, 6프레임)",
+    "character_of": "cust_a_base",
+    "body": {
+      "character_id": "{cust_a_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_b_base": {
+    "endpoint": "/create-character-v3",
+    "note": "손님 기본 캐릭터 b",
+    "body": {
+      "description": "elderly man customer, gray hair, beige cardigan, brown trousers, small round glasses, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_b_walk": {
+    "endpoint": "/animate-character",
+    "note": "손님 b 걷기 (4방향, 6프레임)",
+    "character_of": "cust_b_base",
+    "body": {
+      "character_id": "{cust_b_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_c_base": {
+    "endpoint": "/create-character-v3",
+    "note": "손님 기본 캐릭터 c",
+    "body": {
+      "description": "small child customer, yellow raincoat, red boots, blue backpack, short brown hair, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_c_walk": {
+    "endpoint": "/animate-character",
+    "note": "손님 c 걷기 (4방향, 6프레임)",
+    "character_of": "cust_c_base",
+    "body": {
+      "character_id": "{cust_c_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_d_base": {
+    "endpoint": "/create-character-v3",
+    "note": "손님 기본 캐릭터 d",
+    "body": {
+      "description": "office worker man customer, gray suit, red tie, short black hair, carrying nothing, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_d_walk": {
+    "endpoint": "/animate-character",
+    "note": "손님 d 걷기 (4방향, 6프레임)",
+    "character_of": "cust_d_base",
+    "body": {
+      "character_id": "{cust_d_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_e_base": {
+    "endpoint": "/create-character-v3",
+    "note": "손님 기본 캐릭터 e",
+    "body": {
+      "description": "elderly woman customer, purple shawl, white curly hair, long skirt, brown shoes, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_e_walk": {
+    "endpoint": "/animate-character",
+    "note": "손님 e 걷기 (4방향, 6프레임)",
+    "character_of": "cust_e_base",
+    "body": {
+      "character_id": "{cust_e_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_f_base": {
+    "endpoint": "/create-character-v3",
+    "note": "손님 기본 캐릭터 f",
+    "body": {
+      "description": "teenage boy customer, green hoodie, backwards orange cap, headphones around neck, gray shorts, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_f_walk": {
+    "endpoint": "/animate-character",
+    "note": "손님 f 걷기 (4방향, 6프레임)",
+    "character_of": "cust_f_base",
+    "body": {
+      "character_id": "{cust_f_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
   }
 }

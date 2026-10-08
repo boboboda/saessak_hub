@@ -12,6 +12,7 @@ extension FlowSystem on HubGame {
         if (regionOpen[i]) i
     ];
     final cu = Customer(exitPoint, open[rnd.nextInt(open.length)]);
+    cu.look = rnd.nextInt(6);
     final r = rnd.nextDouble();
     if (day >= 2) {
       cu.kind = r < 0.08 ? 1 : (r < 0.16 ? 2 : (r < 0.22 ? 3 : 0));

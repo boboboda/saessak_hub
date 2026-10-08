@@ -14,5 +14,6 @@ class Customer {
   int kind = 0; // 맡기는 택배 종류 (0 일반, 1 급송, 2 파손주의, 3 대형)
   bool vip = false; // VIP: 인내심이 짧지만 접수하면 팁
   final int region;
+  int look = 0; // 외형 (Sprites.custLooks 중 하나)
   Customer(this.pos, this.region);
 }
