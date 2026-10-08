@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../game/hub_game.dart';
 import 'overlay_ui.dart';
+import 'route_map_screen.dart';
 import 'theme.dart';
 
 /// 맨 아래는 게임 맵(캔버스), 그 위에 메뉴·패널 위젯을 겹침
@@ -30,13 +31,26 @@ class GameScreen extends StatelessWidget {
               onPanUpdate: (d) => game.panUpdate(d.localPosition, d.delta),
               onPanEnd: (_) => game.panEnd(),
               onPanCancel: () => game.panEnd(),
-              child: GameWidget(game: game),
+              child: ValueListenableBuilder<int>(
+                valueListenable: game.tick,
+                // 노선 지도가 열려 있으면 허브 그림은 그리지 않아 가볍게 한다 (게임은 계속 돌아감)
+                builder: (context, _, __) =>
+                    Offstage(offstage: game.showMap, child: GameWidget(game: game)),
+              ),
             ),
           ),
           Positioned.fill(
             child: ValueListenableBuilder<int>(
               valueListenable: game.tick,
-              builder: (context, _, __) => OverlayUi(game),
+              builder: (context, _, __) =>
+                  game.showMap ? const SizedBox.shrink() : OverlayUi(game),
+            ),
+          ),
+          Positioned.fill(
+            child: ValueListenableBuilder<int>(
+              valueListenable: game.tick,
+              builder: (context, _, __) =>
+                  game.showMap ? RouteMapScreen(game) : const SizedBox.shrink(),
             ),
           ),
         ],
