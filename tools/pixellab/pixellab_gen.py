@@ -35,7 +35,7 @@ def token():
     return t
 
 
-def call(method, path, body=None, raw=False):
+def call(method, path, body=None, raw=False, ok409=False):
     url = path if path.startswith("http") else BASE + path
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(url, data=data, method=method)
@@ -51,6 +51,8 @@ def call(method, path, body=None, raw=False):
                 return blob if raw else json.loads(blob.decode() or "{}")
         except urllib.error.HTTPError as e:
             msg = e.read().decode(errors="replace")
+            if e.code == 409 and ok409:
+                return {"_conflict": msg}
             sys.exit(f"[HTTP {e.code}] {method} {path}\n{msg[:2000]}")
         except (TimeoutError, urllib.error.URLError, ConnectionError, OSError) as e:
             last = e
@@ -200,7 +202,12 @@ def run_asset(name, spec, st):
         # 같은 캐릭터로 만든 애니메이션 그룹만 이어 쓴다 (기본 캐릭터를 새로 만들었으면 무시)
         if d and entry.get("animation_group_id") and entry.get("for_character") == b.get("character_id"):
             b["animation_group_id"] = entry["animation_group_id"]
-        resp = call(spec.get("method", "POST"), spec["endpoint"], b)
+        resp = call(spec.get("method", "POST"), spec["endpoint"], b, ok409=True)
+        if "_conflict" in resp:
+            # 이전 요청이 타임아웃 났지만 서버에선 이미 만들어졌거나 만드는 중인 방향 → 건너뜀
+            print(f"  {d or ''}: 이미 있거나 생성 중이라 건너뜀. 잠시 기다립니다...")
+            time.sleep(90)
+            continue
         tag = f"{name}_{d}" if d else name
         dump_raw(f"{tag}_create", resp)
         print("  응답 항목:", ", ".join(f"{k}" for k in resp.keys()))
