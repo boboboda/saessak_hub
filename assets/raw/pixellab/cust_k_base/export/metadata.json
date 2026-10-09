@@ -1,0 +1,36 @@
+{
+  "group_id": "c5a05b07-f249-40c7-9ab9-dfc238d8b704",
+  "states": [
+    {
+      "character": {
+        "id": "8ae10da9-615a-4420-8dc7-1f5c7e004e63",
+        "name": "Idle",
+        "prompt": "foreign businesswoman customer, blonde hair, beige trench coat, sunglasses on head, pulling a small rolling suitcase, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-09T16:59:45.820402+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-09T17:03:14.879332"
+}

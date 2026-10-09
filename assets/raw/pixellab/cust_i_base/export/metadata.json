@@ -1,0 +1,36 @@
+{
+  "group_id": "2bb62f4e-6ddd-4529-8afa-eb3f2dd1623e",
+  "states": [
+    {
+      "character": {
+        "id": "e8241a09-b410-413c-b898-751e07c57526",
+        "name": "Idle",
+        "prompt": "burly middle-aged moving company boss customer, blue work overalls, white towel headband, work gloves, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-09T16:30:07.222598+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-09T16:34:16.036558"
+}

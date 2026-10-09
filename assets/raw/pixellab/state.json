@@ -381,5 +381,33 @@
   "cust_g_walk": {
     "animation_group_id": "fc2ac98d-f4b1-489e-a566-2f1126476929",
     "for_character": "d0f1a262-3c80-43a6-8b98-3f783b6a0ac4"
+  },
+  "cust_h_base": {
+    "character_id": "6221684d-0dac-49ee-86c8-d141a4e93f9d"
+  },
+  "cust_h_walk": {
+    "animation_group_id": "b137bf37-5efb-4c02-b0e3-6612e2083930",
+    "for_character": "6221684d-0dac-49ee-86c8-d141a4e93f9d"
+  },
+  "cust_i_base": {
+    "character_id": "e8241a09-b410-413c-b898-751e07c57526"
+  },
+  "cust_i_walk": {
+    "animation_group_id": "60d2d5a5-8512-4236-8d10-872335ca3500",
+    "for_character": "e8241a09-b410-413c-b898-751e07c57526"
+  },
+  "cust_j_base": {
+    "character_id": "bf0184ca-0bd8-4349-9cc8-ca63eaf0ed90"
+  },
+  "cust_j_walk": {
+    "animation_group_id": "453a7486-74e2-4886-9073-97fcc0a5a7cc",
+    "for_character": "bf0184ca-0bd8-4349-9cc8-ca63eaf0ed90"
+  },
+  "cust_k_base": {
+    "character_id": "8ae10da9-615a-4420-8dc7-1f5c7e004e63"
+  },
+  "cust_k_walk": {
+    "animation_group_id": "de9d9657-a193-4eea-80a9-5748ff9ed93e",
+    "for_character": "8ae10da9-615a-4420-8dc7-1f5c7e004e63"
   }
 }
