@@ -81,7 +81,13 @@ extension BuildSystem on HubGame {
         return '${Cfg.zoneName[t.zone]}에만 놓을 수 있어요';
       }
     }
-    if (t.zone != 3 && r.overlaps(aisle)) return '가운데 통로에는 놓을 수 없어요';
+    if (t.zone != 3 && doorways.any((d) => d.overlaps(r)))
+      return '문 바로 앞은 비워 두세요';
+    for (var y = r.top.toInt(); y < r.bottom; y++) {
+      for (var x = r.left.toInt(); x < r.right; x++) {
+        if (isAisle(x, y)) return '통로 위에는 놓을 수 없어요 (통로를 먼저 철거)';
+      }
+    }
     for (final b in buildings) {
       if (b.rect.overlaps(r)) return '다른 건물과 겹쳐요';
       if (t.zone != 3 && b.type.zone != 3) {
@@ -113,6 +119,36 @@ extension BuildSystem on HubGame {
     ghostX = gx;
     ghostY = gy;
     ui();
+  }
+
+  /// 통로 깔기 모드 시작
+  void startAisle() {
+    mode = 4;
+    aisleTool = 0;
+    selected = null;
+    sheet = null;
+    ui();
+  }
+
+  void endAisle() {
+    mode = 0;
+    aisleLast = null;
+    ui();
+  }
+
+  /// 통로 모드에서 화면을 눌렀거나 끌었을 때 (월드 픽셀)
+  void aisleAt(Offset world, {bool drag = false}) {
+    final x = (world.dx / Cfg.tile).floor(), y = (world.dy / Cfg.tile).floor();
+    final last = aisleLast;
+    if (drag && last != null && last == (x, y)) return;
+    if (drag && last != null) {
+      paintAisleLine(last.$1, last.$2, x, y, erase: aisleTool == 1);
+    } else {
+      final why = aisleTool == 0 ? aisleProblem(x, y) : null;
+      if (why != null && !drag) showToast(why);
+      paintAisleLine(x, y, x, y, erase: aisleTool == 1);
+    }
+    aisleLast = (x, y);
   }
 
   void cancelPlacing() {
@@ -147,7 +183,7 @@ extension BuildSystem on HubGame {
   /// (디버그) 시작 구성 자동 배치: 접수 창구·포장대·선반·도크 1개씩, 남는 직원은 운반
   void debugStarterLayout() {
     // 통로 바로 위에 앞줄 한 칸을 비우고 나란히 (접수 → 포장 → 선반 → 도크)
-    final top = aisle.top.toInt();
+    final top = door.top.toInt();
     final plan = <(String, int, int)>[
       ('counter', Cfg.zoneX1.toInt() - 3, top - 3),
       ('pack', Cfg.zoneX1.toInt() + 1, top - 3),

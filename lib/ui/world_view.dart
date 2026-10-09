@@ -274,14 +274,19 @@ extension WorldView on HubGame {
     }
 
     final a = area;
-    final ai = aisle;
+    final ai = this.door; // 양쪽 벽 문 (가운데 줄)
     final ar = _px(a);
     // 바닥: 콘크리트 + 노란 통로 (이중 격자 Wang 타일, 창고 안만)
     c.save();
     c.clipRect(ar);
     final fl = Sprites.wangFloor;
+    // 유저가 깐 통로 (창고 안)
     bool aisleAt(int x, int y) =>
-        x >= a.left && x < a.right && ai.contains(Offset(x + 0.5, y + 0.5));
+        x >= a.left &&
+        x < a.right &&
+        y >= a.top &&
+        y < a.bottom &&
+        isAisle(x, y);
     final p = Paint()
       ..filterQuality = FilterQuality.none
       ..isAntiAlias = false;
@@ -330,29 +335,28 @@ extension WorldView on HubGame {
         box(c, r.left, r.top, r.width, r.height, Cfg.zoneHot[z]);
       }
     }
-    // 통로 화살표 (진행 방향 →)
-    final arrow = Paint()..color = const Color(0x553A2E10);
-    for (var x = a.left + 1.5; x < a.right - 0.5; x += 2) {
-      final cx = x * t, cy = ai.center.dy * t;
-      c.drawPath(
-        Path()
-          ..moveTo(cx - 6, cy - 9)
-          ..lineTo(cx + 6, cy)
-          ..lineTo(cx - 6, cy + 9)
-          ..lineTo(cx - 6, cy + 4)
-          ..lineTo(cx, cy)
-          ..lineTo(cx - 6, cy - 4)
-          ..close(),
-        arrow,
+    // 도크 마당에 깐 통로: 노란 칠
+    for (final k in aisles) {
+      final x = k % Cfg.cols, y = k ~/ Cfg.cols;
+      if (!Cfg.yard.contains(Offset(x + 0.5, y + 0.5))) continue;
+      box(c, x * t, y * t, t, t, 0xB3E8C94A);
+      strokeBox(
+        c,
+        Rect.fromLTWH(x * t + 1, y * t + 1, t - 2, t - 2),
+        0x663A2E10,
+        1,
       );
     }
-    // 구역 경계: 바닥에 칠한 흰 점선 (통로는 끊김)
+    if (mode == 4) _drawAisleOverlay(c);
+    // 구역 경계: 바닥에 칠한 흰 점선 (통로 칸에서는 끊김)
     final line = Paint()
       ..color = const Color(0x99FFFFFF)
       ..strokeWidth = 2;
     for (final zx in [Cfg.zoneX1, Cfg.zoneX2]) {
       for (var y = a.top + 0.2; y < a.bottom; y += 0.6) {
-        if (y + 0.3 > ai.top && y < ai.bottom) continue;
+        if (isAisle(zx.toInt() - 1, y.floor()) ||
+            isAisle(zx.toInt(), y.floor()))
+          continue;
         c.drawLine(Offset(zx * t, y * t), Offset(zx * t, (y + 0.3) * t), line);
       }
     }
@@ -397,6 +401,37 @@ extension WorldView on HubGame {
       if (y1 > y0) box(c, ar.right - 4, y0, 8, y1 - y0, wall);
     }
     label(c, '입구', ar.left - 40, door.center.dy - 7, size: 12);
+  }
+
+  /// 통로 모드: 칸 격자 + 직원이 자주 다닌 길(동선) 강조
+  void _drawAisleOverlay(Canvas c) {
+    const t = Cfg.tile;
+    final grid = Paint()
+      ..color = const Color(0x332A2438)
+      ..strokeWidth = 1;
+    for (final r in [area]) {
+      for (var x = r.left; x <= r.right; x++) {
+        c.drawLine(Offset(x * t, r.top * t), Offset(x * t, r.bottom * t), grid);
+      }
+      for (var y = r.top; y <= r.bottom; y++) {
+        c.drawLine(Offset(r.left * t, y * t), Offset(r.right * t, y * t), grid);
+      }
+    }
+    var top = 0.0;
+    for (final v in traffic) {
+      if (v > top) top = v;
+    }
+    if (top < 0.5) return;
+    for (var k = 0; k < traffic.length; k++) {
+      final v = traffic[k] / top;
+      if (v < 0.08) continue;
+      final x = k % Cfg.cols, y = k ~/ Cfg.cols;
+      // 많이 다닌 칸일수록 진한 주황 (통로가 없으면 이 길을 따라 깔면 좋다)
+      c.drawRect(
+        Rect.fromLTWH(x * t + 3, y * t + 3, t - 6, t - 6),
+        Paint()..color = Color.fromRGBO(240, 90, 40, 0.15 + 0.45 * v),
+      );
+    }
   }
 
   // ---------------- 건물 ----------------

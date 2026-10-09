@@ -12,6 +12,7 @@ import '../systems/flow_system.dart';
 import '../systems/input_system.dart';
 import '../systems/interact_system.dart';
 import '../systems/ops_system.dart';
+import '../systems/path_system.dart';
 import '../systems/save_system.dart';
 import '../systems/guide_system.dart';
 import '../systems/staff_system.dart';
@@ -26,6 +27,7 @@ export '../systems/flow_system.dart';
 export '../systems/input_system.dart';
 export '../systems/interact_system.dart';
 export '../systems/ops_system.dart';
+export '../systems/path_system.dart';
 export '../systems/save_system.dart';
 export '../systems/guide_system.dart';
 export '../systems/staff_system.dart';
@@ -129,6 +131,17 @@ class HubGame extends FlameGame {
   int ghostX = 0;
   int ghostY = 0;
   bool draggingGhost = false;
+
+  // 직원 통로 (칸 번호 = y * Cfg.cols + x). 모드 4에서 깔고 철거
+  final Set<int> aisles = {};
+  int aisleVer = 0; // 통로가 바뀔 때마다 증가 (길 다시 찾기)
+  int aisleTool = 0; // 0 깔기, 1 철거, 2 화면 이동
+  (int, int)? aisleLast; // 드래그 중 마지막으로 칠한 칸
+  List<bool> walkGrid = []; // 걸을 수 있는 칸 (배치가 바뀌면 다시 만듦)
+  int walkSig = -1;
+  final List<double> traffic = List<double>.filled(Cfg.cols * Cfg.rows, 0); // 칸별 최근 동선
+  double trafficTimer = 0;
+  double walkAll = 0, walkOnAisle = 0; // 최근 걸은 거리 (통로 위 비율 표시용)
   Building? selected;
 
   // 시트: null / 'build' / 'staff'
@@ -161,16 +174,16 @@ class HubGame extends FlameGame {
       ? Offset(b.tx + 1.0, b.ty + b.type.h + 0.6) // 창구: 책상(왼쪽 2칸) 앞
       : Offset(b.tx + b.type.w / 2, b.ty + b.type.h + 0.6);
 
-  /// 운반 직원이 택배를 집거나 내려놓는 자리. 접수 창구는 오른쪽 칸 적재대 앞
-  Offset pickOf(Building b) => b.type.id == 'counter'
-      ? Offset(b.tx + b.type.w - 0.5, b.ty + b.type.h + 0.6)
-      : frontOf(b);
-
-  /// 창고 가운데 통로 (입구 → 도크, 건물 금지)
-  Rect get aisle {
-    final a = area;
-    final top = (a.center.dy - Cfg.aisleH / 2).floorToDouble();
-    return Rect.fromLTRB(a.left, top, a.right, top + Cfg.aisleH);
+  /// 운반 직원이 택배를 집거나 내려놓는 자리. 접수 창구는 오른쪽 칸 적재대 앞,
+  /// 도크는 창고 안쪽 도크 문 앞 (벽 너머 트럭에 문으로 싣는다)
+  Offset pickOf(Building b) {
+    switch (b.type.id) {
+      case 'counter':
+        return Offset(b.tx + b.type.w - 0.5, b.ty + b.type.h + 0.6);
+      case 'dock':
+        return Offset(b.tx - 0.6, b.ty + b.type.h / 2);
+    }
+    return frontOf(b);
   }
 
   /// 건물 앞줄 (손님 줄·직원 서는 자리)

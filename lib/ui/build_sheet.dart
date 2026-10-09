@@ -21,9 +21,10 @@ class BuildSheet extends StatelessWidget {
       ),
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
-        itemCount: Cfg.types.length,
+        itemCount: Cfg.types.length + 1,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (_, i) => _TypeCard(g, Cfg.types[i]),
+        itemBuilder: (_, i) =>
+            i == 0 ? _AisleCard(g) : _TypeCard(g, Cfg.types[i - 1]),
       ),
     );
   }
@@ -99,6 +100,67 @@ class _TypeCard extends StatelessWidget {
                 small: true,
                 onTap: can ? () => g.startPlacing(t) : null,
               ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 통로: 드래그로 칸마다 깔고 철거. 직원이 통로 위에서 빨리 걷는다
+class _AisleCard extends StatelessWidget {
+  final HubGame g;
+  const _AisleCard(this.g);
+
+  @override
+  Widget build(BuildContext context) {
+    const swatch = Color(0xFFE8C94A);
+    return CardBox(
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: swatch.withValues(alpha: 0.22),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: swatch, width: 2),
+            ),
+            child: const Icon(Icons.timeline, color: swatch),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('통로', style: Tx.h2),
+                const SizedBox(height: 2),
+                Text(
+                  '직원이 통로 위에서 ${Cfg.aisleFast}배 빨리 걸어요 (밖은 ${Cfg.aisleSlow}배). '
+                  '접수→포장→선반→도크를 이어 보세요',
+                  style: Tx.sub,
+                ),
+                const SizedBox(height: 4),
+                Text('깐 칸 ${g.aisles.length}개 · 드래그로 깔기·철거', style: Tx.sub),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '칸당 ${Cfg.aisleCost}원',
+                style: const TextStyle(
+                  color: C.gold,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              AppButton('깔기', small: true, onTap: () => g.startAisle()),
             ],
           ),
         ],

@@ -16,6 +16,7 @@ extension WorkerSystem on HubGame {
       if (!c.idle) _move(c, dt);
     }
     // 이번 프레임의 일(접수·포장·운반)이 끝났으니 휴식과 체력 계산
+    this.decayTraffic(dt);
     this.updateRest(dt);
     this.updateStaffEnergy(dt);
   }
@@ -238,8 +239,8 @@ extension WorkerSystem on HubGame {
     final target = c.carrying ? pickOf(c.dst!) : pickOf(c.src!);
     var slow = (c.carrying && c.job!.kind == 3) ? Cfg.bulkySlow : 1.0;
     if (c.job!.stage == 4) slow *= c.dst!.loadMul; // 도크 업그레이드: 싣는 속도
-    c.pos = stepToward(
-        c.pos, target, Cfg.carrierSpeed * c.staff.walkMul * slow, dt);
+    // 통로를 따라 걷는 길찾기 (통로 위 1.5배, 밖 0.7배)
+    this.walkCarrier(c, target, Cfg.carrierSpeed * c.staff.walkMul * slow, dt);
     if ((c.pos - target).distance > 0.05) return;
 
     final p = c.job!;

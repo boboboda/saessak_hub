@@ -68,6 +68,7 @@ extension SaveSystem on HubGame {
             'spec': s.spec,
           }
       ],
+      'aisles': aisles.toList(),
       'buildings': [
         for (final b in buildings)
           {
@@ -208,6 +209,10 @@ extension SaveSystem on HubGame {
       claimed
         ..clear()
         ..addAll(((j['claimed'] as List?) ?? const []).map((e) => e as int));
+      aisles
+        ..clear()
+        ..addAll(((j['aisles'] as List?) ?? const []).map((e) => e as int));
+      aisleVer++;
       staff
         ..clear()
         ..addAll(loadedStaff);

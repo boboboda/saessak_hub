@@ -89,6 +89,7 @@ class ActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (g.mode == 4) return _aisleBar();
     String info;
     Color infoColor;
     String okLabel;
@@ -101,17 +102,20 @@ class ActionBar extends StatelessWidget {
       final problem = g.ghostProblem;
       okEnabled = problem == null;
       infoColor = okEnabled ? C.good : C.bad;
-      info = '${t.name} ${t.w}×${t.h}칸 · ${t.cost}원 — '
+      info =
+          '${t.name} ${t.w}×${t.h}칸 · ${t.cost}원 — '
           '${okEnabled ? '놓을 수 있어요' : problem}';
       okLabel = '확정';
       onOk = () => g.confirmPlace();
       onCancel = () => g.cancelPlacing();
     } else {
-      final next = Cfg.areaName[(g.areaLevel + 1).clamp(0, Cfg.areaName.length - 1)];
+      final next =
+          Cfg.areaName[(g.areaLevel + 1).clamp(0, Cfg.areaName.length - 1)];
       final r = Cfg.areas[(g.areaLevel + 1).clamp(0, Cfg.areas.length - 1)];
       okEnabled = g.canExpand && g.money >= g.nextAreaCost;
       infoColor = okEnabled ? C.blue : C.bad;
-      info = '$next ${r.width.toInt()}×${r.height.toInt()}칸 · '
+      info =
+          '$next ${r.width.toInt()}×${r.height.toInt()}칸 · '
           '${g.nextAreaCost}원 (건물은 그대로)'
           '${g.money >= g.nextAreaCost ? '' : ' — 돈이 모자라요'}';
       okLabel = '확장 확정';
@@ -152,16 +156,96 @@ class ActionBar extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: AppButton('취소',
-                    color: C.card, expand: true, onTap: () => onCancel()),
+                child: AppButton(
+                  '취소',
+                  color: C.card,
+                  expand: true,
+                  onTap: () => onCancel(),
+                ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 flex: 2,
-                child: AppButton(okLabel,
-                    color: C.good,
+                child: AppButton(
+                  okLabel,
+                  color: C.good,
+                  expand: true,
+                  onTap: okEnabled ? () => onOk() : null,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+extension on ActionBar {
+  /// 통로 모드 하단 바: 도구(깔기·철거·화면 이동) + 동선 효율 + 완료
+  Widget _aisleBar() {
+    final pct = g.walkAll < 1
+        ? null
+        : (g.walkOnAisle / g.walkAll * 100).round();
+    final tools = [
+      ('깔기', Icons.edit),
+      ('철거', Icons.delete_outline),
+      ('화면 이동', Icons.pan_tool),
+    ];
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: const BoxDecoration(
+        color: C.panel,
+        border: Border(top: BorderSide(color: C.line)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            decoration: BoxDecoration(
+              color: C.gold.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: C.gold.withValues(alpha: 0.6)),
+            ),
+            child: Text(
+              '드래그해서 깔아요 · 칸당 ${Cfg.aisleCost}원 (철거 시 절반 환불) · ${g.money}원\n'
+              '주황 칸 = 직원이 자주 다닌 길 · 최근 걸음 중 통로 위 ${pct == null ? '-' : '$pct%'}',
+              style: const TextStyle(
+                color: C.gold,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              for (var i = 0; i < tools.length; i++) ...[
+                Expanded(
+                  child: AppButton(
+                    tools[i].$1,
+                    small: true,
+                    icon: tools[i].$2,
+                    color: g.aisleTool == i ? C.accent : C.card,
                     expand: true,
-                    onTap: okEnabled ? () => onOk() : null),
+                    onTap: () {
+                      g.aisleTool = i;
+                      g.ui();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Expanded(
+                child: AppButton(
+                  '완료',
+                  small: true,
+                  color: C.good,
+                  expand: true,
+                  onTap: () => g.endAisle(),
+                ),
               ),
             ],
           ),
@@ -211,7 +295,10 @@ class _NavBtn extends StatelessWidget {
                   Text(
                     sub == null ? label : '$label · $sub',
                     style: TextStyle(
-                        color: fg, fontSize: 11, fontWeight: FontWeight.w700),
+                      color: fg,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

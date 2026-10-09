@@ -17,6 +17,11 @@ extension InputSystem on HubGame {
       return;
     }
     if (mode == 3) return;
+    if (mode == 4) {
+      if (aisleTool != 2) this.aisleAt(w);
+      aisleLast = null;
+      return;
+    }
 
     // 내 자리 손님을 눌렀으면 접수
     if (this.tapCustomer(w)) return;
@@ -31,17 +36,28 @@ extension InputSystem on HubGame {
   void panStart(Offset p) {
     draggingGhost = false;
     if (size.x == 0) return;
+    if (mode == 4 && aisleTool != 2) {
+      aisleLast = null;
+      this.aisleAt(toWorld(p));
+      return;
+    }
     if (mode == 2 && placing != null) {
       final r = this.ghostRect;
-      final px = Rect.fromLTWH(r.left * Cfg.tile, r.top * Cfg.tile,
-          r.width * Cfg.tile, r.height * Cfg.tile);
+      final px = Rect.fromLTWH(
+        r.left * Cfg.tile,
+        r.top * Cfg.tile,
+        r.width * Cfg.tile,
+        r.height * Cfg.tile,
+      );
       if (px.inflate(14).contains(toWorld(p))) draggingGhost = true;
     }
   }
 
   void panUpdate(Offset p, Offset delta) {
     if (size.x == 0) return;
-    if (draggingGhost && placing != null) {
+    if (mode == 4 && aisleTool != 2) {
+      this.aisleAt(toWorld(p), drag: true);
+    } else if (draggingGhost && placing != null) {
       this.moveGhost(toWorld(p));
     } else {
       cam = cam - delta;
@@ -51,5 +67,6 @@ extension InputSystem on HubGame {
 
   void panEnd() {
     draggingGhost = false;
+    aisleLast = null;
   }
 }
