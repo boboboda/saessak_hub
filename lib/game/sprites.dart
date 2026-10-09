@@ -27,6 +27,12 @@ class Sprites {
   /// 허브 도로 배경 차량 (위에서 본 모습, 아래로 달리는 방향. 위로 갈 땐 상하 반전)
   static final List<ui.Image> roadCars = [];
 
+  /// 허브 도크 대형 트럭 (위에서 본 3/4, 왼쪽 짐칸·오른쪽 운전석). 빈 차 / 짐 가득 (같은 모양)
+  static ui.Image? dockTruck, dockTruckFull;
+
+  /// 도크 트럭 짐칸 (그림 픽셀): 실은 만큼 운전석 쪽부터 짐 실은 그림으로 채움
+  static const ui.Rect dockTruckBed = ui.Rect.fromLTRB(3, 7, 71, 36);
+
   /// 노선 지도 지역센터 건물 (assets/sprites/map/center_<지역>.png). 없으면 null → 도형으로 그림.
   static final List<ui.Image?> centers = List.filled(5, null);
   static ui.Image? hub; // 노선 지도 허브 외관
@@ -131,6 +137,8 @@ class Sprites {
     hubLounge = await _img('assets/sprites/props/hub_lounge.png');
     hubDock = await _img('assets/sprites/props/hub_dock.png');
     wangFloor = await _img('assets/sprites/tiles/wang_floor.png');
+    dockTruck = await _img('assets/sprites/props/dock_truck.png');
+    dockTruckFull = await _img('assets/sprites/props/dock_truck_full.png');
     roadCars.clear();
     for (final n in const ['car', 'van', 'moto']) {
       final im = await _img('assets/sprites/props/road_$n.png');

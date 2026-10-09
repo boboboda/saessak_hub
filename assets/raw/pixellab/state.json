@@ -328,5 +328,12 @@
   },
   "road_moto_down2": {
     "object_id": "f5719e52-d17b-4810-b471-2eb12b49689c"
+  },
+  "dock_truck": {
+    "object_id": "0a5bbf85-41fb-4d4e-9509-f91f83d8f858",
+    "picked_id": "0a92a5a0-0111-4846-9da3-405a21dd6ea7"
+  },
+  "dock_truck_full": {
+    "object_id": "cebbb489-3ea0-4069-9d4b-35c8c374ca89"
   }
 }

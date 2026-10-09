@@ -540,7 +540,53 @@ extension WorldView on HubGame {
             final vx = r.left + 14 + off * (Cfg.road.left - b.tx) * Cfg.tile;
             final vy = r.center.dy - vh / 2;
             final vimg = Sprites.vehicleImg(v.type.name);
-            if (vimg != null) {
+            final ti = Sprites.dockTruck;
+            if (ti != null) {
+              // 새 도크 트럭: 1:1 크기, 짐칸 뒤(왼쪽)가 도크 문에 붙게
+              final w = ti.width.toDouble(), h = ti.height.toDouble();
+              final dst = Rect.fromLTWH(
+                (r.left + 8 + off * (Cfg.road.left - b.tx) * Cfg.tile)
+                    .roundToDouble(),
+                (r.center.dy - h / 2).roundToDouble(),
+                w,
+                h,
+              );
+              final np = Paint()..filterQuality = FilterQuality.none;
+              final src = Rect.fromLTWH(0, 0, w, h);
+              c.drawImageRect(ti, src, dst, np);
+              final full = Sprites.dockTruckFull;
+              if (full != null && v.loaded > 0) {
+                // 실은 만큼 짐칸을 운전석 쪽부터 상자로 채움
+                const bed = Sprites.dockTruckBed;
+                final frac = (v.loaded / v.cap).clamp(0.0, 1.0);
+                c.save();
+                c.clipRect(
+                  Rect.fromLTRB(
+                    dst.left + bed.right - bed.width * frac,
+                    dst.top,
+                    dst.left + bed.right,
+                    dst.bottom,
+                  ),
+                );
+                c.drawImageRect(full, src, dst, np);
+                c.restore();
+              }
+              box(
+                c,
+                dst.left + 2,
+                dst.top - 7,
+                22,
+                4,
+                Cfg.regionColor[v.region],
+              );
+              labelIn(
+                c,
+                '${v.loaded}/${v.cap}',
+                Rect.fromLTWH(dst.left + 26, dst.top - 13, 44, 14),
+                size: 11,
+                color: const Color(0xFFFFFFFF),
+              );
+            } else if (vimg != null) {
               final vr = Rect.fromLTWH(vx, vy, vw, vh);
               final drawn = Sprites.containRect(vimg, vr);
               final fimg = Sprites.vehicleFullImg(v.type.name);
