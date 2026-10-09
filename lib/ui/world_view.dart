@@ -22,10 +22,10 @@ extension WorldView on HubGame {
 
   int x0Of(HubGame g) => max(0, (g.cam.dx / Cfg.tile).floor());
   int x1Of(HubGame g) =>
-      min(Cfg.cols, ((g.cam.dx + g.size.x) / Cfg.tile).ceil());
+      min(Cfg.cols, ((g.cam.dx + g.viewW) / Cfg.tile).ceil());
   int y0Of(HubGame g) => max(0, (g.cam.dy / Cfg.tile).floor());
   int y1Of(HubGame g) =>
-      min(Cfg.rows, ((g.cam.dy + g.size.y) / Cfg.tile).ceil());
+      min(Cfg.rows, ((g.cam.dy + g.viewH) / Cfg.tile).ceil());
 
   // ---------------- 인도(길) ----------------
   /// 창고 입구(왼쪽 벽 가운데)에서 왼쪽 세로길까지 이어지는 길. 창고가 커지면 같이 이동.
@@ -63,8 +63,8 @@ extension WorldView on HubGame {
     final view = Rect.fromLTWH(
       cam.dx - 160,
       cam.dy - 160,
-      size.x + 320,
-      size.y + 320,
+      viewW + 320,
+      viewH + 320,
     );
     for (final d in Scenery.items) {
       final img = Sprites.decor[d.key];
@@ -85,6 +85,7 @@ extension WorldView on HubGame {
     box(c, 0, 0, size.x, size.y, 0xFF2A2438);
 
     c.save();
+    c.scale(zoom);
     c.translate(-cam.dx, -cam.dy);
 
     // 잔디
@@ -220,7 +221,7 @@ extension WorldView on HubGame {
     final cars = Sprites.roadCars;
     if (cars.isEmpty) return;
     final rd = Cfg.road;
-    final view = Rect.fromLTWH(cam.dx, cam.dy, size.x, size.y).inflate(t * 2);
+    final view = Rect.fromLTWH(cam.dx, cam.dy, viewW, viewH).inflate(t * 2);
     final p = Paint()..filterQuality = FilterQuality.none;
     for (var lane = 0; lane < 2; lane++) {
       final lx = lane == 0

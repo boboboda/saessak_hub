@@ -10,6 +10,11 @@ class Cfg {
   static const int cols = 36; // 월드 가로 칸
   static const int rows = 36; // 월드 세로 칸
 
+  // ---- 허브 화면 확대 ----
+  static const double zoomFitTiles = 10; // 기본 확대: 화면 가로에 이만큼 칸이 보이게
+  static const double zoomMin = 0.6; // 가장 멀리 (월드보다 넓게 보이면 그만큼 더 제한)
+  static const double zoomMax = 2.4; // 가장 가까이
+
   // 창고 영역 (타일 좌표). 오른쪽 벽(wallX)은 고정, 왼쪽·위·아래로 커짐.
   static const double wallX = 22; // 창고 오른쪽 벽 = 도크가 붙는 벽
   static const List<Rect> areas = [

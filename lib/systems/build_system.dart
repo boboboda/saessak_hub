@@ -106,7 +106,7 @@ extension BuildSystem on HubGame {
     sheet = null;
     // 보이는 화면 가운데에서 시작 (놓을 수 있는 구역 안으로 보정)
     final visibleH = size.y - insetTop - insetBottom;
-    final c = Offset(size.x / 2, insetTop + visibleH / 2) + cam;
+    final c = this.toWorld(Offset(size.x / 2, insetTop + visibleH / 2));
     if (t.zone == 3) {
       moveGhost(c);
       return;

@@ -27,10 +27,25 @@ class GameScreen extends StatelessWidget {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTapUp: (d) => game.handleTap(d.localPosition),
-              onPanStart: (d) => game.panStart(d.localPosition),
-              onPanUpdate: (d) => game.panUpdate(d.localPosition, d.delta),
-              onPanEnd: (_) => game.panEnd(),
-              onPanCancel: () => game.panEnd(),
+              // 한 손가락: 끌기(화면 이동·배치·통로), 두 손가락: 확대/축소 + 이동
+              onScaleStart: (d) {
+                if (d.pointerCount >= 2) {
+                  game.panEnd();
+                  game.pinchStart();
+                } else {
+                  game.panStart(d.localFocalPoint);
+                }
+              },
+              onScaleUpdate: (d) {
+                if (d.pointerCount >= 2) {
+                  game.pinchUpdate(d.localFocalPoint, d.scale);
+                  game.cam -= d.focalPointDelta / game.zoom;
+                  game.clampCam();
+                } else {
+                  game.panUpdate(d.localFocalPoint, d.focalPointDelta);
+                }
+              },
+              onScaleEnd: (_) => game.panEnd(),
               child: ValueListenableBuilder<int>(
                 valueListenable: game.tick,
                 // 노선 지도가 열려 있으면 허브 그림은 그리지 않아 가볍게 한다 (게임은 계속 돌아감)

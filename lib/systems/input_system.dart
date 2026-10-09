@@ -5,7 +5,7 @@ import '../game/hub_game.dart';
 
 /// 맵(게임 화면) 터치만 담당. 메뉴·패널은 Flutter 위젯이 처리.
 extension InputSystem on HubGame {
-  Offset toWorld(Offset p) => p + cam;
+  Offset toWorld(Offset p) => p / zoom + cam;
 
   void handleTap(Offset p) {
     if (size.x == 0) return;
@@ -60,7 +60,7 @@ extension InputSystem on HubGame {
     } else if (draggingGhost && placing != null) {
       this.moveGhost(toWorld(p));
     } else {
-      cam = cam - delta;
+      cam = cam - delta / zoom;
       clampCam();
     }
   }

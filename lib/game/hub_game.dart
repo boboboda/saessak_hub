@@ -120,6 +120,8 @@ class HubGame extends FlameGame {
   // 카메라 (월드 픽셀 기준 화면 왼쪽 위)
   Offset cam = Offset.zero;
   bool camInit = false;
+  double zoom = 1; // 화면 픽셀 / 월드 픽셀
+  double _pinchZoom = 1; // 두 손가락을 댔을 때의 확대율
 
   // 위젯 UI가 가리는 위·아래 높이 (GameScreen이 채워 줌)
   double insetTop = 100;
@@ -216,29 +218,64 @@ class HubGame extends FlameGame {
   }
 
   // ---- 카메라 ----
+  /// 화면에 보이는 월드 크기 (월드 픽셀)
+  double get viewW => size.x / zoom;
+  double get viewH => size.y / zoom;
+
+  /// 가장 멀리 볼 수 있는 확대율: 월드(허브 경계)보다 넓게 보이지 않게
+  double get zoomLo {
+    final visH = size.y - insetTop - insetBottom;
+    return max(
+      Cfg.zoomMin,
+      max(size.x / (Cfg.cols * Cfg.tile), visH / (Cfg.rows * Cfg.tile)),
+    );
+  }
+
+  double get zoomHi => max(Cfg.zoomMax, zoomLo);
+
+  /// 기본 확대율: 화면 가로에 Cfg.zoomFitTiles 칸
+  double get zoomDefault =>
+      (size.x / (Cfg.zoomFitTiles * Cfg.tile)).clamp(zoomLo, zoomHi).toDouble();
+
   void clampCam() {
+    zoom = zoom.clamp(zoomLo, zoomHi).toDouble();
     final worldW = Cfg.cols * Cfg.tile;
     final worldH = Cfg.rows * Cfg.tile;
+    final vw = viewW, vh = viewH;
     double x = cam.dx;
     double y = cam.dy;
-    if (worldW <= size.x) {
-      x = (worldW - size.x) / 2;
+    if (worldW <= vw) {
+      x = (worldW - vw) / 2;
     } else {
-      x = x.clamp(0.0, worldW - size.x).toDouble();
+      x = x.clamp(0.0, worldW - vw).toDouble();
     }
-    final minY = -insetTop;
-    final maxY = worldH - size.y + insetBottom;
+    // 위·아래는 메뉴가 가리는 만큼 더 밀 수 있음 (월드 끝이 메뉴 바로 옆까지만)
+    final minY = -insetTop / zoom;
+    final maxY = worldH - vh + insetBottom / zoom;
     y = maxY < minY ? (minY + maxY) / 2 : y.clamp(minY, maxY).toDouble();
     cam = Offset(x, y);
   }
 
-  /// 창고 오른쪽(보관·도크 쪽)이 보이도록 처음 위치를 잡음
+  /// 화면 점 focal 아래의 월드 위치를 그대로 두고 확대율을 바꿈
+  void zoomAt(Offset focal, double z) {
+    final w = focal / zoom + cam;
+    zoom = z.clamp(zoomLo, zoomHi).toDouble();
+    cam = w - focal / zoom;
+    clampCam();
+  }
+
+  void pinchStart() => _pinchZoom = zoom;
+  void pinchUpdate(Offset focal, double scale) =>
+      zoomAt(focal, _pinchZoom * scale);
+
+  /// 창고 작업 구역(접수~보관)이 보이도록 처음 위치를 잡음
   void centerCamOnArea() {
     final a = area;
+    zoom = zoomDefault;
     final visibleH = size.y - insetTop - insetBottom;
     cam = Offset(
-      (a.right - 3) * Cfg.tile - size.x / 2,
-      a.center.dy * Cfg.tile - (insetTop + visibleH / 2),
+      (a.right - 4.5) * Cfg.tile - viewW / 2,
+      a.center.dy * Cfg.tile - (insetTop + visibleH / 2) / zoom,
     );
     clampCam();
   }
