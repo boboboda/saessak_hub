@@ -286,5 +286,26 @@
   },
   "house_apt": {
     "object_id": "b74e828e-0df5-462b-bdca-33a4cb5a5986"
+  },
+  "hub_counter": {
+    "object_id": "2b15e12c-8e18-4e7d-a18a-e785b267387f"
+  },
+  "hub_pack": {
+    "object_id": "7ffb7f89-c67f-42e5-a8ad-5de0e0c32751"
+  },
+  "hub_shelf": {
+    "object_id": "5e1c7eb9-4802-48b3-b3e6-bddaa2bebbcf"
+  },
+  "hub_lounge": {
+    "object_id": "c013b7f9-2867-4de3-a31e-2bb5cab3fa2f"
+  },
+  "hub_dock": {
+    "object_id": "dd82e0ef-71c5-484d-a706-d4d30604e9f9"
+  },
+  "hub_floor": {
+    "tileset_id": "97254c75-dc95-42e5-82f0-1de5308d80af"
+  },
+  "hub_dock2": {
+    "object_id": "cbabc1d4-1a0d-49ec-b2a8-915f36af9bf4"
   }
 }

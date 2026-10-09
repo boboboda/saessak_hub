@@ -156,6 +156,16 @@ class HubGame extends FlameGame {
   Offset frontOf(Building b) =>
       Offset(b.tx + b.type.w / 2, b.ty + b.type.h + 0.6);
 
+  /// 창고 가운데 통로 (입구 → 도크, 건물 금지)
+  Rect get aisle {
+    final a = area;
+    final top = (a.center.dy - Cfg.aisleH / 2).floorToDouble();
+    return Rect.fromLTRB(a.left, top, a.right, top + Cfg.aisleH);
+  }
+
+  /// 건물 앞줄 (손님 줄·직원 서는 자리)
+  Rect frontRow(Rect r) => Rect.fromLTWH(r.left, r.bottom, r.width, 1);
+
   /// 손님이 들어오고 나가는 입구 바깥 지점
   Offset get exitPoint => Offset(area.left - 3, area.center.dy);
 

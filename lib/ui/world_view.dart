@@ -141,16 +141,29 @@ extension WorldView on HubGame {
         }
       }
     }
+    // 하역장 표시: 도크 앞 주차칸(흰 선)
+    for (final d in ofType('dock')) {
+      final r = _px(d.rect);
+      final lp = Paint()
+        ..color = const Color(0x88FFFFFF)
+        ..strokeWidth = 2;
+      c.drawLine(Offset(r.right, r.top + 2), Offset(_px(y).right - 2, r.top + 2), lp);
+      c.drawLine(Offset(r.right, r.bottom - 2), Offset(_px(y).right - 2, r.bottom - 2), lp);
+    }
     // 도크를 고르면 마당이 강조됨
     if (mode == 2 && placing != null && placing!.zone == 3) {
       final r = _px(y);
       box(c, r.left, r.top, r.width, r.height, Cfg.zoneHot[3]);
     }
     strokeBox(c, _px(y), 0xFF2A2438, 3);
-    label(c, Cfg.zoneName[3], y.left * t + 8, y.top * t + 6, size: 12);
+    final dt = Rect.fromLTWH(y.left * t + 6, y.top * t + 6, 74, 18);
+    c.drawRRect(RRect.fromRectAndRadius(dt, const Radius.circular(4)), Paint()..color = const Color(0xF2FFD166));
+    labelIn(c, '④ 출고 도크', dt, size: 11, color: const Color(0xFF2A2438));
   }
 
   // ---------------- 창고 건물 ----------------
+  // 동선: 입구(왼쪽 벽) → ① 접수 → ② 분류·포장 → ③ 보관 → ④ 출고 도크(오른쪽 벽 밖).
+  // 가운데 노란 통로가 그 길이고, 화살표가 진행 방향이다.
   void _drawWarehouse(Canvas c) {
     const t = Cfg.tile;
 
@@ -164,41 +177,101 @@ extension WorldView on HubGame {
           r.top + 6, size: 12);
     }
 
-    // 창고 바닥
     final a = area;
-    for (var y = max(a.top.toInt(), y0Of(this)); y < min(a.bottom.toInt(), y1Of(this)); y++) {
-      for (var x = max(a.left.toInt(), x0Of(this)); x < min(a.right.toInt(), x1Of(this)); x++) {
-        if (!Sprites.drawFloor(c, x * t, y * t, t)) {
-          box(c, x * t, y * t, t, t,
-              (x + y) % 2 == 0 ? 0xFFE3D5B8 : 0xFFDCCDAE);
+    final ai = aisle;
+    final ar = _px(a);
+    // 바닥: 콘크리트 + 노란 통로 (이중 격자 Wang 타일, 창고 안만)
+    c.save();
+    c.clipRect(ar);
+    final fl = Sprites.wangFloor;
+    bool aisleAt(int x, int y) =>
+        x >= a.left && x < a.right && ai.contains(Offset(x + 0.5, y + 0.5));
+    final p = Paint()
+      ..filterQuality = FilterQuality.none
+      ..isAntiAlias = false;
+    for (var j = max(a.top.toInt(), y0Of(this)); j <= min(a.bottom.toInt(), y1Of(this)); j++) {
+      for (var i = max(a.left.toInt(), x0Of(this)); i <= min(a.right.toInt(), x1Of(this)); i++) {
+        final dst = Rect.fromLTWH((i - 0.5) * t, (j - 0.5) * t, t, t);
+        if (fl == null) {
+          box(c, dst.left, dst.top, t, t, aisleAt(i, j) ? 0xFFE8C94A : 0xFFDCCDAE);
+          continue;
         }
+        final m = (aisleAt(i - 1, j - 1) ? 8 : 0) |
+            (aisleAt(i, j - 1) ? 4 : 0) |
+            (aisleAt(i - 1, j) ? 2 : 0) |
+            (aisleAt(i, j) ? 1 : 0);
+        final w = fl.width / 16;
+        c.drawImageRect(fl, Rect.fromLTWH(w * m, 0, w, fl.height.toDouble()), dst, p);
       }
     }
+    c.restore();
 
-    // 구역 색 + 이름 (건물을 고르면 들어갈 구역이 진하게)
+    // 배치 중이면 들어갈 구역만 진하게
+    for (var z = 0; z < 3; z++) {
+      if (mode == 2 && placing != null && placing!.zone == z) {
+        final r = _px(this.zoneRect(z));
+        box(c, r.left, r.top, r.width, r.height, Cfg.zoneHot[z]);
+      }
+    }
+    // 통로 화살표 (진행 방향 →)
+    final arrow = Paint()..color = const Color(0x553A2E10);
+    for (var x = a.left + 1.5; x < a.right - 0.5; x += 2) {
+      final cx = x * t, cy = ai.center.dy * t;
+      c.drawPath(
+          Path()
+            ..moveTo(cx - 6, cy - 9)
+            ..lineTo(cx + 6, cy)
+            ..lineTo(cx - 6, cy + 9)
+            ..lineTo(cx - 6, cy + 4)
+            ..lineTo(cx, cy)
+            ..lineTo(cx - 6, cy - 4)
+            ..close(),
+          arrow);
+    }
+    // 구역 경계: 바닥에 칠한 흰 점선 (통로는 끊김)
+    final line = Paint()
+      ..color = const Color(0x99FFFFFF)
+      ..strokeWidth = 2;
+    for (final zx in [Cfg.zoneX1, Cfg.zoneX2]) {
+      for (var y = a.top + 0.2; y < a.bottom; y += 0.6) {
+        if (y + 0.3 > ai.top && y < ai.bottom) continue;
+        c.drawLine(Offset(zx * t, y * t), Offset(zx * t, (y + 0.3) * t), line);
+      }
+    }
+    // 구역 간판 (번호 = 진행 순서)
+    const names = ['① 접수', '② 분류·포장', '③ 보관'];
     for (var z = 0; z < 3; z++) {
       final r = _px(this.zoneRect(z));
-      final hot = mode == 2 && placing != null && placing!.zone == z;
-      box(c, r.left, r.top, r.width, r.height,
-          hot ? Cfg.zoneHot[z] : Cfg.zoneTint[z]);
-      label(c, Cfg.zoneName[z], r.left + 6, r.top + 5,
-          size: 12, color: const Color(0xFF5A3A28));
+      // 창고 윗벽 바깥에 걸린 간판 (안쪽 건물·수량표와 겹치지 않게)
+      final tag = Rect.fromLTWH(r.left + 4, r.top - 26, names[z].length * 11.0 + 10, 18);
+      c.drawRRect(RRect.fromRectAndRadius(tag, const Radius.circular(4)),
+          Paint()..color = Color(Cfg.zoneHot[z]).withValues(alpha: 0.95));
+      labelIn(c, names[z], tag, size: 11, color: const Color(0xFF2A2438));
     }
-    final line = Paint()
-      ..color = const Color(0xAA7A5C3A)
-      ..strokeWidth = 2;
-    c.drawLine(Offset(Cfg.zoneX1 * t, a.top * t),
-        Offset(Cfg.zoneX1 * t, a.bottom * t), line);
-    c.drawLine(Offset(Cfg.zoneX2 * t, a.top * t),
-        Offset(Cfg.zoneX2 * t, a.bottom * t), line);
 
-    // 벽 (오른쪽 벽은 두껍게: 도크가 붙는 벽)
-    strokeBox(c, _px(a), 0xFF7A5C3A, 4);
-    box(c, Cfg.wallX * t - 4, a.top * t, 8, a.height * t, 0xFF7A5C3A);
-
-    // 입구 (왼쪽 벽 가운데)
-    box(c, a.left * t - 4, (a.center.dy - 0.7) * t, 8, 1.4 * t, 0xFF8B5E3C);
-    label(c, '입구', a.left * t - 38, a.center.dy * t - 7, size: 12);
+    // 벽: 두께 8px, 입구(왼쪽 벽의 통로 자리)와 도크 문(오른쪽 벽)은 뚫림
+    const wall = 0xFF7A5C3A, cap = 0xFF9C7A52;
+    box(c, ar.left - 4, ar.top - 4, ar.width + 8, 8, wall); // 위
+    box(c, ar.left - 4, ar.top - 4, ar.width + 8, 3, cap);
+    box(c, ar.left - 4, ar.bottom - 4, ar.width + 8, 8, wall); // 아래
+    final door = _px(ai);
+    box(c, ar.left - 4, ar.top, 8, door.top - ar.top, wall); // 왼쪽 (입구 위·아래)
+    box(c, ar.left - 4, door.bottom, 8, ar.bottom - door.bottom, wall);
+    final openings = <Rect>[
+      door, // 통로 끝 (도크로 나가는 길)
+      for (final d in ofType('dock')) _px(d.rect),
+    ];
+    var y = ar.top;
+    final ys = <(double, double)>[];
+    for (final o in openings..sort((p, q) => p.top.compareTo(q.top))) {
+      ys.add((y, o.top));
+      y = max(y, o.bottom);
+    }
+    ys.add((y, ar.bottom));
+    for (final (y0, y1) in ys) {
+      if (y1 > y0) box(c, ar.right - 4, y0, 8, y1 - y0, wall);
+    }
+    label(c, '입구', ar.left - 40, door.center.dy - 7, size: 12);
   }
 
   // ---------------- 건물 ----------------
@@ -207,7 +280,7 @@ extension WorldView on HubGame {
       final r = _px(b.rect).deflate(1);
       final sp = Sprites.forBuilding(b.type.id);
       if (sp != null) {
-        Sprites.drawFitWidth(c, sp, r);
+        Sprites.drawFitBottom(c, sp, r, left: b.type.id == 'dock');
       } else {
         box(c, r.left, r.top, r.width, r.height, b.type.color);
         strokeBox(c, r, 0xFF2A2438, 2);
@@ -241,60 +314,56 @@ extension WorldView on HubGame {
 
       switch (b.type.id) {
         case 'counter':
-        // 대기 중인 택배는 창구 안쪽 위에 작은 상자로
+          // 대기 중인 택배는 창구 왼쪽 옆 바닥에 작은 상자 줄로 (직원·손님과 겹치지 않게)
           for (var i = 0; i < b.outbox.length; i++) {
-            if (!Sprites.drawBox(
-                c,
-                Rect.fromLTWH(r.left + 2 + i * 12, r.top + 1, 13, 13),
-                Cfg.regionColor[b.outbox[i].region])) {
-              box(c, r.left + 4 + i * 11, r.top + 3, 9, 9,
-                  Cfg.regionColor[b.outbox[i].region]);
+            final br = Rect.fromLTWH(r.left + 1 + (i % 4) * 11, r.top + 1 + (i ~/ 4) * 11, 11, 11);
+            if (!Sprites.drawBox(c, br, Cfg.regionColor[b.outbox[i].region])) {
+              box(c, br.left, br.top, 9, 9, Cfg.regionColor[b.outbox[i].region]);
             }
-            if (b.outbox[i].kind > 0) {
-              strokeBox(c, Rect.fromLTWH(r.left + 4 + i * 11, r.top + 3, 9, 9),
-                  0xFFFF3B30, 1.5);
-            }
+            if (b.outbox[i].kind > 0) strokeBox(c, br, 0xFFFF3B30, 1.5);
           }
           break;
         case 'pack':
           break; // 상자·진행 막대는 직원 뒤에 다시 그림 (_drawPackContent)
         case 'shelf':
           // 들어온 택배 수만큼 선반 칸에 상자가 쌓임 (아래 칸부터)
-          if (Sprites.shelf != null && Sprites.boxS != null) {
-            final sh = Sprites.shelf!;
-            final k = r.width / sh.width; // 선반 그림 배율
-            final top = r.bottom - sh.height * k;
-            const tierBase = [64.0, 37.0, 11.0]; // 각 칸 바닥(그림 기준 픽셀)
+          // 들어온 택배 수만큼 선반 판 위에 상자가 쌓임 (아래 판부터). 수량 표시는 선반 위 빈칸에
+          final sh = Sprites.forBuilding('shelf');
+          if (sh != null && Sprites.boxS != null) {
+            final d = Sprites.fitBottom(sh, r);
+            final k = d.width / sh.width;
+            const tierBase = [48.0, 31.0, 14.0]; // 각 판 위 상자 바닥 (그림 기준 픽셀, hub_shelf)
             const perTier = 4;
             final slots = (b.stored / b.cap * perTier * 3).ceil().clamp(0, perTier * 3);
             for (var i = 0; i < slots; i++) {
               final tier = i ~/ perTier, col = i % perTier;
-              Sprites.drawSmallBox(
-                  c,
-                  r.left + 10 * k + col * 12.5 * k + 1,
-                  top + tierBase[tier] * k - 11);
+              Sprites.drawSmallBox(c, d.left + (7 + col * 12) * k, d.top + tierBase[tier] * k - 12);
             }
           }
-          box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
-          box(c, r.left + 4, r.bottom - 10,
-              (r.width - 8) * (b.stored / b.cap).clamp(0.0, 1.0), 6,
-              b.stored >= b.cap ? 0xFFE5484D : 0xFF7BD389);
-          label(c, '${b.stored}/${b.cap}', r.left + 5, r.bottom - 26,
-              size: 11);
+          final full = b.stored >= b.cap;
+          final tag = Rect.fromLTWH(r.left + 6, r.top + 2, r.width - 12, 14);
+          c.drawRRect(RRect.fromRectAndRadius(tag, const Radius.circular(4)),
+              Paint()..color = const Color(0xCC2A2438));
+          box(c, tag.left + 2, tag.bottom - 4, (tag.width - 4) * (b.stored / b.cap).clamp(0.0, 1.0), 2,
+              full ? 0xFFE5484D : 0xFF7BD389);
+          labelIn(c, '${b.stored}/${b.cap}', tag.translate(0, -1), size: 10);
           break;
         case 'lounge':
-          // 앉는 자리마다 벤치
-          for (final o in Cfg.loungeSeats) {
-            _bench(c, Offset((b.tx + o.dx) * Cfg.tile, (b.ty + o.dy) * Cfg.tile));
+          // 그림이 없을 때만 벤치를 그림 (그림에는 소파가 있음)
+          if (sp == null) {
+            for (final o in Cfg.loungeSeats) {
+              _bench(c, Offset((b.tx + o.dx) * Cfg.tile, (b.ty + o.dy) * Cfg.tile));
+            }
+            label(c, '휴게실', r.center.dx - 18, r.bottom - 15, size: 11);
           }
-          label(c, '휴게실', r.center.dx - 18, r.bottom - 15, size: 11);
           break;
         case 'dock':
-        // 벽 쪽에 셔터, 바깥쪽에 주차선
-          box(c, r.left, r.top + 8, 8, r.height - 16, 0xFFB0B0C0);
-          for (var i = 1; i < 3; i++) {
-            box(c, r.left + 14, r.top + i * r.height / 3 - 1, r.width - 22, 2,
-                0x55FFFFFF);
+          // 그림이 없을 때만 셔터·주차선을 그림
+          if (sp == null) {
+            box(c, r.left, r.top + 8, 8, r.height - 16, 0xFFB0B0C0);
+            for (var i = 1; i < 3; i++) {
+              box(c, r.left + 14, r.top + i * r.height / 3 - 1, r.width - 22, 2, 0x55FFFFFF);
+            }
           }
           final v = b.vehicle;
           if (v != null) {
@@ -404,9 +473,9 @@ extension WorldView on HubGame {
   /// 길을 오가는 행인 (보기용). 시간만으로 위치가 정해지는 왕복 경로.
   static final List<List<Offset>> _walkRoutes = [
     // 윗길(가로) → 왼쪽 길(세로) → 아랫길(가로)
-    [Offset(31, 6.6), Offset(1, 6.6), Offset(1, 29.4), Offset(31, 29.4)],
+    [Offset(Cfg.road.left - 1, 6.6), Offset(1, 6.6), Offset(1, 29.4), Offset(Cfg.road.left - 1, 29.4)],
     // 오른쪽 인도(세로)
-    [Offset(35.5, 1.5), Offset(35.5, 34.5)],
+    [Offset(Cfg.road.right + 0.5, 1.5), Offset(Cfg.road.right + 0.5, 34.5)],
   ];
   static const List<List<double>> _walkers = [
     // [경로, 위상(칸), 속도(칸/초), 방향(+1/-1), 외형]
@@ -484,12 +553,24 @@ extension WorldView on HubGame {
     if (front) c.restore();
   }
 
+  /// 창구·포장대에서 직원이 서는 자리 (건물 왼쪽 위 기준, 칸). 책상 그림 뒤쪽, 칸 안.
+  List<Offset> _spots(Building b) {
+    final w = b.type.w.toDouble(), h = b.type.h.toDouble();
+    final sp = Sprites.forBuilding(b.type.id);
+    // 책상 윗면 뒤쪽 = 그림 위 끝에서 조금 아래
+    final topY = sp == null ? 0.1 : h - sp.height / Cfg.tile + 0.25;
+    return [Offset(w - 0.5, topY), Offset(0.5, topY)];
+  }
+
   /// 포장대 위 상자(가운데)와 진행 막대. 직원·책상 앞면 위에 그린다.
   void _drawPackContent(Canvas c, Building b) {
     final p = b.slot;
     if (p == null) return;
-    final r = _px(b.rect).deflate(1);
-    final dyn = Sprites.packEmpty != null;
+    final r0 = _px(b.rect).deflate(1);
+    final sp = Sprites.forBuilding('pack');
+    // 상자는 책상 윗면 가운데에 놓이도록 (그림이 있으면 그림 위 끝 기준)
+    final r = sp == null ? r0 : Rect.fromLTRB(r0.left, Sprites.fitBottom(sp, r0).top - 6, r0.right, r0.bottom);
+    final dyn = Sprites.packEmpty != null || Sprites.boxOpen != null;
     final prog = (b.progress / Cfg.packTime).clamp(0.0, 1.0);
     if (p.stage == 3) {
       final rr = Rect.fromLTWH(r.center.dx - 10, r.top + 1, 20, 20);
@@ -556,8 +637,7 @@ extension WorldView on HubGame {
     for (final b in ofType('counter')) {
       final working = customers
           .any((cu) => cu.counter == b && cu.state != 2 && cu.serveT > 0);
-      final w = b.type.w.toDouble();
-      final spots = [Offset(w - 0.5, -0.5), Offset(0.5, -0.5)];
+      final spots = _spots(b);
       final act = b.active;
       for (var i = 0; i < act.length && i < spots.length; i++) {
         const bob = 0.0;
@@ -575,8 +655,7 @@ extension WorldView on HubGame {
     // 포장 직원: 포장대 안쪽. 자리에 있는 직원만 표시.
     for (final b in ofType('pack')) {
       final working = b.slot != null && b.slot!.stage == 2;
-      final w = b.type.w.toDouble();
-      final spots = [Offset(w - 0.45, 0.12), Offset(0.45, 0.12)];
+      final spots = _spots(b);
       final act = b.active;
       for (var i = 0; i < act.length && i < spots.length; i++) {
         const bob = 0.0;
@@ -598,12 +677,11 @@ extension WorldView on HubGame {
         final sp = Sprites.forBuilding(id);
         if (sp == null) continue;
         final r = _px(b.rect).deflate(1);
-        final h = r.width * sp.height / sp.width;
-        final top = r.bottom - h;
+        final d = Sprites.fitBottom(sp, r);
+        // 책상(윗면 뒤 끝 아래부터)을 다시 그려 직원 다리를 가림
         c.save();
-        c.clipRect(Rect.fromLTRB(
-            r.left, top, r.right, r.bottom));
-        Sprites.drawFitWidth(c, sp, r);
+        c.clipRect(Rect.fromLTRB(d.left, d.top + d.height * 0.22, d.right, d.bottom));
+        Sprites.drawFitBottom(c, sp, r);
         c.restore();
       }
     }
@@ -613,10 +691,7 @@ extension WorldView on HubGame {
 
     // 자리 비움 표시: 쉬러 간 직원을 따라가지 않고, 그 직원이 서 있던 자리(머리 위)에 표시
     for (final b in [...ofType('counter'), ...ofType('pack')]) {
-      final w = b.type.w.toDouble();
-      final spots = b.type.id == 'counter'
-          ? [Offset(w - 0.5, -0.5), Offset(0.5, -0.5)]
-          : [Offset(w - 0.45, 0.12), Offset(0.45, 0.12)];
+      final spots = _spots(b);
       // 자리에 있는 직원이 앞 칸을 쓰므로, 빈자리는 그 다음 칸부터
       final here = b.active.length;
       final awayN = b.crew.where((s) => s.away).length;

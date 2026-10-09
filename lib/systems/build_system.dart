@@ -77,8 +77,13 @@ extension BuildSystem on HubGame {
         return '${Cfg.zoneName[t.zone]}에만 놓을 수 있어요';
       }
     }
+    if (t.zone != 3 && r.overlaps(aisle)) return '가운데 통로에는 놓을 수 없어요';
     for (final b in buildings) {
       if (b.rect.overlaps(r)) return '다른 건물과 겹쳐요';
+      if (t.zone != 3 && b.type.zone != 3) {
+        if (frontRow(b.rect).overlaps(r)) return '다른 건물 앞줄(서는 자리)을 막아요';
+        if (frontRow(r).overlaps(b.rect)) return '이 건물 앞줄이 막혀요';
+      }
     }
     if (money < t.cost) return '돈이 부족해요';
     return null;
@@ -137,13 +142,13 @@ extension BuildSystem on HubGame {
 
   /// (디버그) 시작 구성 자동 배치: 접수 창구·포장대·선반·도크 1개씩, 남는 직원은 운반
   void debugStarterLayout() {
-    final a = area;
-    final y = (a.top + 3).toInt();
+    // 통로 바로 위에 앞줄 한 칸을 비우고 나란히 (접수 → 포장 → 선반 → 도크)
+    final top = aisle.top.toInt();
     final plan = <(String, int, int)>[
-      ('counter', Cfg.zoneX1.toInt() - 3, y),
-      ('pack', Cfg.zoneX1.toInt() + 1, y),
-      ('shelf', Cfg.zoneX2.toInt() + 1, y),
-      ('dock', Cfg.wallX.toInt(), y),
+      ('counter', Cfg.zoneX1.toInt() - 3, top - 3),
+      ('pack', Cfg.zoneX1.toInt() + 1, top - 3),
+      ('shelf', Cfg.zoneX2.toInt() + 1, top - 4),
+      ('dock', Cfg.wallX.toInt(), top - 1),
     ];
     for (final (id, x, yy) in plan) {
       final t = Cfg.types.firstWhere((t) => t.id == id);

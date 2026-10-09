@@ -1025,5 +1025,100 @@
       "description": "pixel art, black outline, front view, flat orthographic, no perspective, single modern tall apartment building, many windows, light beige walls, flat roof, entrance at bottom",
       "size": 128
     }
+  },
+  "hub_counter": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 개편: 접수 창구 (2x2칸, 내려다보기 3/4)",
+    "body": {
+      "description": "pixel art, black outline, high top-down three-quarter view, parcel shop reception counter desk seen from the front and above, orange front panel, light wood top with a small computer monitor and a parcel weighing scale, nobody, simple clean shapes, game asset",
+      "size": 64
+    }
+  },
+  "hub_pack": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 개편: 분류·포장대 (2x2)",
+    "body": {
+      "description": "pixel art, black outline, high top-down three-quarter view, same style as reference, game asset, nobody, parcel packing table with green top, short roller conveyor section, tape dispenser and flattened cardboard, seen from front and above",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8Po4DLQIqiWfVnNU1x7QIgRdHe3/uhpcwL2543LAIGlzE2MQHfDA5K+7of7ii4hsDjYHAh7Jee0OqEnpkCWQU8FADNAqFrIQvyxls7NKuFQeBxcLm21dW65bDd5J977aWSjezZtVtbrIuA7QTGYr+Am0FwFdO6JkIDnOzPE/cB4+d/gm8PvQ6ZTAainRvg3NAxer1tyzu6TPi6RvcsAJL8spGOB/X6TXffWiBL7v0dLQAqQ7S3ohz6R2IxiJ25oLe3PPkonDp6iNbXbeyG704M630HDg7o9eZIAzzU3mGwz4IyZs4d/+ApqA81QjCQgUQSA8YY7ureCeWCbFWCWpOi+p1C/YknoO2ZvdL+2el/aTl08GOoQfJEs2JZiJZkjowHtu+nmUn3pLmpHhLxOCTmcu0M5AZZMf3bmF6vv77VUvbSzxN5h5quBacwf5wwl9VMF4FRH1BhOpnW25hVJs9fFJRN2U6en/TFH0/DDavbTOWtJj31x9+WtlBIfKjJ8/2vGUP7jmbz3ZWNz8BUfMagDztxsNLY2Q6GgqZ9r+75vCQ72GrA6X3bTM8eYT23A0hKIn8yDr+yESoBH+iKBdttw6/eftzQDq+M0LzL51pG7JM3IXtlDv6c+r1w60n02/3ybAw/9s61Lblr/8Qtxxr0/C9Lzn52vkcgKGy/1sd2SoMgde6JHbQc+/RlGrl1AioUg+jTvgN9xekJLc8H+oBqmBO2Gzx6ahwS+aBJWd+1ydBuCM5BJBKh9SOffQEnT4zrfan0FYjebJ9R7AJf79ZO6Nm1G4rlo2e7jD+K0yMQve1GGD07aTjPm989Ymqob7vxvLffdwuUCtm6rW2roRcAevqHdDtkcc1IooAeIMnkV1yzRE9/fBpUDDdCDrcqr8AMp7rmgxO7Tn0iwT3L3witiTY5VhSG6lAOu0vDqwxtzCpfHj4JixVNzcUDJT1Tsg6AM/IF0NS6AgP5Qc6ROVmMHpFadQmkoM6RnAwWL8R+RXxaU6GiD4VFkebe3tv5x8vy8uJ19jSo8BfJIhy9P6C3QzXgOjoHk9b/G1zbkttm+7++XHFnetpzb+R6h7MLYiu1tIEkSMN1LArWzv6l1198+t6KOfRe34ihvZC2eLDd4PQPo+X2B9Tb76m6LdO3wim6TdwJ2d1iEEXgcRB4CLK7xXSIwEP4R0AC4huL8S6w3NgegVruPsBtyDIcElfHzWlQBgKPg7wWA0QQeBwEHgcX+xRVEsMjVbEly3CK+EJkcmsjFSTZgB/AZwfWP58UyusTdVcaZo+Uq/ovQ0rLzxubDeBLs36n12X9oiy/OHzbqW4RcbHZ+NyNUD7YK+JAsgtINtgQrgU3MXBplpbi53pYFCQCaUXRuh5ZB8kL5xbMwUBLlJbMZlNLM8RhWYEc7xMZQ9qsNNNDGOgflX6wqcicqfT3QtVisX6s6ePj4+Pj4wNV4T+JvtM+tp633QAAAABJRU5ErkJggg==",
+          "format": "png"
+        }
+      ]
+    }
+  },
+  "hub_shelf": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 개편: 보관 선반 (2x3)",
+    "body": {
+      "description": "pixel art, black outline, high top-down three-quarter view, same style as reference, game asset, nobody, empty tall blue metal warehouse storage rack with three shelf levels, seen from front and above, nothing on the shelves",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8Po4DLQIqiWfVnNU1x7QIgRdHe3/uhpcwL2543LAIGlzE2MQHfDA5K+7of7ii4hsDjYHAh7Jee0OqEnpkCWQU8FADNAqFrIQvyxls7NKuFQeBxcLm21dW65bDd5J977aWSjezZtVtbrIuA7QTGYr+Am0FwFdO6JkIDnOzPE/cB4+d/gm8PvQ6ZTAainRvg3NAxer1tyzu6TPi6RvcsAJL8spGOB/X6TXffWiBL7v0dLQAqQ7S3ohz6R2IxiJ25oLe3PPkonDp6iNbXbeyG704M630HDg7o9eZIAzzU3mGwz4IyZs4d/+ApqA81QjCQgUQSA8YY7ureCeWCbFWCWpOi+p1C/YknoO2ZvdL+2el/aTl08GOoQfJEs2JZiJZkjowHtu+nmUn3pLmpHhLxOCTmcu0M5AZZMf3bmF6vv77VUvbSzxN5h5quBacwf5wwl9VMF4FRH1BhOpnW25hVJs9fFJRN2U6en/TFH0/DDavbTOWtJj31x9+WtlBIfKjJ8/2vGUP7jmbz3ZWNz8BUfMagDztxsNLY2Q6GgqZ9r+75vCQ72GrA6X3bTM8eYT23A0hKIn8yDr+yESoBH+iKBdttw6/eftzQDq+M0LzL51pG7JM3IXtlDv6c+r1w60n02/3ybAw/9s61Lblr/8Qtxxr0/C9Lzn52vkcgKGy/1sd2SoMgde6JHbQc+/RlGrl1AioUg+jTvgN9xekJLc8H+oBqmBO2Gzx6ahwS+aBJWd+1ydBuCM5BJBKh9SOffQEnT4zrfan0FYjebJ9R7AJf79ZO6Nm1G4rlo2e7jD+K0yMQve1GGD07aTjPm989Ymqob7vxvLffdwuUCtm6rW2roRcAevqHdDtkcc1IooAeIMnkV1yzRE9/fBpUDDdCDrcqr8AMp7rmgxO7Tn0iwT3L3witiTY5VhSG6lAOu0vDqwxtzCpfHj4JixVNzcUDJT1Tsg6AM/IF0NS6AgP5Qc6ROVmMHpFadQmkoM6RnAwWL8R+RXxaU6GiD4VFkebe3tv5x8vy8uJ19jSo8BfJIhy9P6C3QzXgOjoHk9b/G1zbkttm+7++XHFnetpzb+R6h7MLYiu1tIEkSMN1LArWzv6l1198+t6KOfRe34ihvZC2eLDd4PQPo+X2B9Tb76m6LdO3wim6TdwJ2d1iEEXgcRB4CLK7xXSIwEP4R0AC4huL8S6w3NgegVruPsBtyDIcElfHzWlQBgKPg7wWA0QQeBwEHgcX+xRVEsMjVbEly3CK+EJkcmsjFSTZgB/AZwfWP58UyusTdVcaZo+Uq/ovQ0rLzxubDeBLs36n12X9oiy/OHzbqW4RcbHZ+NyNUD7YK+JAsgtINtgQrgU3MXBplpbi53pYFCQCaUXRuh5ZB8kL5xbMwUBLlJbMZlNLM8RhWYEc7xMZQ9qsNNNDGOgflX6wqcicqfT3QtVisX6s6ePj4+Pj4wNV4T+JvtM+tp633QAAAABJRU5ErkJggg==",
+          "format": "png"
+        }
+      ]
+    }
+  },
+  "hub_lounge": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 개편: 휴게실 (3x3)",
+    "body": {
+      "description": "pixel art, black outline, high top-down three-quarter view, same style as reference, game asset, nobody, small staff break area on a square rug, two-seat sofa, low table with coffee cups, small water dispenser, seen from front and above",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "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",
+          "format": "png"
+        }
+      ]
+    }
+  },
+  "hub_dock": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 개편: 하역 도크 (4x3)",
+    "body": {
+      "description": "pixel art, black outline, high top-down three-quarter view, same style as reference, game asset, nobody, truck loading dock bay seen from above: grey roll-up shutter door on the left edge, yellow black safety bumpers, painted parking bay lines on concrete, empty bay, no truck",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "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",
+          "format": "png"
+        }
+      ]
+    }
+  },
+  "hub_floor": {
+    "endpoint": "/create-tileset",
+    "note": "허브 개편: 창고 바닥 / 노란 줄무늬 통로",
+    "body": {
+      "lower_description": "clean light grey concrete warehouse floor, subtle tile seams",
+      "upper_description": "yellow painted safety walkway floor with thin black edge stripes",
+      "transition_description": "black and yellow hazard stripe edge",
+      "transition_size": 0.0,
+      "tile_size": {
+        "width": 32,
+        "height": 32
+      },
+      "view": "high top-down",
+      "outline": "lineless",
+      "detail": "medium detail",
+      "shading": "basic shading",
+      "lower_reference_image": {
+        "type": "base64",
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACQklEQVR4nMVXy0rEUAy9EwaqIoIb/3/hR/gBfoJ+gTsRBkV0XCm3NvXk9CTtrAwMTJvHzcnNq7unx7vv1lr7On604eyiKWIePg/nl7/vPt+lbmXv9fDSzF+iwf7rQszDZ+S/HZ6DcXRMUdd3vjGzG+tosmhkTiEydko54xGzzDAqIdr+PzxD6K+ub/4iUABAfcsE3DDf/xg+cSWOujuRofWDUcaCoQm1G8TDF8jh2f+PuZEkY4goyBh6xsqMnHnzdREPHXXynGCeuQFElGWwOqiKWpCbHEa52QFG1COBxjNSIed+MV8NIXc5Y2HMYk4eRj43IcoFBYqRhwh8FSFSCNw5d9D5rB9s0FWFCAzQmfBQpcBdkiPD6Neqw2ZlECibSNElOVLq6hiEZSgylM7jBFUlyU0Lk9zJQth6YiW1vXBiZfpxDjB5NzQMm5cfG2BadY4SMkSBxrchahRWPZ+jFQyK8a0AcGnbKYtEaDJTtFwfJyH2kmyq+hXsN5+eOIQhVVtTVl1hHximsqgyPyNsSOycOyL1yllw1PW7laopyu+tGx/XMGq9px6elVxaSbgTDtQ2UVlVQ4WIN6JsCPl+YPNBVI5qrqd7QrLtsCNqxuxVe0QBdIj/V98Rij+WKp1jbLwyhiMVjXsOBVkRPe60owPZxuJCqnaZ/EBsRgtbsDvglVk1fLKPj+xZjeqsHYcyZKquhFFu/QDJ3pn6Etrq/WLRpMHEzU2dsWdDqlTceE+2rMutRcXnAvN2D/e34+f5f9EPfskmOuYxgQIAAAAASUVORK5CYII=",
+        "format": "png"
+      }
+    }
+  },
+  "hub_dock2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 개편: 하역 도크 2차 (정면 위에서, 원근 없음)",
+    "body": {
+      "description": "pixel art, black outline, flat orthographic top-down game tile, no perspective, no isometric angle, rectangular truck loading bay floor: concrete floor with yellow painted parking bay lines and yellow black hazard stripes along the left edge, a grey roll-up shutter door strip on the left edge, empty, nothing parked, wider than tall",
+      "size": 128
+    }
   }
 }

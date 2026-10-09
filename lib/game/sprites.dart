@@ -21,6 +21,10 @@ class Sprites {
   static ui.Image? grass, asphalt, sidewalk, yard;
   static ui.Image? boxS, boxOpen, packEmpty;
 
+  /// 허브 개편 그림: 모두 같은 시점(내려다보기 3/4)·같은 배율(도트 1px = 1칸의 1/32)
+  static ui.Image? hubCounter, hubPack, hubShelf, hubLounge, hubDock;
+  static ui.Image? wangFloor; // 창고 바닥(콘크리트) / 노란 통로
+
   /// 노선 지도 지역센터 건물 (assets/sprites/map/center_<지역>.png). 없으면 null → 도형으로 그림.
   static final List<ui.Image?> centers = List.filled(5, null);
   static ui.Image? hub; // 노선 지도 허브 외관
@@ -79,6 +83,12 @@ class Sprites {
     boxS = await _img('assets/sprites/props/box_s.png');
     boxOpen = await _img('assets/sprites/props/box_open.png');
     packEmpty = await _img('assets/sprites/props/pack_empty.png'); // 있으면 포장 상자가 동적으로 생김
+    hubCounter = await _img('assets/sprites/props/hub_counter.png');
+    hubPack = await _img('assets/sprites/props/hub_pack.png');
+    hubShelf = await _img('assets/sprites/props/hub_shelf.png');
+    hubLounge = await _img('assets/sprites/props/hub_lounge.png');
+    hubDock = await _img('assets/sprites/props/hub_dock.png');
+    wangFloor = await _img('assets/sprites/tiles/wang_floor.png');
     grass = await _img('assets/sprites/tiles/grass.png');
     asphalt = await _img('assets/sprites/tiles/asphalt.png');
     sidewalk = await _img('assets/sprites/tiles/sidewalk.png');
@@ -203,13 +213,34 @@ class Sprites {
   static ui.Image? forBuilding(String id) {
     switch (id) {
       case 'counter':
-        return counter;
+        return hubCounter ?? counter;
       case 'pack':
-        return packEmpty ?? pack;
+        return hubPack ?? packEmpty ?? pack;
       case 'shelf':
-        return shelf;
+        return hubShelf ?? shelf;
+      case 'lounge':
+        return hubLounge;
+      case 'dock':
+        return hubDock;
+      case 'vending':
+        return mapProps['vending'];
     }
     return null;
+  }
+
+  /// 칸(r) 안에 비율 유지로 넣고 아래에 붙임 (칸 밖으로 넘치지 않음). 1:1 보다 크게는 안 키움.
+  static ui.Rect fitBottom(ui.Image img, ui.Rect r, {bool left = false}) {
+    var k = (r.width / img.width) < (r.height / img.height) ? r.width / img.width : r.height / img.height;
+    if (k > 1) k = 1;
+    final w = img.width * k, h = img.height * k;
+    final x = left ? r.left : r.center.dx - w / 2;
+    return ui.Rect.fromLTWH(x.roundToDouble(), (r.bottom - h).roundToDouble(), w, h);
+  }
+
+  static ui.Rect drawFitBottom(ui.Canvas c, ui.Image img, ui.Rect r, {bool left = false}) {
+    final dst = fitBottom(img, r, left: left);
+    _blit(c, img, dst);
+    return dst;
   }
 
   /// 칸 너비에 맞춰(비율 유지) 아래쪽 기준으로 그린다. 위로 넘쳐도 됨.

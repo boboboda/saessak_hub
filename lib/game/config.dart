@@ -22,8 +22,9 @@ class Cfg {
   static const List<String> areaName = ['작은 창고', '중형 창고', '대형 창고', '물류센터'];
 
   // 도크 마당 (창고 오른쪽 벽 바깥)과 도로
-  static const Rect yard = Rect.fromLTRB(22, 7, 32, 29);
-  static const Rect road = Rect.fromLTRB(32, 0, 35, 36);
+  // 도크 마당은 도크 4칸 + 차가 드나드는 2칸만 (빈 마당이 넓지 않게), 그 오른쪽이 도로
+  static const Rect yard = Rect.fromLTRB(22, 7, 28, 29);
+  static const Rect road = Rect.fromLTRB(28, 0, 31, 36);
 
   // ---- 구역: 창고 안 접수 | 포장 | 보관·출고, 그리고 벽 밖 도크 ----
   static const double zoneX1 = 14; // 접수 | 포장 경계
@@ -39,13 +40,18 @@ class Cfg {
 
   // 건물 종류 (zone: 0 접수/1 포장/2 보관·출고/3 도크, -1 창고 어디든 / slots: 근무 직원 자리 수)
   static const List<BuildingType> types = [
-    BuildingType('counter', '접수 창구', 2, 1, 1500, 0xFFF0963A, '손님 접수 · 직원 2명까지', 0, 2),
+    BuildingType('counter', '접수 창구', 2, 2, 1500, 0xFFF0963A, '손님 접수 · 직원 2명까지', 0, 2),
     BuildingType('pack', '포장대', 2, 2, 2000, 0xFF5BA88A, '택배 포장 · 직원 2명까지', 1, 2),
     BuildingType('shelf', '선반', 2, 3, 1500, 0xFF8B5E3C, '택배 20건 보관', 2, 0),
     BuildingType('vending', '자판기', 1, 1, 4000, 0xFF3B82D6, '인내심 감소 완화', -1, 0),
     BuildingType('lounge', '휴게실', 3, 3, 8000, 0xFFB06AB3, '지친 직원이 와서 쉼 (회복 3배)', -1, 0),
     BuildingType('dock', '도크', 4, 3, 3000, 0xFF3D4466, '벽에 붙여 설치 · 차량이 서는 칸', 3, 0),
   ];
+
+  // ---- 허브 배치 규칙 ----
+  // 창고 가운데 줄은 입구(왼쪽 벽) → 도크(오른쪽 벽)로 이어지는 통로. 건물을 못 놓는다.
+  static const double aisleH = 2; // 통로 폭(칸)
+  // 건물 바로 아래 한 줄은 '앞줄'(손님 줄·직원 서는 자리). 다른 건물이 막을 수 없다.
 
   // ---- 흐름 수치 ----
   static const double serveTime = 5; // 접수 시간(초, 직원 1명 기준 ×1.0)
