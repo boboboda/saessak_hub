@@ -70,7 +70,7 @@ extension FlowSystem on HubGame {
         0,
         (a, s) =>
             a +
-            s.workRate * (b.type.id == 'counter' && s.spec == 1 ? 1.25 : 1.0),
+            s.workRate * this.jobRate(s),
       ) *
       b.speedMul;
 
@@ -79,9 +79,11 @@ extension FlowSystem on HubGame {
     final p = Parcel(c.region);
     p.kind = c.kind;
     p.born = gt;
-    if (c.vip) {
-      money += Cfg.vipTip;
-      dayEarn += Cfg.vipTip;
+        if (c.vip) {
+      final cnt = c.counter;
+      final tip = Cfg.vipTip * (cnt != null && this.vipDouble(cnt) ? 2 : 1);
+      money += tip;
+      dayEarn += tip;
     }
     return p;
   }
@@ -91,9 +93,9 @@ extension FlowSystem on HubGame {
     final act = b.active;
     final vend = ofType('vending').length.clamp(0, Cfg.vendingMax);
     final vm = 1.0 - Cfg.vendingCalm * vend;
-    if (act.isEmpty) return 1.0 * vm;
+        if (act.isEmpty) return 1.0 * vm;
     final avg = act.fold<int>(0, (a, s) => a + s.kind) / act.length;
-    return (1.25 - 0.1 * avg) * vm;
+    return (1.25 - 0.1 * avg) * vm * this.jobCalm(b); // 상담원·접수원 Lv4
   }
 
   /// 포장 실수 판정: 꼼꼼할수록 줄고, 지친 직원이 있으면 늘어남
@@ -103,7 +105,7 @@ extension FlowSystem on HubGame {
     final care = act.fold<int>(0, (a, s) => a + s.care) / act.length;
     var chance = Cfg.slipBase - Cfg.slipPerCare * care;
     if (act.any((s) => s.tired)) chance += Cfg.slipTired;
-    if (act.any((s) => s.spec == 2)) chance *= 0.5;
+    chance *= this.jobSlip(b); // 포장사 Lv4·검수원
     return rnd.nextDouble() < chance.clamp(0.0, 0.9);
   }
 

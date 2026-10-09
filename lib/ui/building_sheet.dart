@@ -174,8 +174,15 @@ class BuildingSheet extends StatelessWidget {
               children: [
                 StaffAvatar(s, size: 30),
                 const SizedBox(width: 10),
-                Expanded(
-                  child: Text('${s.name} Lv.${s.level}', style: Tx.h2),
+                                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${s.name} Lv.${s.level}', style: Tx.h2),
+                      const SizedBox(height: 2),
+                      JobChip(s, fit: _fitsHere(s)),
+                    ],
+                  ),
                 ),
                 RoleChip(g, s),
                 const SizedBox(width: 8),
@@ -192,10 +199,45 @@ class BuildingSheet extends StatelessWidget {
     return out;
   }
 
-  /// 선반·도크: 운반 담당 현황 + 운반 직원 고르기
+    /// 고르는 직원을 이 건물에 놓으면 직업 효과가 나는지
+  bool _fitsHere(Staff s) {
+    switch (b.type.id) {
+      case 'counter':
+        return s.job == 0 || s.job == 4 || s.job == 7;
+      case 'pack':
+        return s.job == 1 || s.job == 5 || s.job == 7;
+      case 'shelf':
+        return s.job == 3 || s.job == 2 || s.job == 7; // 분류사(보조 자리) 또는 운반
+      case 'dock':
+        return s.job == 6 || s.job == 2 || s.job == 7; // 정비사(보조 자리) 또는 운반
+    }
+    return false;
+  }
+
+  /// 선반·도크: 보조 자리(분류사·정비사) + 운반 담당 현황 + 운반 직원 고르기
   List<Widget> _carrierSection() {
     final n = g.staff.where((s) => s.carrier).length;
+    final hj = b.type.id == 'shelf' ? 3 : 6;
+    final helper = b.crew.isEmpty ? null : b.crew.first;
     return [
+      const SizedBox(height: 8),
+      Text('보조 자리 ${b.crew.length}/1 · ${Cfg.jobName[hj]} (${Cfg.jobSkills[hj][0]})', style: Tx.h2),
+      const SizedBox(height: 6),
+      if (helper != null)
+        CardBox(
+          child: Row(
+            children: [
+              StaffAvatar(helper, size: 30),
+              const SizedBox(width: 10),
+              Expanded(child: Text(helper.name, style: Tx.h2)),
+              JobChip(helper),
+              const SizedBox(width: 8),
+              AppButton('해제', small: true, color: C.card, onTap: () => g.unassign(helper)),
+            ],
+          ),
+        )
+      else
+        ..._pickRows((s) => g.assignTo(s, b), (s) => s.job == hj && s.post != b),
       const SizedBox(height: 8),
       Text('운반 담당 $n명 (접수 → 포장 → 선반 → 도크를 나름)', style: Tx.h2),
       const SizedBox(height: 6),
@@ -222,7 +264,7 @@ class BuildingSheet extends StatelessWidget {
     final rows = <Widget>[
       Row(
         children: [
-          Text('근무 직원 ${b.crew.length}/${t.slots}', style: Tx.h2),
+                    Text('근무 직원 ${b.crew.length}/${b.seats}', style: Tx.h2),
           const Spacer(),
           if (b.active.isNotEmpty)
             Pill(Icons.speed, '×${rate.toStringAsFixed(1)}', color: C.accent),
@@ -247,8 +289,9 @@ class BuildingSheet extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
-                          '${s.name} Lv.${s.level}${s.spec > 0 ? ' · ${s.specName}' : ''}',
+                          '${s.name} Lv.${s.level}',
                           style: Tx.h2),
+                      JobChip(s, fit: g.jobFits(s)),
                       if (s.away) RoleChip(g, s),
                     ],
                   ),
@@ -269,8 +312,8 @@ class BuildingSheet extends StatelessWidget {
     }
 
     // 빈 자리가 있으면 직원 목록을 바로 보여 줌: 고르면 배치 (대기 직원이 위)
-    if (b.crew.length < t.slots) {
-      rows.add(Text('직원 고르기 · 빈 자리 ${t.slots - b.crew.length}', style: Tx.sub));
+        if (b.crew.length < b.seats) {
+      rows.add(Text('직원 고르기 · 빈 자리 ${b.seats - b.crew.length} · ✓ = 직업이 맞아 효과가 나요', style: Tx.sub));
       rows.add(const SizedBox(height: 6));
       rows.addAll(_pickRows((s) => g.assignTo(s, b), (s) => !b.crew.contains(s)));
     }

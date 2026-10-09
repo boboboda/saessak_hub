@@ -148,6 +148,94 @@ class _StaffCard extends StatelessWidget {
   final Staff s;
   const _StaffCard(this.g, this.s);
 
+  /// 직업 레벨 막대 · 배운 스킬 · 직업 바꾸기 · 전직
+  Widget _jobBox(BuildContext context) {
+    final sk = Cfg.jobSkills[s.job];
+    final learned = [
+      sk[0],
+      if (s.jobLv >= 2) sk[1],
+      if (s.jobLv >= 4) sk[2],
+      if (s.promoted) sk[3],
+    ];
+    final pct = s.jobLv >= Cfg.jobMaxLv ? 1.0 : (s.jobXp / s.jobXpNeed).clamp(0.0, 1.0);
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Color(Cfg.jobColor[s.job]).withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text('${s.jobTitle} · ${Cfg.jobWhere[s.job]}', style: Tx.body),
+              const Spacer(),
+              Text(s.jobLv >= Cfg.jobMaxLv ? '직업 최고 레벨' : '직업 경험 ${(pct * 100).floor()}%', style: Tx.sub),
+            ],
+          ),
+          const SizedBox(height: 4),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: LinearProgressIndicator(
+              value: pct.toDouble(),
+              minHeight: 4,
+              backgroundColor: C.line,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(Cfg.jobColor[s.job])),
+            ),
+          ),
+          const SizedBox(height: 4),
+          for (final t in learned) Text('· $t', style: const TextStyle(color: C.text, fontSize: 12)),
+          if (!g.jobFits(s) && !s.idle)
+            const Text('지금 자리는 직업과 맞지 않아 직업 효과·경험치가 없어요', style: TextStyle(color: C.accent, fontSize: 12)),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              AppButton('직업 바꾸기', small: true, color: C.card, onTap: () => _pickJob(context)),
+              const SizedBox(width: 8),
+              if (s.canPromote)
+                AppButton('전직 (전직서 ${g.tickets}장)',
+                    small: true, color: C.gold, onTap: g.tickets > 0 ? () => g.promote(s) : null),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _pickJob(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: C.panel,
+        title: Text('${s.name} 직업 바꾸기', style: Tx.title),
+        content: SizedBox(
+          width: 320,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              const Text('새 직업은 Lv1부터 시작해요 (예전 직업 레벨은 기록에 남아요)', style: Tx.sub),
+              const SizedBox(height: 8),
+              for (var j = 0; j < Cfg.jobName.length; j++)
+                ListTile(
+                  dense: true,
+                  enabled: j != s.job,
+                  leading: CircleAvatar(radius: 8, backgroundColor: Color(Cfg.jobColor[j])),
+                  title: Text('${Cfg.jobName[j]}${s.jobHist[j] != null ? ' (예전 Lv${s.jobHist[j]})' : ''}', style: Tx.body),
+                  subtitle: Text('${Cfg.jobWhere[j]} · ${Cfg.jobSkills[j][0]}', style: Tx.sub),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    g.changeJob(s, j);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return CardBox(
@@ -167,9 +255,8 @@ class _StaffCard extends StatelessWidget {
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Text(
-                            '${s.name} Lv.${s.level}${s.spec > 0 ? ' · ${s.specName}' : ''}',
-                            style: Tx.h2),
+                                                Text('${s.name} Lv.${s.level}', style: Tx.h2),
+                        JobChip(s, fit: g.jobFits(s)),
                         RoleChip(g, s),
                       ],
                     ),
@@ -182,6 +269,8 @@ class _StaffCard extends StatelessWidget {
               ),
             ],
           ),
+                    const SizedBox(height: 8),
+          _jobBox(context),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -277,7 +366,13 @@ class _CandCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(s.name, style: Tx.h2),
+                    Row(
+                      children: [
+                        Text(s.name, style: Tx.h2),
+                        const SizedBox(width: 8),
+                        JobChip(s),
+                      ],
+                    ),
                     const SizedBox(height: 6),
                     StaffStats(s),
                   ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../game/config.dart';
 import '../game/hub_game.dart';
 import '../models/models.dart';
 import 'theme.dart';
@@ -25,6 +26,30 @@ String roleText(HubGame g, Staff s) {
   if (s.rest == 2) return '$base · 휴식 중';
   if (s.rest == 3) return '$base · 복귀 중';
   return base;
+}
+
+/// 직업 칩: '접수원 Lv3' (전직하면 상위 직업 이름 + 별). fit = 지금 자리에서 직업 효과가 나는지
+class JobChip extends StatelessWidget {
+  final Staff s;
+  final bool? fit;
+  const JobChip(this.s, {super.key, this.fit});
+
+  @override
+  Widget build(BuildContext context) {
+    final col = Color(Cfg.jobColor[s.job]);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: col.withValues(alpha: 0.22),
+        border: Border.all(color: col),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        '${s.promoted ? '★' : ''}${s.jobTitle} Lv${s.jobLv}${fit == null ? '' : (fit! ? ' ✓' : ' ✗')}',
+        style: TextStyle(color: col, fontSize: 11, fontWeight: FontWeight.w800),
+      ),
+    );
+  }
 }
 
 /// 이름 첫 글자가 들어간 동그란 아바타 (색 = 맡은 일)

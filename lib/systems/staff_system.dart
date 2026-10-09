@@ -23,15 +23,17 @@ extension StaffSystem on HubGame {
     final total = sp + wk + kd + st + cr;
     final name = Cfg.surnames[rnd.nextInt(Cfg.surnames.length)] +
         Cfg.givens[rnd.nextInt(Cfg.givens.length)];
-    return Staff(nextStaffId++, name, sp, wk, kd, st, cr, 600 + total * 250,
+        final s = Staff(nextStaffId++, name, sp, wk, kd, st, cr, 600 + total * 250,
         40 + total * 11);
+    s.job = this.bestJob(s); // 능력치에 어울리는 직업으로 들어옴 (바꿀 수 있음)
+    return s;
   }
 
   /// 게임 시작 때 이미 있는 직원 3명. 모두 대기(휴식 벤치)에서 시작하고, 유저가 직접 배치한다.
   void addStarters() {
-    staff.add(Staff(nextStaffId++, '김신입', 3, 2, 3, 3, 2, 0, 100));
-    staff.add(Staff(nextStaffId++, '이성실', 2, 3, 4, 2, 4, 0, 110));
-    staff.add(Staff(nextStaffId++, '박쾌속', 4, 4, 2, 4, 1, 0, 130));
+        staff.add(Staff(nextStaffId++, '김신입', 3, 2, 3, 3, 2, 0, 100)..job = 0);
+    staff.add(Staff(nextStaffId++, '이성실', 2, 3, 4, 2, 4, 0, 110)..job = 1);
+    staff.add(Staff(nextStaffId++, '박쾌속', 4, 4, 2, 4, 1, 0, 130)..job = 2);
     syncCarriers();
     if (fleet.isEmpty) grantStarterUnits(0); // 기본 차량: 대형 트럭 + 오토바이
   }
@@ -104,7 +106,16 @@ extension StaffSystem on HubGame {
   }
 
   void assignTo(Staff s, Building b) {
-    if (b.type.slots == 0 || b.crew.length >= b.type.slots) return;
+    if (b.seats == 0 || b.crew.length >= b.seats) return;
+    // 선반·도크 보조 자리는 분류사·정비사만 (직접 일은 안 하고 보너스만 냄)
+    if (b.type.id == 'shelf' && s.job != 3) {
+      showToast('선반 보조 자리에는 분류사만 배치할 수 있어요');
+      return;
+    }
+    if (b.type.id == 'dock' && s.job != 6) {
+      showToast('도크 보조 자리에는 정비사만 배치할 수 있어요');
+      return;
+    }
     if (b.crew.contains(s)) return;
     _detach(s);
     b.crew.add(s);
@@ -132,7 +143,7 @@ extension StaffSystem on HubGame {
 
   /// 빈 자리가 있는 건물들
   Iterable<Building> openPosts() =>
-      buildings.where((b) => b.type.slots > 0 && b.crew.length < b.type.slots);
+      buildings.where((b) => b.seats > 0 && b.crew.length < b.seats);
 
   int get dailyWages => staff.fold<int>(0, (a, s) => a + s.wage);
 
@@ -170,8 +181,9 @@ extension StaffSystem on HubGame {
     final s = picking;
     if (s == null) return false;
     picking = null;
-    if (b.type.slots > 0) {
-      if (b.crew.length >= b.type.slots && !b.crew.contains(s)) {
+        final helper = (b.type.id == 'shelf' && s.job == 3) || (b.type.id == 'dock' && s.job == 6);
+    if (b.type.slots > 0 || helper) {
+      if (b.crew.length >= b.seats && !b.crew.contains(s)) {
         showToast('${b.type.name}에 빈 자리가 없어요');
         return true;
       }
@@ -273,7 +285,7 @@ extension StaffSystem on HubGame {
   /// 체력 계산: 일한 직원은 줄고, 쉰 직원은 찬다. (매 프레임, 일 처리 뒤에 호출)
   void updateStaffEnergy(double dt) {
     final n = loungeBonus;
-    final drain = Cfg.drainPerSec * (1.0 - Cfg.loungeDrain * n);
+    final drain = Cfg.drainPerSec * (1.0 - Cfg.loungeDrain * n) * this.jobDrain; // 현장 반장
     for (final s in staff) {
       // 회복 속도: 대기·휴식 자리 > 휴게실(×3) > 자리에서 서서 쉬기(아주 느림)
       double gain;
@@ -299,15 +311,6 @@ extension StaffSystem on HubGame {
         s.level++;
         s.wage += 15;
         showToast('${s.name} 레벨 ${s.level}! 일급 +15원');
-      }
-    }
-    if (s.level >= 3 && s.spec == 0) {
-      final role = s.carrier
-          ? 3
-          : (s.post?.type.id == 'counter' ? 1 : (s.post?.type.id == 'pack' ? 2 : 0));
-      if (role > 0) {
-        s.spec = role;
-        showToast('${s.name} 특기: ${s.specName}');
       }
     }
   }

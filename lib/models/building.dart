@@ -68,14 +68,19 @@ class Building {
       : 1.0;
 
   /// 선반 용량
-  int get cap => Cfg.shelfCap + 10 * (level - 1);
+  int get cap => Cfg.shelfCap + 10 * (level - 1) + capPlus;
+  int capPlus = 0; // 직업(분류사)·세트로 늘어난 선반 용량 (매 프레임 다시 계산)
+  double loadPlus = 1; // 직업(정비사)·세트로 빨라진 도크 싣기
 
   /// 접수 창구 대기 택배 한도
   int get outCap =>
       min(Cfg.outboxCap + 2 * (level - 1), Cfg.stackCols * Cfg.stackLayers);
 
   /// 도크 싣는 속도 배수
-  double get loadMul => type.id == 'dock' ? 1 + 0.5 * (level - 1) : 1.0;
+  double get loadMul => type.id == 'dock' ? (1 + 0.5 * (level - 1)) * loadPlus : 1.0;
+
+  /// 배치할 수 있는 직원 수: 기본 자리 + 선반·도크의 보조 자리 1칸 (분류사·정비사)
+  int get seats => type.slots + ((type.id == 'shelf' || type.id == 'dock') ? 1 : 0);
 
   /// 지금 실제로 자리에 있는 직원 (쉬러 간 직원은 빠짐)
   List<Staff> get active => crew.where((s) => !s.away).toList();

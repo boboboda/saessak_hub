@@ -643,7 +643,7 @@ extension WorldView on HubGame {
     }
     // 직원을 고른 중이면 배치할 수 있는 시설을 테두리로 강조
     if (picking != null &&
-        (b.type.slots > b.crew.length ||
+                (b.seats > b.crew.length ||
             b.type.id == 'shelf' ||
             b.type.id == 'dock')) {
       strokeBox(c, r.inflate(2), 0xFFFFD166, 2);
@@ -1218,6 +1218,19 @@ extension WorldView on HubGame {
             workHz: 9,
           ),
         ); // 접수: 타이핑처럼 빠르고 작게
+      }
+    }
+
+    // 보조 자리 직원: 분류사는 선반 오른쪽 옆, 정비사는 도크 문 안쪽 (운반 직원이 서는 자리는 비워 둠)
+    for (final b in [...ofType('shelf'), ...ofType('dock')]) {
+      for (final st in b.active) {
+        final sp = b.type.id == 'shelf'
+            ? Offset(b.tx + b.type.w + 0.35, b.ty + b.type.h - 0.45)
+            : Offset(b.tx - 1.5, b.ty + 0.4);
+        final p = Offset(sp.dx * t, sp.dy * t);
+        final busy = b.type.id == 'shelf' ? b.stored > 0 : b.vehicle != null;
+        _at(p.dy + t * 0.35, () => _person(c, p, st.initial, 0xFFB9F6CA, 0xFF1B5E20,
+            tired: st.tired, energy: st.energyPct, key: st, work: busy, workHz: 5));
       }
     }
 

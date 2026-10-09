@@ -67,7 +67,9 @@ extension SaveSystem on HubGame {
             'carrier': s.carrier,
             'lv': s.level,
             'xp': s.xp,
-            'spec': s.spec,
+                        'spec': s.spec,
+            'job': [s.job, s.jobLv, s.jobXp, s.promoted ? 1 : 0],
+            'jh': {for (final e in s.jobHist.entries) '${e.key}': e.value},
           }
       ],
       'aisles': aisles.toList(),
@@ -113,7 +115,8 @@ extension SaveSystem on HubGame {
       if (raw == null) return false;
       final j = jsonDecode(raw) as Map<String, dynamic>;
 
-      final loadedStaff = <Staff>[];
+            final loadedStaff = <Staff>[];
+      final noJob = <Staff>[]; // 예전 저장에서 직업이 없던 직원 (건물을 읽은 뒤 맡은 일로 정함)
       for (final m in (j['staff'] as List)) {
         final st = (m['st'] as List).map((e) => e as int).toList();
         final s = Staff(m['id'] as int, m['name'] as String, st[0], st[1], st[2],
@@ -123,7 +126,25 @@ extension SaveSystem on HubGame {
         s.carrier = m['carrier'] as bool;
         s.level = (m['lv'] as int?) ?? 1;
         s.xp = ((m['xp'] as num?) ?? 0).toDouble();
-        s.spec = (m['spec'] as int?) ?? 0;
+                s.spec = (m['spec'] as int?) ?? 0;
+        final jb = m['job'] as List?;
+        if (jb != null && jb.length >= 4) {
+          s.job = ((jb[0] as num).toInt()).clamp(0, Cfg.jobName.length - 1);
+          s.jobLv = ((jb[1] as num).toInt()).clamp(1, Cfg.jobMaxLv);
+          s.jobXp = (jb[2] as num).toDouble();
+          s.promoted = (jb[3] as num) == 1;
+        } else {
+          // 예전 저장: 특기는 직업 Lv3으로 옮기고, 없으면 지금 하는 일·능력치로 직업을 정함
+                    s.job = s.spec > 0 ? s.spec - 1 : (s.carrier ? 2 : bestJob(s));
+          s.jobLv = s.spec > 0 ? 3 : 1;
+          if (s.spec == 0 && !s.carrier) noJob.add(s);
+        }
+        final jh = m['jh'] as Map?;
+        if (jh != null) {
+          for (final e in jh.entries) {
+            s.jobHist[int.parse(e.key as String)] = (e.value as num).toInt();
+          }
+        }
         loadedStaff.add(s);
       }
       final byId = {for (final s in loadedStaff) s.id: s};
@@ -146,7 +167,12 @@ extension SaveSystem on HubGame {
             s.post = b;
           }
         }
-        loadedB.add(b);
+                loadedB.add(b);
+      }
+      for (final s in noJob) {
+        final id = s.post?.type.id;
+        if (id == 'counter') s.job = 0;
+        if (id == 'pack') s.job = 1;
       }
 
       money = j['money'] as int;

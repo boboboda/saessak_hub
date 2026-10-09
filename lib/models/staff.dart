@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import '../game/config.dart';
 import 'building.dart';
 
 /// 직원 한 명 (이름·능력치·체력 상태가 있는 캐릭터)
@@ -22,9 +23,19 @@ class Staff {
   static const List<String> specNames = ['', '접수 베테랑', '포장 장인', '쾌속 운반'];
   int level = 1;
   double xp = 0; // 일한 시간(게임 초)이 쌓임
-  int spec = 0; // 특기: 1 접수 베테랑, 2 포장 장인, 3 쾌속 운반
+  int spec = 0; // (예전 특기, 불러올 때 직업 레벨로 옮기고 안 씀)
+
+  // ---- 직업 ----
+  int job = 0; // Cfg.jobName 번호
+  int jobLv = 1;
+  double jobXp = 0;
+  bool promoted = false; // 상위 직업으로 전직했는지
+  final Map<int, int> jobHist = {}; // 예전에 했던 직업의 최고 레벨 (기록)
+  String get jobTitle => promoted ? Cfg.jobPromo[job] : Cfg.jobName[job];
+  double get jobXpNeed => jobLv >= Cfg.jobMaxLv ? 0 : Cfg.jobXpNeed[jobLv - 1];
   double get xpNeed => 120.0 * level;
   String get specName => specNames[spec];
+  bool get canPromote => jobLv >= Cfg.jobMaxLv && !promoted;
 
   double energy; // 현재 체력 (일하면 줄고, 쉬면 참)
   bool working = false; // 이번 프레임에 일했는지 (체력 계산용)
@@ -66,8 +77,7 @@ class Staff {
   double get walkMul =>
       (0.7 + 0.15 * walk) *
       fatigueMul *
-      (1 + 0.06 * (level - 1)) *
-      (spec == 3 ? 1.25 : 1.0);
+            (1 + 0.06 * (level - 1)); // 직업 걸음 보너스는 JobSystem.jobWalk
 
   String get initial => name.isEmpty ? '?' : name.substring(0, 1);
 }

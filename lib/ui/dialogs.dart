@@ -109,7 +109,7 @@ Future<void> showAssignPostDialog(
               b.type.id == 'counter' ? Icons.support_agent : Icons.inventory_2,
               b.type.id == 'counter' ? C.accent : C.good),
           title: '${b.type.name} #${g.typeIndex(b)}',
-          sub: '근무 ${b.crew.length}/${b.type.slots}명',
+          sub: '근무 ${b.crew.length}/${b.seats}명',
           onTap: () {
             g.assignTo(s, b);
             Navigator.pop(ctx);

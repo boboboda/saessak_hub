@@ -74,6 +74,13 @@ class TopBar extends StatelessWidget {
                     case 7:
                       g.debugRestCheck();
                       break;
+                    case 8:
+                      // 직원 모두 직업 Lv5 + 전직서 1장 (전직 확인용)
+                      for (final s in g.staff) {
+                        s.jobLv = Cfg.jobMaxLv;
+                      }
+                      g.tickets++;
+                      break;
                   }
                   g.ui();
                 },
@@ -102,6 +109,10 @@ class TopBar extends StatelessWidget {
                   PopupMenuItem(
                     value: 7,
                     child: Text('휴게실 놓고 직원 지치게', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 8,
+                    child: Text('직업 Lv5 + 전직서 1장', style: Tx.body),
                   ),
                   PopupMenuItem(
                     value: 4,
