@@ -936,5 +936,23 @@
       "description": "pixel art, black outline, front view, flat orthographic, no perspective, single green highway direction sign on two posts, white arrow",
       "size": 64
     }
+  },
+  "veh_moto_rider": {
+    "endpoint": "/create-1-direction-object",
+    "note": "배달 오토바이 + 운전자 (빈 짐칸), 측면",
+    "body": {
+      "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, delivery rider sitting on an orange delivery scooter motorcycle, rider wears orange safety vest and navy blue helmet, both hands on handlebar, empty metal cargo rack on the back, full body of rider visible",
+      "size": 64,
+      "view": "sidescroller"
+    }
+  },
+  "veh_van_driver": {
+    "endpoint": "/create-1-direction-object",
+    "note": "소형 트럭 + 운전석의 기사 (빈 짐칸), 측면",
+    "body": {
+      "description": "pixel art, black outline, side view facing right, flat orthographic, no perspective, small white delivery truck with open flatbed cargo area, orange stripe, cab on the right side, a delivery driver wearing navy blue cap clearly visible through the cab side window, empty cargo bed",
+      "size": 128,
+      "view": "sidescroller"
+    }
   }
 }

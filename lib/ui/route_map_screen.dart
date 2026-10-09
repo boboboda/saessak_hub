@@ -78,10 +78,91 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     cam.pos = Offset(nx, ny);
   }
 
+  /// 지도를 탭: 가까운 차량이 있으면 그 차량 정보 카드, 없으면 카드 닫기
+  void _tapMap(Offset local) {
+    const T = _MapPainter.T;
+    final tile = (local + cam.pos) / T;
+    int? best;
+    var bd = 1.3;
+    for (final (u, pos) in _MapPainter.units(g, sel)) {
+      // 차량 그림은 발 밑에서 위로 그려지므로 조금 위쪽까지 맞은 걸로 침
+      final d = (tile - pos.translate(0, -0.3)).distance;
+      if (d < bd) {
+        bd = d;
+        best = u.id;
+      }
+    }
+    setState(() => cam.pick = best);
+  }
+
+  String _skillStars(int s) => '★' * s + '☆' * (5 - s);
+
+  /// 고른 차량 정보: 기사 이름·능력, 차량 레벨·상태·적재, 따라가기
+  Widget _unitInfo() {
+    FleetUnit? u;
+    for (final x in g.fleet) {
+      if (x.id == cam.pick && x.region == sel) u = x;
+    }
+    if (u == null) return const SizedBox();
+    final unit = u;
+    final img = _img(unit.type, full: unit.state == 1 && unit.cargo > 0);
+    final following = cam.follow == unit.id;
+    return Container(
+      width: 230,
+      padding: const EdgeInsets.fromLTRB(8, 6, 6, 6),
+      decoration: BoxDecoration(
+        color: const Color(0xEE1E1B2E),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Color(Cfg.regionColor[unit.region]).withValues(alpha: 0.8)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 44,
+            height: 34,
+            child: img == null
+                ? const SizedBox()
+                : RawImage(image: img, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('${unit.driver} · ${Cfg.skillName[unit.skill]}',
+                    style: const TextStyle(
+                        color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
+                Text('${_skillStars(unit.skill)}  ${unit.name} Lv.${unit.level}',
+                    style: const TextStyle(color: C.gold, fontSize: 10)),
+                Text(_state(unit), style: const TextStyle(color: C.sub, fontSize: 10)),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () => setState(() {
+              cam.follow = following ? null : unit.id;
+              cam.vel = Offset.zero;
+            }),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: following ? C.accent : C.line,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.my_location, size: 16, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _select(int i) {
     setState(() => sel = i);
     cam.reset = true;
     cam.follow = null;
+    cam.pick = null;
   }
 
   @override
@@ -115,6 +196,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
                       cam.pos -= d.delta;
                     },
                     onPanEnd: (d) => cam.vel = -d.velocity.pixelsPerSecond,
+                    onTapUp: (d) => _tapMap(d.localPosition),
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -256,6 +338,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
             ),
           ),
         Positioned(left: 8, bottom: 8, child: _camButtons()),
+        if (open && cam.pick != null) Positioned(left: 8, top: 40, child: _unitInfo()),
         Positioned(right: 8, bottom: 8, child: _miniMap()),
         if (!open)
           Positioned.fill(
@@ -325,12 +408,15 @@ class _RouteMapScreenState extends State<RouteMapScreen>
         }),
         const SizedBox(height: 6),
         if (g.regionOpen[sel] && list.isNotEmpty)
-          btn(Icons.my_location, cur == null ? '차량 따라가기' : '${cur.name} #${cur.id} 따라가는 중',
+          btn(Icons.my_location, cur == null ? '차량 따라가기' : '${cur.driver} (${cur.name}) 따라가는 중',
               cur != null, () {
-            final moving = list.where((u) => u.busy).toList();
-            final pick = moving.isEmpty ? list : moving;
+            // 실제로 달리는 차량부터, 없으면 도크에서 싣는 차량, 그것도 없으면 전부
+            final moving = list.where((u) => u.state == 1 || u.state == 2).toList();
+            final busy = list.where((u) => u.busy).toList();
+            final pick = moving.isNotEmpty ? moving : (busy.isNotEmpty ? busy : list);
             final i = cur == null ? 0 : pick.indexOf(cur) + 1;
             cam.follow = i < pick.length ? pick[i].id : null;
+            cam.pick = cam.follow;
             cam.vel = Offset.zero;
             g.ui();
           }),
@@ -551,14 +637,14 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     }
   }
 
-  ui.Image? _img(int type) {
+  ui.Image? _img(int type, {bool full = false}) {
     switch (type) {
       case 0:
-        return Sprites.truck;
+        return full ? (Sprites.truckFull ?? Sprites.truck) : Sprites.truck;
       case 1:
-        return Sprites.van;
+        return full ? (Sprites.vanFull ?? Sprites.van) : Sprites.van;
       default:
-        return Sprites.moto;
+        return full ? (Sprites.motoFull ?? Sprites.moto) : Sprites.moto;
     }
   }
 
@@ -693,6 +779,7 @@ class _Cam {
   Offset vel = Offset.zero; // 손을 뗀 뒤 관성 속도 (dp/초)
   Size view = Size.zero;
   int? follow; // 따라가는 차량 id (null 이면 자유 드래그)
+  int? pick; // 탭해서 정보 카드를 연 차량 id
   bool reset = true; // 다음 프레임에 허브 쪽으로 이동
 }
 
@@ -1540,7 +1627,12 @@ class _MapPainter extends CustomPainter {
   }
 
   void _unit(Canvas c, FleetUnit u, Offset tilePos) {
-    final img = u.isTrunk ? Sprites.truck : (u.type == 1 ? Sprites.van : Sprites.moto);
+    final loaded = u.state == 1 && u.cargo > 0;
+    final img = u.isTrunk
+        ? (loaded ? Sprites.truckFull ?? Sprites.truck : Sprites.truck)
+        : (u.type == 1
+            ? (loaded ? Sprites.vanFull ?? Sprites.van : Sprites.van)
+            : (loaded ? Sprites.motoFull ?? Sprites.moto : Sprites.moto));
     final wTiles = u.isTrunk ? 2.5 : (u.type == 1 ? 1.8 : 1.1);
     final w = wTiles * t;
     final bob = (u.state == 1 || u.state == 2) ? sin(g.clock * 14 + u.id) * 0.5 : 0.0;
@@ -1581,6 +1673,20 @@ class _MapPainter extends CustomPainter {
       c.restore();
     }
     final top = foot.dy - (img == null ? t : w * img.height / img.width);
+    // 고르거나 따라가는 차량은 기사 이름표
+    if (cam.pick == u.id || cam.follow == u.id) {
+      final tp = TextPainter(
+        text: TextSpan(
+            text: '${u.driver} ${'★' * u.skill}',
+            style: TextStyle(color: Colors.black, fontSize: t * 0.34, fontWeight: FontWeight.w800)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final r = Rect.fromCenter(
+          center: Offset(foot.dx, foot.dy + t * 0.35), width: tp.width + t * 0.4, height: tp.height + t * 0.1);
+      c.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(t * 0.15)),
+          Paint()..color = Color(Cfg.regionColor[u.region]).withValues(alpha: 0.9));
+      tp.paint(c, Offset(r.left + t * 0.2, r.top + t * 0.05));
+    }
     // 싣고 있는 택배 수
     if (u.state == 1 && u.cargo > 0) {
       final tag = Rect.fromCenter(center: Offset(foot.dx, top - t * 0.3), width: t * 1.0, height: t * 0.5);

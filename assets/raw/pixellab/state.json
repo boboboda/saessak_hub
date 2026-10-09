@@ -251,5 +251,19 @@
   },
   "prop_hwsign": {
     "object_id": "2dcef405-1919-405d-bc1b-56d0cbc8f846"
+  },
+  "veh_moto_rider": {
+    "object_id": "0b3238ed-1cbd-4903-a9d0-ed881b9bffc0",
+    "picked_id": "b12062f2-c237-47d2-b88c-5bac8335e8d7"
+  },
+  "veh_moto_rider_full": {
+    "object_id": "16dd068c-2c48-4d08-89fa-07f5913e8125"
+  },
+  "veh_van_driver": {
+    "object_id": "92eed82d-bad7-43a6-9058-c6a84aea995d",
+    "picked_id": "6431b67c-57b8-4146-8089-2c22ff91b9c4"
+  },
+  "veh_van_driver_full": {
+    "object_id": "bd7c4400-37c4-4609-8dd2-a0db41358683"
   }
 }
