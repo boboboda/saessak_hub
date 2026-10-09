@@ -106,7 +106,11 @@ extension StaffSystem on HubGame {
   }
 
   void assignTo(Staff s, Building b) {
-    if (b.seats == 0 || b.crew.length >= b.seats) return;
+        if (b.seats == 0 || b.crew.length >= b.seats) return;
+    if (s.training != null) {
+      showToast('${s.name}은(는) 훈련 중이에요');
+      return;
+    }
     // 선반·도크 보조 자리는 분류사·정비사만 (직접 일은 안 하고 보너스만 냄)
     if (b.type.id == 'shelf' && s.job != 3) {
       showToast('선반 보조 자리에는 분류사만 배치할 수 있어요');

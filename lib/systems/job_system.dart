@@ -86,7 +86,7 @@ extension JobSystem on HubGame {
   int jobCap(Building b) {
     var p = 0;
     for (final s in b.crew) {
-      if (jobFits(s) && s.job == 3) p = max(p, const [3, 5, 8, 12][_tier(s)]);
+            if (jobFits(s) && s.job == 3) p = max(p, (const [3, 5, 8, 12][_tier(s)] * this.resSorter).round()); // 분류 자동화
     }
     return p;
   }

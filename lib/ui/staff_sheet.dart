@@ -191,7 +191,10 @@ class _StaffCard extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              AppButton('직업 바꾸기', small: true, color: C.card, onTap: () => _pickJob(context)),
+                            AppButton('직업 바꾸기', small: true, color: C.card, onTap: () => _pickJob(context)),
+              const SizedBox(width: 8),
+              AppButton(s.training != null ? '훈련 중' : '훈련',
+                  small: true, color: C.card, onTap: s.training != null ? null : () => _pickTrain(context)),
               const SizedBox(width: 8),
               if (s.canPromote)
                 AppButton('전직 (전직서 ${g.tickets}장)',
@@ -199,6 +202,37 @@ class _StaffCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+    void _pickTrain(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: C.panel,
+        title: Text('${s.name} 훈련', style: Tx.title),
+        content: SizedBox(
+          width: 320,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              const Text('교육실에서 하루 동안 일을 쉬고 능력치 하나 +1 (최대 5)', style: Tx.sub),
+              const SizedBox(height: 8),
+              for (var k = 0; k < Cfg.statName.length; k++)
+                ListTile(
+                  dense: true,
+                  enabled: g.trainProblem(s, k) == null,
+                  title: Text(g.statOf(s, k) >= 5 ? '${Cfg.statName[k]} 5 (최대)' : '${Cfg.statName[k]} ${g.statOf(s, k)} → ${g.statOf(s, k) + 1}', style: Tx.body),
+                  subtitle: Text(g.trainProblem(s, k) ?? '${g.fmt(g.trainCost(s, k))}원', style: Tx.sub),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    g.startTraining(s, k);
+                  },
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -256,7 +290,7 @@ class _StaffCard extends StatelessWidget {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                                                 Text('${s.name} Lv.${s.level}', style: Tx.h2),
-                        JobChip(s, fit: g.jobFits(s)),
+                        JobChip(s, fit: s.idle || s.training != null ? null : g.jobFits(s)),
                         RoleChip(g, s),
                       ],
                     ),

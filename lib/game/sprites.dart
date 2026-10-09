@@ -137,6 +137,10 @@ class Sprites {
     hubShelf = await _img('assets/sprites/props/hub_shelf.png');
     hubLounge = await _img('assets/sprites/props/hub_lounge.png');
         hubDock = await _img('assets/sprites/props/hub_dock.png');
+        final lab = await _img('assets/sprites/props/hub_lab.png');
+    if (lab != null) setProps['lab'] = lab;
+    final cls = await _img('assets/sprites/props/hub_class.png');
+    if (cls != null) setProps['classroom'] = cls;
     for (final n in const ['bin', 'chair', 'plant', 'board', 'aircon', 'conveyor']) {
       final im = await _img('assets/sprites/props/prop_$n.png');
       if (im != null) setProps[n] = im;

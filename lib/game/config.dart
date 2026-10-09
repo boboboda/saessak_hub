@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/building.dart';
 import '../models/mission.dart';
 import '../models/vehicle.dart';
+import '../systems/research_system.dart';
 import '../systems/set_system.dart';
 import 'region_map.dart';
 
@@ -59,7 +60,10 @@ class Cfg {
     BuildingType('plant', '화분', 1, 1, 300, 0xFF3FA34D, '반경 2칸 직원 체력 소모 −5% (3개까지)', -1, 0),
     BuildingType('board', '게시판', 1, 1, 500, 0xFFB98A5E, '공지 게시판. 접수 창구 세트 재료', -1, 0),
     BuildingType('aircon', '에어컨', 1, 1, 2500, 0xFFDDE6EE, '반경 3칸 체력 소모 −10% (여름 2배)', -1, 0),
-    BuildingType('conveyor', '컨베이어', 2, 1, 1500, 0xFF7A8FA6, '선반·포장대·도크를 잇는 세트 재료', -1, 0),
+        BuildingType('conveyor', '컨베이어', 2, 1, 1500, 0xFF7A8FA6, '선반·포장대·도크를 잇는 세트 재료 (연구 필요)', -1, 0),
+    // ---- 연구·훈련 시설 ----
+    BuildingType('lab', '연구실', 3, 3, 10000, 0xFF6C8EBF, '하루 +30 RP (연구 포인트)', -1, 0),
+    BuildingType('classroom', '교육실', 3, 3, 6000, 0xFFB98AC8, '직원을 하루 훈련해 능력치 +1 (2명까지)', -1, 0),
   ];
 
   // ---- 허브 배치 규칙 ----
@@ -340,7 +344,7 @@ class Cfg {
         hidden: true, hint: '포장대와 선반 사이를 잇는 벨트', speed: 1.1),
   ];
     static const int hiddenSetFame = 20; // 숨은 세트 처음 발견 명성
-  static const Set<String> propIds = {'bin', 'chair', 'plant', 'board', 'aircon', 'conveyor', 'vending'};
+    static const Set<String> propIds = {'bin', 'chair', 'plant', 'board', 'aircon', 'conveyor', 'vending', 'lab', 'classroom'};
   static const double plantRadius = 2, plantDrain = 0.05; // 화분: 반경 2칸, 소모 −5%
   static const int plantMax = 3;
   static const double airconRadius = 3, airconDrain = 0.10; // 에어컨: 반경 3칸, 소모 −10%
@@ -370,6 +374,25 @@ class Cfg {
   static const int evtHeatCost = 2000;
   static const double evtHeatDrain = 1.3;
   static const double evtRookieWage = 2.0;
+
+    // ---- 연구 (RP: 배송 1건 = 1, 연구실 1개당 하루 +30). 한 번에 하나, 같은 갈래는 앞 단계부터 ----
+  static const List<String> resBranch = ['작업', '물류', '서비스'];
+  static const List<ResearchDef> research = [
+    ResearchDef('바코드 접수', 0, 0, 200, 1000, 120, '접수 +10%'),
+    ResearchDef('자동 테이프', 0, 1, 500, 3000, 240, '포장 +15%'),
+    ResearchDef('포장 라인 2세대', 0, 2, 1200, 8000, 400, '세트 효과 ×1.5'),
+    ResearchDef('컨베이어 해금', 1, 0, 400, 2000, 180, '컨베이어를 지을 수 있음'),
+    ResearchDef('분류 자동화', 1, 1, 900, 5000, 300, '분류사 선반 용량 효과 ×1.5'),
+    ResearchDef('야간 출고', 1, 2, 2000, 10000, 480, '하루 끝에 선반 택배 10건을 지역센터로 자동 출고'),
+    ResearchDef('번호표', 2, 0, 300, 1500, 150, '손님 인내심 감소 −10%'),
+    // 단골 카드: 제안서 '재방문 +'을 손님 수 +8%로 정함
+    ResearchDef('단골 카드', 2, 1, 700, 4000, 270, '단골이 다시 와서 손님 +8%'),
+    ResearchDef('프리미엄 배송', 2, 2, 1500, 9000, 420, '급송 보너스 ×2'),
+  ];
+  static const int rpPerParcel = 1, labRpDay = 30, nightShip = 10;
+  // ---- 훈련 (교육실에서 하루, 능력치 하나 +1, 비용 1,000 × 지금 능력치) ----
+  static const List<String> statName = ['손속도', '걸음', '친절', '체력', '꼼꼼'];
+  static const int trainBase = 1000, classSeats = 2;
 
   // ---- 계절 (1년 28일 = 7일씩) ----
   static const List<String> seasonName = ['봄', '여름', '가을', '겨울'];

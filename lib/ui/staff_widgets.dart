@@ -13,8 +13,9 @@ Color roleColor(Staff s) {
 }
 
 String roleText(HubGame g, Staff s) {
-  final String base;
+    final String base;
   final p = s.post;
+  if (s.training != null) return '교육실 훈련 중 (${Cfg.statName[s.trainStat.clamp(0, 4)]})';
   if (s.carrier) {
     base = '운반 담당';
   } else if (p == null) {

@@ -7,11 +7,11 @@ import 'building.dart';
 class Staff {
   final int id;
   final String name;
-  final int speed; // 손속도 1~5: 접수·포장 속도
-  final int walk; // 걸음 1~5: 운반 속도
-  final int kind; // 친절 1~5: 손님이 짜증 내는 속도 감소
-  final int stamina; // 체력 1~5: 오래 일할 수 있는 정도
-  final int care; // 꼼꼼 1~5: 포장 실수 확률 감소
+    int speed; // 손속도 1~5: 접수·포장 속도 (훈련으로 +1)
+    int walk; // 걸음 1~5: 운반 속도
+    int kind; // 친절 1~5: 손님이 짜증 내는 속도 감소
+    int stamina; // 체력 1~5: 오래 일할 수 있는 정도
+    int care; // 꼼꼼 1~5: 포장 실수 확률 감소
   final int hireCost; // 고용비
   int wage; // 일급(하루 월급). 레벨이 오르면 올라감
 
@@ -51,7 +51,12 @@ class Staff {
       this.care, this.hireCost, this.wage)
       : energy = 60.0 + 20.0 * stamina;
 
-  bool get idle => post == null && !carrier;
+    // ---- 훈련 (교육실에서 하루) ----
+  Building? training; // 훈련 중인 교육실
+  int trainStat = -1; // 올리는 능력치 (Cfg.statName 번호)
+  int trainUntil = 0; // 이 날이 되면 끝
+
+  bool get idle => post == null && !carrier && training == null;
 
   /// 자리를 비운 상태 (쉬러 가는 중·쉬는 중·돌아오는 중)
   bool get away => rest != 0;

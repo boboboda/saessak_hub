@@ -49,7 +49,11 @@ extension SaveSystem on HubGame {
       ],
             'claimed': claimed.toList(),
       'rate': rt.toJson(),
-            'tickets': tickets,
+                  'tickets': tickets,
+      'rp': rp,
+      'res': researched.toList(),
+      'resNow': resNow,
+      'resLeft': resLeft,
       'evts': [for (final e in evts) e.toJson()],
       'evtLast': {for (final e in evtLast.entries) '${e.key}': e.value},
       'routes': [
@@ -71,7 +75,9 @@ extension SaveSystem on HubGame {
             'xp': s.xp,
                         'spec': s.spec,
             'job': [s.job, s.jobLv, s.jobXp, s.promoted ? 1 : 0],
-            'jh': {for (final e in s.jobHist.entries) '${e.key}': e.value},
+                        'jh': {for (final e in s.jobHist.entries) '${e.key}': e.value},
+            if (s.training != null)
+              'tr': [buildings.indexOf(s.training!), s.trainStat, s.trainUntil],
           }
       ],
       'aisles': aisles.toList(),
@@ -246,7 +252,24 @@ extension SaveSystem on HubGame {
       } catch (e) {
         debugPrint('평가 기록 불러오기 실패: $e');
       }
-            tickets = (j['tickets'] as num?)?.toInt() ?? 0;
+                  tickets = (j['tickets'] as num?)?.toInt() ?? 0;
+      rp = (j['rp'] as num?)?.toInt() ?? 0;
+      researched
+        ..clear()
+        ..addAll(((j['res'] as List?) ?? const []).map((e) => (e as num).toInt()));
+      resNow = (j['resNow'] as num?)?.toInt();
+      resLeft = ((j['resLeft'] as num?) ?? 0).toDouble();
+      // 훈련 중이던 직원 (교육실 번호로 다시 연결)
+      final trs = (j['staff'] as List);
+      for (var i = 0; i < trs.length && i < loadedStaff.length; i++) {
+        final tr = (trs[i] as Map)['tr'] as List?;
+        if (tr == null || tr.length < 3) continue;
+        final bi = (tr[0] as num).toInt();
+        if (bi < 0 || bi >= loadedB.length || loadedB[bi].type.id != 'classroom') continue;
+        loadedStaff[i].training = loadedB[bi];
+        loadedStaff[i].trainStat = (tr[1] as num).toInt();
+        loadedStaff[i].trainUntil = (tr[2] as num).toInt();
+      }
       // 진행 중 사건 (예전 저장엔 없음)
       try {
         evts

@@ -99,7 +99,11 @@ extension BuildSystem on HubGame {
     return null;
   }
 
-  void startPlacing(BuildingType t) {
+    void startPlacing(BuildingType t) {
+    if (t.id == 'conveyor' && !this.conveyorOpen) {
+      showToast('컨베이어는 연구(물류: 컨베이어 해금)가 필요해요');
+      return;
+    }
     placing = t;
     mode = 2;
     selected = null;

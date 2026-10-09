@@ -368,5 +368,11 @@
   },
   "prop_conveyor": {
     "object_id": "08ca1fd3-fd00-41e2-a6a5-d2b13842a3e0"
+  },
+  "hub_lab": {
+    "object_id": "7ee8af08-92f0-42ff-991c-232091641109"
+  },
+  "hub_class": {
+    "object_id": "e9ee92e3-7807-4466-8c1b-8afb6a4f1058"
   }
 }

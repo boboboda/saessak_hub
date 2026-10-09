@@ -251,7 +251,8 @@ extension FleetSystem on HubGame {
       final pay = (payD * this.perkMul).round(); // 업적 영구 수익 보너스
       money += pay;
       dayEarn += pay;
-      delivered += n;
+            delivered += n;
+      rp += n * Cfg.rpPerParcel; // 연구 포인트
       onTimeCount += ok;
       lateCount += late;
       fame = max(0, fame + fameD);

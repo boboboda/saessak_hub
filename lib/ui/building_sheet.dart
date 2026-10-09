@@ -101,6 +101,24 @@ class BuildingSheet extends StatelessWidget {
             ),
           if (t.id == 'dock') const SizedBox(height: 8),
           if (t.id == 'shelf' || t.id == 'dock') ..._carrierSection(),
+                    if (t.id == 'lab' || t.id == 'classroom')
+            CardBox(
+              child: Row(
+                children: [
+                  Icon(t.id == 'lab' ? Icons.science : Icons.school, size: 18, color: C.sub),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      t.id == 'lab'
+                          ? '하루 끝에 RP +${Cfg.labRpDay} · 지금 RP ${g.fmt(g.rp)} (운영 > 연구)'
+                          : '훈련 중 ${g.staff.where((s) => s.training == b).map((s) => s.name).join(', ')}'
+                              '${g.staff.any((s) => s.training == b) ? '' : '없음'} · 직원 카드의 [훈련]으로 보냄',
+                      style: Tx.body,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           if (t.id == 'vending')
             CardBox(
               child: Row(

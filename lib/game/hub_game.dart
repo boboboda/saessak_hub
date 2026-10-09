@@ -16,6 +16,7 @@ import '../systems/interact_system.dart';
 import '../systems/ops_system.dart';
 import '../systems/path_system.dart';
 import '../systems/rating_system.dart';
+import '../systems/research_system.dart';
 import '../systems/save_system.dart';
 import '../systems/set_system.dart';
 import '../systems/guide_system.dart';
@@ -35,6 +36,7 @@ export '../systems/interact_system.dart';
 export '../systems/ops_system.dart';
 export '../systems/path_system.dart';
 export '../systems/rating_system.dart';
+export '../systems/research_system.dart';
 export '../systems/save_system.dart';
 export '../systems/set_system.dart';
 export '../systems/guide_system.dart';
@@ -90,7 +92,12 @@ class HubGame extends FlameGame {
   HubEvent? evtNow; // 고르는 중인 사건 (게임 멈춤)
   final List<ActiveEvt> evts = []; // 진행 중인 사건
     final List<String> evtNotes = []; // 오늘 끝난 사건 결과 (정산 카드에 표시)
-  int debugEvt = 0; // (디버그) 다음에 일으킬 사건
+    int debugEvt = 0; // (디버그) 다음에 일으킬 사건
+  // 연구
+  int rp = 0; // 연구 포인트
+  final Set<int> researched = {};
+  int? resNow; // 진행 중 연구
+  double resLeft = 0; // 남은 시간(게임 초)
   double fever = 0; // 수익 부스트(광고) 남은 시간(초)
 
   // 배송 기한: 택배마다 접수 시각을 단계마다 넘겨준다 (먼저 들어온 것부터 나감)
@@ -132,7 +139,7 @@ class HubGame extends FlameGame {
   }
 
   /// 지금 접수량 (분당 택배 수) = 명성 구간 × 성수기 배수
-    double get intakeNow => Cfg.intakeBase(fame) * (holiday?.$4 ?? 1.0) * this.evtIntake; // 사건(TV 취재·특근·대량 주문)
+    double get intakeNow => Cfg.intakeBase(fame) * (holiday?.$4 ?? 1.0) * this.evtIntake * this.resIntake; // 사건(TV 취재·특근·대량 주문)·연구(단골 카드)
   double dayTimer = 0;
   double candTimer = 0;
   int lastPayroll = 0;
@@ -309,7 +316,8 @@ class HubGame extends FlameGame {
     if (!await this.loadGame()) {
             this.addStarters();
     }
-    this.planEvents();
+          this.planEvents();
+      this.finishTraining();
     this.genCandidates();
   }
 
@@ -335,9 +343,10 @@ class HubGame extends FlameGame {
     dayTimer += d;
         if (dayTimer >= Cfg.dayLength) {
       dayTimer = 0;
-            evtNotes
+                  evtNotes
         ..clear()
-        ..addAll(this.resolveEvents(day));
+        ..addAll(this.resolveEvents(day))
+        ..addAll(this.researchDayEnd());
       this.endOfDay(day);
       day++;
       this.payroll();
@@ -358,7 +367,8 @@ class HubGame extends FlameGame {
 
     gt += d;
         this.updateFever(d);
-    this.updateEvents(d);
+        this.updateEvents(d);
+    this.updateResearch(d);
     if (sootheCd > 0) sootheCd = max(0.0, sootheCd - d);
 
     this.updateFlow(d);

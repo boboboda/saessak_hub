@@ -84,6 +84,9 @@ class TopBar extends StatelessWidget {
                                         case 9:
                       g.debugProps();
                       break;
+                                        case 11:
+                      g.rp += 1000;
+                      break;
                     case 10:
                       // 사건 차례로 일으키기 (확인용)
                       g.openEvent(g.debugEvt++ % Cfg.hubEvtName.length);
@@ -128,6 +131,10 @@ class TopBar extends StatelessWidget {
                                     PopupMenuItem(
                     value: 10,
                     child: Text('사건 일으키기 (차례로)', style: Tx.body),
+                  ),
+                                    PopupMenuItem(
+                    value: 11,
+                    child: Text('RP +1000', style: Tx.body),
                   ),
                   PopupMenuItem(
                     value: 4,

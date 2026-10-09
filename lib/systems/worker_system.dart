@@ -305,10 +305,11 @@ extension WorkerSystem on HubGame {
         d.incoming = max(0, d.incoming - 1);
         if (p.kind == 1) {
           if (gt - p.born <= Cfg.urgentLimit) {
-            money += Cfg.urgentBonus;
-            dayEarn += Cfg.urgentBonus;
+                        final ub = Cfg.urgentBonus * this.resUrgent; // 프리미엄 배송 ×2
+            money += ub;
+            dayEarn += ub;
             urgentOk++;
-            showToast('급송 성공! +${Cfg.urgentBonus}원');
+            showToast('급송 성공! +$ub원');
           } else {
             showToast('급송이 늦었어요');
           }

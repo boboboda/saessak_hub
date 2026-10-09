@@ -73,12 +73,13 @@ extension SetSystem on HubGame {
           final b = buildings[i];
           if (b.type.id != d.target) continue;
           b.sets.add(si);
-          b.setSpeed *= d.speed;
-          b.setCalm *= d.calm;
-          b.setRest *= d.rest;
-          b.setCap += d.cap;
-          b.setLoad *= d.load;
-          b.setDrain *= d.drain;
+                    // 포장 라인 2세대(연구): 세트 효과 ×1.5
+          b.setSpeed *= this.resAmp(d.speed);
+          b.setCalm *= this.resAmp(d.calm);
+          b.setRest *= this.resAmp(d.rest);
+          b.setCap += this.resAmpCap(d.cap);
+          b.setLoad *= this.resAmp(d.load);
+          b.setDrain *= this.resAmp(d.drain);
         }
         if (!rt.foundSets.contains(si)) {
           rt.foundSets.add(si);

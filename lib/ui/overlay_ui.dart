@@ -48,11 +48,14 @@ class OverlayUi extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFF0963A)),
               ),
-              child: Text(g.hint!,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700)),
+              child: Text(
+                g.hint!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
         if (g.mode == 0 && sheet == null && g.alerts.isNotEmpty)
@@ -68,13 +71,6 @@ class OverlayUi extends StatelessWidget {
           bottom: 0,
           child: g.mode == 0 ? BottomBar(g) : ActionBar(g),
         ),
-        if (g.toastTime > 0)
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: navInset(context) + (g.mode == 0 ? 96 : 160),
-            child: Center(child: _Toast(g.toast)),
-          ),
         if (sheet != null)
           Positioned.fill(
             child: GestureDetector(
@@ -83,12 +79,22 @@ class OverlayUi extends StatelessWidget {
               child: Container(color: Colors.black38),
             ),
           ),
-                if (sheet != null)
+        if (sheet != null)
           Positioned(left: 0, right: 0, bottom: 0, child: sheet),
-                // 선택형 사건 (정산 카드보다 아래, 둘이 겹치면 정산 먼저)
+        // 알림은 시트 위에 (시트보다 앞에 끼우면 시트가 다시 만들어져 스크롤이 처음으로 돌아감)
+        if (g.toastTime > 0)
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: navInset(context) + (g.mode == 0 ? 96 : 160),
+            child: Center(child: _Toast(g.toast)),
+          ),
+        // 선택형 사건 (정산 카드보다 아래, 둘이 겹치면 정산 먼저)
         if (g.evtNow != null && g.report == null) ...[
           Positioned.fill(child: Container(color: Colors.black45)),
-          Positioned.fill(child: Center(child: SingleChildScrollView(child: EventCard(g)))),
+          Positioned.fill(
+            child: Center(child: SingleChildScrollView(child: EventCard(g))),
+          ),
         ],
         // 하루 정산 카드 (맨 위)
         if (g.report != null) ...[

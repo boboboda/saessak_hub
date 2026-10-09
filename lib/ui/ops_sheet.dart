@@ -61,7 +61,9 @@ class OpsSheet extends StatelessWidget {
             const SizedBox(height: 8),
           ],
           const SizedBox(height: 8),
-                              _setBook(),
+                                        _research(),
+          const SizedBox(height: 16),
+          _setBook(),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -231,7 +233,76 @@ class OpsSheet extends StatelessWidget {
     );
   }
 
-    /// 세트 도감: 공개 세트는 조건까지, 숨은 세트는 발견 전엔 ??? + 힌트
+      /// 연구 트리: 3갈래 × 3단계. RP + 돈 + 시간, 한 번에 하나
+  Widget _research() {
+    final now = g.resNow;
+    return CardBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('연구', style: Tx.h2),
+              const Spacer(),
+              Pill(Icons.science, 'RP ${g.fmt(g.rp)}', color: C.blue),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text('택배 1건 배송 = RP ${Cfg.rpPerParcel}, 연구실 1곳당 하루 +${Cfg.labRpDay} RP', style: Tx.sub),
+          if (now != null) ...[
+            const SizedBox(height: 8),
+            Text('연구 중: ${Cfg.research[now].name} · ${g.resLeft.ceil()}초 남음', style: const TextStyle(color: C.gold, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 4),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: LinearProgressIndicator(
+                value: (1 - g.resLeft / Cfg.research[now].time).clamp(0.0, 1.0).toDouble(),
+                minHeight: 5,
+                backgroundColor: C.line,
+                valueColor: const AlwaysStoppedAnimation<Color>(C.gold),
+              ),
+            ),
+          ],
+          for (var b = 0; b < Cfg.resBranch.length; b++) ...[
+            const SizedBox(height: 10),
+            Text(Cfg.resBranch[b], style: Tx.body),
+            for (var i = 0; i < Cfg.research.length; i++)
+              if (Cfg.research[i].branch == b) _resRow(i),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _resRow(int i) {
+    final d = Cfg.research[i];
+    final done = g.resDone(i);
+    final why = g.resProblem(i);
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        children: [
+          Icon(done ? Icons.check_circle : (g.resOpen(i) ? Icons.science_outlined : Icons.lock_outline),
+              size: 18, color: done ? C.good : C.sub),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(d.name, style: Tx.body),
+                Text('${d.effect} · RP ${d.rp} · ${g.fmt(d.cost)}원 · ${d.time.round()}초', style: Tx.sub),
+              ],
+            ),
+          ),
+          if (!done)
+            AppButton(why == null ? '연구' : (g.resNow == i ? '진행 중' : why),
+                small: true, color: C.blue, onTap: why == null ? () => g.startResearch(i) : null),
+        ],
+      ),
+    );
+  }
+
+  /// 세트 도감: 공개 세트는 조건까지, 숨은 세트는 발견 전엔 ??? + 힌트
   Widget _setBook() {
     final found = g.rt.foundSets;
     String need(Map<String, int> m) => m.entries

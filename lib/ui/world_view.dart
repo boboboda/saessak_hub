@@ -1235,6 +1235,18 @@ extension WorldView on HubGame {
       }
     }
 
+        // 훈련 중 직원: 교육실 책상 앞에서 공부
+    for (final b in ofType('classroom')) {
+      final tr = staff.where((s) => s.training == b).toList();
+      for (var i = 0; i < tr.length; i++) {
+        final st = tr[i];
+        // 책상 앞 의자 자리 (화이트보드에 가리지 않게 교육실 그림 다음에 그림)
+        final p = Offset((b.tx + 0.77 + i * 0.78) * t, (b.ty + 2.6) * t);
+        _at((b.ty + b.type.h) * t + 1, () => _person(c, p, st.initial, 0xFFE0E0E0, 0xFF555555,
+            energy: st.energyPct, key: st, work: true, workHz: 3));
+      }
+    }
+
     // 보조 자리 직원: 분류사는 선반 오른쪽 옆, 정비사는 도크 문 안쪽 (운반 직원이 서는 자리는 비워 둠)
     for (final b in [...ofType('shelf'), ...ofType('dock')]) {
       for (final st in b.active) {
