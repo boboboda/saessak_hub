@@ -26,6 +26,46 @@ class Scenery {
 
   static const Set<String> onPath = {'lamp', 'light', 'bench', 'sign'};
 
+  // ---- 장식 종류별로 놓을 수 있는 바닥 ----
+  // grass: 풀밭, walk: 인도(보도블록·길), yard: 도크 마당, road: 차도
+  static const Map<String, Set<String>> allowed = {
+    'tree': {'grass'}, 'tree2': {'grass'}, 'bush': {'grass'}, 'flower': {'grass'},
+    'house1': {'grass'}, 'house2': {'grass'}, 'house3': {'grass'},
+    'lamp': {'grass', 'walk'}, 'light': {'grass', 'walk'}, 'sign': {'grass', 'walk'}, 'bench': {'grass', 'walk'},
+    'cone': {'yard'}, 'pallet': {'yard'},
+  };
+
+  /// 오른쪽 인도에서 행인이 걷는 가운데 통로 (가로)
+  static final Rect walkLane = Rect.fromLTRB(Cfg.road.right + 1.0, 0, Cfg.road.right + 2.3, Cfg.rows.toDouble());
+
+  /// 도크 마당 왼쪽 위 '④ 출고 도크' 이름표 자리 (장식이 가리지 않게)
+  static final Rect yardLabel = Rect.fromLTWH(Cfg.yard.left, Cfg.yard.top, 2.8, 1.0);
+
+  /// (x, y) 칸의 바닥 종류. 창고 입구 길은 창고 크기에 따라 달라서 그릴 때 따로 거름
+  static String surface(double x, double y) {
+    final p = Offset(x, y - 0.01); // 발끝이 칸 경계에 걸리면 위 칸으로
+    if (Cfg.road.contains(p)) return 'road';
+    if (Cfg.yard.contains(p)) return 'yard';
+    if (x >= Cfg.road.right) return 'walk';
+    for (final q in paths) {
+      if (q.contains(p)) return 'walk';
+    }
+    return 'grass';
+  }
+
+  /// 이 장식을 이 자리에 둬도 되는지: 바닥 종류 + 인도 가운데 통로 + 마당 이름표
+  static bool fits(Deco d) {
+    final ok = allowed[d.key];
+    if (ok != null && !ok.contains(surface(d.x, d.y))) return false;
+    final foot = Rect.fromCenter(center: Offset(d.x, d.y - 0.3), width: d.wTiles.clamp(0.6, 1.2), height: 0.6);
+    if (foot.overlaps(walkLane)) return false;
+    if (d.key == 'cone' || d.key == 'pallet') {
+      final img = Rect.fromLTRB(d.x - 0.5, d.y - 1.2, d.x + 0.5, d.y);
+      if (img.overlaps(yardLabel)) return false;
+    }
+    return true;
+  }
+
   static final List<Deco> items = _build();
 
   static List<Deco> _build() {
@@ -109,10 +149,12 @@ class Scenery {
         }
       }
     }
-    // 마당: 라바콘·팔레트
-    out.add(Deco('cone', Cfg.yard.left + 1.5, Cfg.yard.top + 1.2, 1));
+    // 마당: 라바콘·팔레트 (마당 구석, 이름표 아래. 도크 앞 주차칸에 걸리면 그릴 때 숨김)
+    out.add(Deco('cone', Cfg.yard.right - 0.7, Cfg.yard.top + 1.1, 1));
     out.add(Deco('cone', Cfg.yard.left + 1.5, Cfg.yard.bottom - 0.3, 1));
-    out.add(Deco('pallet', Cfg.yard.left + 8, Cfg.yard.top + 1.5, 1));
+    out.add(Deco('pallet', Cfg.yard.right - 1.2, Cfg.yard.bottom - 0.3, 1));
+    // 규칙에 안 맞는 장식(차도 위 상자, 보도블록 위 나무 등)은 뺌
+    out.removeWhere((d) => !fits(d));
     out.sort((a, b) => a.y.compareTo(b.y));
     return out;
   }

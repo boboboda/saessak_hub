@@ -94,6 +94,8 @@ class HubGame extends FlameGame {
   final List<double> evtTimes = []; // 오늘 사건이 뜰 시각(하루 초)
   final Map<int, int> evtLast = {}; // 사건별 마지막으로 뜬 날
   HubEvent? evtNow; // 고르는 중인 사건 (게임 멈춤)
+  double evtLastAt = -1e9; // 마지막 사건이 뜬 시각 (게임 초, 날짜 포함)
+  int lastTouchMs = 0; // 마지막으로 화면을 만진 시각 (실제 ms, 팝업 유예용)
   final List<ActiveEvt> evts = []; // 진행 중인 사건
     final List<String> evtNotes = []; // 오늘 끝난 사건 결과 (정산 카드에 표시)
     int debugEvt = 0; // (디버그) 다음에 일으킬 사건

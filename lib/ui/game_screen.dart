@@ -21,7 +21,10 @@ class GameScreen extends StatelessWidget {
 
     return Material(
       color: C.bg,
-      child: Stack(
+      child: Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) => game.lastTouchMs = DateTime.now().millisecondsSinceEpoch,
+        child: Stack(
         children: [
           Positioned.fill(
             child: GestureDetector(
@@ -69,6 +72,7 @@ class GameScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

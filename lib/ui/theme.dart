@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import '../game/config.dart';
 
 /// 색상
 class C {
@@ -200,4 +204,34 @@ class CardBox extends StatelessWidget {
       child: child,
     );
   }
+}
+/// 팝업이 뜬 직후 잠깐(Cfg.popupTapGuard) 탭을 막음: 다른 곳을 누르던 손가락이 팝업 버튼을 잘못 누르지 않게
+class TapGuard extends StatefulWidget {
+  final Widget child;
+  const TapGuard({super.key, required this.child});
+
+  @override
+  State<TapGuard> createState() => _TapGuardState();
+}
+
+class _TapGuardState extends State<TapGuard> {
+  bool ready = false;
+  Timer? _t;
+
+  @override
+  void initState() {
+    super.initState();
+    _t = Timer(const Duration(milliseconds: Cfg.popupTapGuard), () {
+      if (mounted) setState(() => ready = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _t?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AbsorbPointer(absorbing: !ready, child: widget.child); // 막는 동안 탭이 아래 맵으로도 안 감
 }

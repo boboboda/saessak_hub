@@ -11,6 +11,7 @@ extension EventSystem on HubGame {
   /// 새 날이 시작될 때: 오늘 사건이 뜰 시각 1~2개를 정함 (하루 초 단위)
   void planEvents() {
     evtTimes.clear();
+    if (day <= Cfg.evtQuietDays) return; // 처음 이틀은 조용히
     final n = Cfg.evtPerDay[0] + rnd.nextInt(Cfg.evtPerDay[1] - Cfg.evtPerDay[0] + 1);
     for (var i = 0; i < n; i++) {
             final t = Cfg.evtWindow[0] + rnd.nextDouble() * (Cfg.evtWindow[1] - Cfg.evtWindow[0]);
@@ -22,11 +23,12 @@ extension EventSystem on HubGame {
   /// 매 프레임: 시각이 되면 고를 수 있는 사건 하나를 팝업
   void updateEvents(double d) {
     if (evtNow != null || buildings.isEmpty) return;
-    if (evtTimes.isNotEmpty && dayTimer >= evtTimes.first) {
+    if (evtTimes.isNotEmpty && dayTimer >= evtTimes.first && !uiBusy) {
       evtTimes.removeAt(0);
       final pool = [for (var k = 0; k < Cfg.hubEvtName.length; k++) if (_eligible(k)) k];
-      if (pool.isEmpty) return;
-      openEvent(pool[rnd.nextInt(pool.length)]);
+      if (pool.isNotEmpty && gameTime - evtLastAt >= Cfg.evtMinGap) {
+        openEvent(pool[rnd.nextInt(pool.length)]);
+      }
     }
     // 진행 중 사건의 직원 능률(다툼) 반영
     for (final s in staff) {
@@ -39,6 +41,17 @@ extension EventSystem on HubGame {
       }
     }
   }
+
+  /// 지금까지 흐른 게임 시간 (초, 날짜 포함)
+  double get gameTime => (day - 1) * Cfg.dayLength + dayTimer;
+
+  /// 팝업을 띄우면 안 되는 때: 시트·건물 시트가 열렸거나, 배치·통로 모드, 직원을 고르는 중, 방금 화면을 만짐
+  bool get uiBusy =>
+      sheet != null ||
+      selected != null ||
+      mode != 0 ||
+      picking != null ||
+      DateTime.now().millisecondsSinceEpoch - lastTouchMs < Cfg.evtTouchGrace;
 
   bool _eligible(int k) {
     final last = evtLast[k];
@@ -63,6 +76,7 @@ extension EventSystem on HubGame {
     }
     final need = k == 3 ? max(8, (intakeNow * 5 * 0.8).round()) : 0;
     evtNow = HubEvent(k, ids, need);
+    evtLastAt = gameTime;
     evtLast[k] = day;
     ui();
   }

@@ -97,21 +97,24 @@ class OverlayUi extends StatelessWidget {
                 // 연말 시상식 · 승급 (정산 카드를 닫은 뒤)
         if (g.report == null && g.award != null) ...[
           Positioned.fill(child: Container(color: Colors.black45)),
-          Positioned.fill(child: Center(child: SingleChildScrollView(child: AwardCard(g)))),
+          Positioned.fill(child: TapGuard(key: const ValueKey('award'), child: Center(child: SingleChildScrollView(child: AwardCard(g))))),
         ] else if (g.report == null && g.gradeUp != null) ...[
           Positioned.fill(child: Container(color: Colors.black45)),
-          Positioned.fill(child: Center(child: GradeUpCard(g))),
+          Positioned.fill(child: TapGuard(key: ValueKey('grade${g.gradeUp}'), child: Center(child: GradeUpCard(g)))),
         ],
         if (g.evtNow != null && g.report == null && g.award == null && g.gradeUp == null) ...[
           Positioned.fill(child: Container(color: Colors.black45)),
           Positioned.fill(
-            child: Center(child: SingleChildScrollView(child: EventCard(g))),
+            child: TapGuard(
+              key: ValueKey('evt${g.evtNow!.kind}${g.evtLastAt}'),
+              child: Center(child: SingleChildScrollView(child: EventCard(g))),
+            ),
           ),
         ],
         // 하루 정산 카드 (맨 위)
         if (g.report != null) ...[
           Positioned.fill(child: Container(color: Colors.black45)),
-          Positioned.fill(child: Center(child: ReportCard(g))),
+          Positioned.fill(child: TapGuard(key: ValueKey('report${g.day}'), child: Center(child: ReportCard(g)))),
         ],
       ],
     );

@@ -107,6 +107,10 @@ extension PathSystem on HubGame {
     for (final d in Scenery.items) {
       if (!Scenery.solid.contains(d.key)) continue;
       if (a.inflate(0.6).contains(Offset(d.x, d.y - 0.3))) continue; // 창고에 덮여 안 보이는 장식
+      if ((d.key == 'cone' || d.key == 'pallet') &&
+          ofType('dock').any((b) => d.y > b.ty - 0.3 && d.y - 1.0 < b.ty + b.type.h + 0.3)) {
+        continue; // 도크 앞이라 숨긴 마당 장식
+      }
       final k = tileKey(d.x.floor(), (d.y - 0.05).floor());
       if (k >= 0 && k < walkGrid.length) walkGrid[k] = false;
     }

@@ -10,33 +10,68 @@ HubGame _game() {
 }
 
 void main() {
-  test('하루 사건 시각은 1~2개, 하루 구간 안', () {
+  test('처음 이틀은 사건 없음, 그 뒤 하루 0~1개, 하루 구간 안', () {
+    final g0 = _game()..day = 1;
+    g0.planEvents();
+    expect(g0.evtTimes, isEmpty);
+    g0.day = Cfg.evtQuietDays;
+    g0.planEvents();
+    expect(g0.evtTimes, isEmpty);
+    var some = 0;
     for (var i = 0; i < 50; i++) {
-      final g = _game()..planEvents();
-      expect(g.evtTimes.length, inInclusiveRange(1, 2));
+      final g = _game()..day = Cfg.evtQuietDays + 1;
+      g.planEvents();
+      expect(g.evtTimes.length, inInclusiveRange(0, 1));
+      some += g.evtTimes.length;
       for (final t in g.evtTimes) {
         expect(t, inInclusiveRange(Cfg.evtWindow[0], Cfg.evtWindow[1]));
       }
     }
+    expect(some, greaterThan(0));
   });
 
-  test('시각이 되면 저절로 팝업, 같은 사건은 7일 안에 다시 안 뜸', () {
-    final g = _game()..planEvents();
+  test('시각이 되면 저절로 팝업, 같은 사건은 7일 안에 다시 안 뜸, 사건 사이 최소 간격', () {
+    final g = _game()..day = Cfg.evtQuietDays + 1;
+    g.evtTimes
+      ..clear()
+      ..add(Cfg.evtWindow[0]);
     g.dayTimer = Cfg.evtWindow[1] + 1;
     g.updateEvents(0);
     expect(g.evtNow, isNotNull);
     final k = g.evtNow!.kind;
     g.chooseEvent(1);
-    g.evtLast[k] = g.day;
+    // 바로 다음 시각은 최소 간격 때문에 건너뜀
+    g.evtTimes.add(g.dayTimer);
+    g.updateEvents(0);
+    expect(g.evtNow, isNull);
     g.day += Cfg.evtCooldownDays - 1;
     for (var i = 0; i < 40; i++) {
       g.evtNow = null;
+      g.evtLastAt = -1e9;
       g.evtTimes
         ..clear()
         ..add(0);
       g.updateEvents(0);
       expect(g.evtNow?.kind, isNot(k));
     }
+  });
+
+  test('시트가 열려 있거나 방금 만졌으면 팝업을 미룸', () {
+    final g = _game()..day = Cfg.evtQuietDays + 1;
+    g.evtTimes
+      ..clear()
+      ..add(0);
+    g.sheet = 'build';
+    g.updateEvents(0);
+    expect(g.evtNow, isNull);
+    expect(g.evtTimes, isNotEmpty); // 버리지 않고 기다림
+    g.sheet = null;
+    g.lastTouchMs = DateTime.now().millisecondsSinceEpoch;
+    g.updateEvents(0);
+    expect(g.evtNow, isNull);
+    g.lastTouchMs = 0;
+    g.updateEvents(0);
+    expect(g.evtNow, isNotNull);
   });
 
   test('TV 취재 수락: 오늘 접수량 ×1.5, 하루가 끝나면 결과가 나고 사라짐', () {

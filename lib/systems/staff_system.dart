@@ -212,7 +212,7 @@ extension StaffSystem on HubGame {
 
   Offset _restTarget(Staff s) {
     final l = s.lounge;
-    if (l == null) return breakSpot;
+    if (l == null) return breakSpot + Cfg.benchRestSlots[s.seat % Cfg.benchRestSlots.length];
     final o = Cfg.loungeSeats[s.seat];
     return Offset(l.tx + o.dx, l.ty + o.dy);
   }
@@ -220,6 +220,12 @@ extension StaffSystem on HubGame {
   /// 빈 자리가 있는 휴게실을 고름. 없으면 lounge = null (창고 밖에서 쉼)
   void _pickRest(Staff s) {
     s.lounge = null;
+    // 휴게실이 없으면 창고 밖 벤치 옆 빈 칸에 서서 쉼 (벤치 대기 줄과 안 겹치게)
+    final outside = staff.where((x) => x != s && x.rest != 0 && x.lounge == null).map((x) => x.seat).toSet();
+    s.seat = 0;
+    while (outside.contains(s.seat) && s.seat < Cfg.benchRestSlots.length - 1) {
+      s.seat++;
+    }
     for (final l in ofType('lounge')) {
       final used = staff
           .where((x) => x != s && x.rest != 0 && x.lounge == l)

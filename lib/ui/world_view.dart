@@ -85,6 +85,10 @@ extension WorldView on HubGame {
           entrancePath.contains(Offset(d.x, d.y - 0.3))) {
         continue; // 입구 길 위의 나무 등은 숨김
       }
+      if ((d.key == 'cone' || d.key == 'pallet') &&
+          ofType('dock').any((b) => d.y > b.ty - 0.3 && d.y - 1.0 < b.ty + b.type.h + 0.3)) {
+        continue; // 도크 앞 주차칸(차가 서는 줄)에 걸리면 숨김
+      }
       _at(d.y * t, () {
         if (d.key != 'flower') {
           shadowAt(c, Offset(d.x * t, d.y * t), min(w * 0.75, t * 2.6));
@@ -705,13 +709,14 @@ extension WorldView on HubGame {
     if (Sprites.staffWalk != null) {
       final f = _faces.putIfAbsent(key ?? initial, () => _Face(p));
       final dx = p.dx - f.last.dx, dy = p.dy - f.last.dy;
-      final moved = dx * dx + dy * dy > 0.9;
+      // 프레임마다가 아니라 마지막으로 방향을 정한 자리부터 쌓인 이동으로 판단 (느리게 걸어도 앞을 보지 않게)
+      final moved = dx * dx + dy * dy > 2.0;
       if (moved) {
         f.dir = dx.abs() > dy.abs() ? (dx < 0 ? 1 : 2) : (dy < 0 ? 3 : 0);
-        f.until = clock + 0.15;
+        f.until = clock + 0.25;
+        f.last = p;
       }
-      if (!moved && clock > f.until + 0.3) f.dir = 0; // 멈춰 있으면 정면(남쪽)을 봄
-      f.last = p;
+      if (!moved && clock > f.until + Cfg.faceIdle) f.dir = 0; // 한참 멈춰 있어야 정면(남쪽)을 봄
       shadowAt(c, Offset(p.dx, p.dy + t * 0.35), 20);
       Sprites.drawStaff(
         c,
@@ -1308,14 +1313,11 @@ extension WorldView on HubGame {
       }
     }
 
-    // 앉아서 쉬는 직원: 벤치 앞쪽을 다시 그려 '앉은' 느낌
-    var sitAtBreak = false;
+    // 앉아서 쉬는 직원: 휴게실 소파 앞쪽을 다시 그려 '앉은' 느낌 (창고 밖 벤치 옆은 서서 쉼)
     for (final s in staff) {
       if (!s.away || s.rest != 2) continue;
       final l = s.lounge;
-      if (l == null) {
-        sitAtBreak = true;
-      } else {
+      if (l != null) {
         final o = Cfg.loungeSeats[s.seat];
         final sp = Sprites.hubLounge;
         final sitKey = (l.ty + o.dy) * t + t * 0.35 + 0.5; // 앉은 직원 바로 다음
@@ -1342,13 +1344,6 @@ extension WorldView on HubGame {
         }
       }
     }
-    if (sitAtBreak) {
-      _at(
-        breakSpot.dy * t + t * 0.35 + 0.5,
-        () =>
-            _bench(c, Offset(breakSpot.dx * t, breakSpot.dy * t), front: true),
-      );
-    }
 
     // 손님
     for (final cu in customers) {
@@ -1357,13 +1352,13 @@ extension WorldView on HubGame {
         if (Sprites.staffWalk != null) {
           final f = _faces.putIfAbsent(cu, () => _Face(p));
           final dx = p.dx - f.last.dx, dy = p.dy - f.last.dy;
-          final moved = dx * dx + dy * dy > 0.9;
+          final moved = dx * dx + dy * dy > 2.0;
           if (moved) {
             f.dir = dx.abs() > dy.abs() ? (dx < 0 ? 1 : 2) : (dy < 0 ? 3 : 0);
-            f.until = clock + 0.15;
+            f.until = clock + 0.25;
+            f.last = p;
           }
-          if (!moved && clock > f.until + 0.3) f.dir = 3; // 서서 기다릴 땐 창구(위)를 봄
-          f.last = p;
+          if (!moved && clock > f.until + Cfg.faceIdle) f.dir = 3; // 서서 기다릴 땐 창구(위)를 봄
           shadowAt(c, Offset(p.dx, p.dy + t * 0.35), 20);
           Sprites.drawPerson(
             c,

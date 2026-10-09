@@ -131,6 +131,16 @@ class Cfg {
     Offset(0.41, 2.34),
     Offset(2.56, 2.34),
   ];
+  // 휴게실이 없을 때 창고 밖 벤치 옆에 서서 쉬는 자리 (breakSpot 기준, 칸 단위). 벤치 앞 줄은 대기 직원 자리
+  static const List<Offset> benchRestSlots = [
+    Offset(-1.2, 0.05),
+    Offset(1.2, 0.05),
+    Offset(-2.0, 0.05),
+    Offset(2.0, 0.05),
+    Offset(-1.2, -0.8),
+    Offset(1.2, -0.8),
+  ];
+  static const double faceIdle = 0.6; // 이만큼(초) 멈춰 있어야 정면을 봄
   static const double overnightRest = 0.5; // 하루가 지나면 최대 체력의 이만큼 회복
   static const double slipBase = 0.30; // 포장 실수 기본 확률
   static const double slipPerCare = 0.05; // 꼼꼼 1당 감소
@@ -366,7 +376,11 @@ class Cfg {
     '오늘은 찜통더위예요. 직원들이 금방 지칠 것 같아요.',
     '경력 많은 지원자가 찾아왔어요. 월급은 두 배를 원해요.',
   ];
-  static const List<int> evtPerDay = [1, 2]; // 하루 사건 수 (최소, 최대)
+  static const List<int> evtPerDay = [0, 1]; // 하루 사건 수 (최소, 최대)
+  static const int evtQuietDays = 2; // 처음 이틀은 사건 없음 (가게를 차리는 동안)
+  static const double evtMinGap = 360; // 사건 사이 최소 간격 (게임 초, 하루 = 300)
+  static const int evtTouchGrace = 1000; // 마지막 터치 뒤 이만큼(ms) 지나야 팝업
+  static const int popupTapGuard = 300; // 팝업이 뜬 직후 이만큼(ms)은 탭 무시
   static const List<double> evtWindow = [40, 260]; // 하루(300초) 중 사건이 뜨는 구간(초)
   static const int evtCooldownDays = 7;
   static const double evtTvBase = 0.25, evtTvIntake = 1.5;
