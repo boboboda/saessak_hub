@@ -47,7 +47,7 @@ class Cfg {
   static const List<BuildingType> types = [
     BuildingType('counter', '접수 창구', 3, 2, 1500, 0xFFF0963A, '손님 접수 · 직원 2명까지 · 오른쪽 칸은 상자 적재대', 0, 2),
     BuildingType('pack', '포장대', 2, 2, 2000, 0xFF5BA88A, '택배 포장 · 직원 2명까지', 1, 2),
-    BuildingType('shelf', '선반', 2, 3, 1500, 0xFF8B5E3C, '택배 20건 보관', 2, 0),
+    BuildingType('shelf', '선반', 2, 2, 1500, 0xFF8B5E3C, '택배 20건 보관', 2, 0),
     BuildingType('vending', '자판기', 1, 1, 4000, 0xFF3B82D6, '인내심 감소 완화', -1, 0),
     BuildingType('lounge', '휴게실', 3, 3, 8000, 0xFFB06AB3, '지친 직원이 와서 쉼 (회복 3배)', -1, 0),
     BuildingType('dock', '도크', 4, 3, 3000, 0xFF3D4466, '벽에 붙여 설치 · 차량이 서는 칸', 3, 0),

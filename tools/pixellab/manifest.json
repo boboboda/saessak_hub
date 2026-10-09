@@ -1255,5 +1255,32 @@
       "size": 64,
       "view": "sidescroller"
     }
+  },
+  "hub_shelf_tq": {
+    "endpoint": "/create-1-direction-object",
+    "note": "선반 탑뷰 3/4 (시점 통일) 1차",
+    "body": {
+      "description": "pixel art, black outline, high top-down three-quarter view like the reference table, same style and palette as reference, game asset, empty blue metal warehouse storage shelf rack, rectangular and axis-aligned, not rotated, not diagonal, the top shelf surface seen from above and the front of three shelf levels visible, four blue corner posts, wooden shelf boards, wider than tall, nothing on the shelves",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "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"
+        }
+      ]
+    }
+  },
+  "hub_shelf_tq2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "선반 탑뷰 3/4 2차 (정면 정렬)",
+    "body": {
+      "description": "pixel art, black outline, high top-down view facing straight south like the reference counter, front-facing, perfectly symmetrical left and right, no side faces visible, not rotated, axis-aligned rectangle, same style and palette as reference, game asset, empty warehouse storage shelf rack: flat rectangular top shelf board seen from above, below it the front of two lower shelf levels, blue metal posts at the left and right front corners, light wooden boards, wider than tall, nothing on the shelves",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8f76KAy0CKoln1ZzVNce0CIEXR3t/7oaXMC9ueNywCBpcxNjEB3wwOSvu6H+4ouIbA42BwIeyXntDqhJ6ZAlkFPBQAzQKhayEL8sZbOzSrhUHgcXC5ttXVuuWw3eSfe+2lko3s2bVbW6yLgO0ExmK/gJtBcBXTuiZCA5zszxP3AePnf4JvD70OmUwGop0b4NzQMXq9bcs7ukz4ukb3LACS/LKRjgf1+k1331ogS+79HS0AKkO0t6Ic+kdiMYiduaC3tzz5KJw6eojW123shu9ODOt9Bw4O6PXmSAM81N5hsM+CMmbOHf/gKagPNUIwkIFEEgPGGO7q3gnlgmxVglqTovqdQv2JJ6Dtmb3S/tnpf2k5dPBjqEHyRLNiWYiWZI6MB7bvp5lJ96S5qR4S8Tgk5nLtDOQGWTH925her7++1VL20s8TeYeargWnMH+cMJfVTBeBUR9QYTqZ1tuYVSbPXxSUTdlOnp/0xR9Pww2r20zlrSY99cfflrZQSHyoyfP9rxlD+45m892Vjc/AVHzGoA87cbDS2NkOhoKmfa/u+bwkO9hqwOl920zPHmE9twNISiJ/Mg6/shEqAR/oigXbbcOv3n7c0A6vjNC8y+daRuyTNyF7ZQ7+nPq9cOtJ9Nv98mwMP/bOtS25a//ELcca9PwvS85+dr5HIChsv9bHdkqDIHXuiR20HPv0ZRq5dQIqFIPo074DfcXpCS3PB/qAapgTths8emocEvmgSVnftcnQbgjOQSQSofUjn30BJ0+M632p9BWI3myfUewCX+/WTujZtRuK5aNnu4w/itMjEL3tRhg9O2k4z5vfPWJqqG+78by333cLlArZuq1tq6EXAHr6h3Q7ZHHNSKKAHiDJ5Fdcs0RPf3waVAw3Qg63Kq/ADKe65oMTu059IsE9y98IrYk2OVYUhupQDrtLw6sMbcwqXx4+CYsVTc3FAyU9U7IOgDPyBdDUugID+UHOkTlZjB6RWnUJpKDOkZwMFi/EfkV8WlOhog+FRZHm3t7b+cfL8vLidfY0qPAXySIcvT+gt0M14Do6B5PW/xtc25LbZvu/vlxxZ3rac2/keoezC2IrtbSBJEjDdSwK1s7+pddffPreijn0Xt+Iob2Qtniw3eD0D6Pl9gfU2++pui3Tt8Ipuk3cCdndYhBF4HEQeAiyu8V0iMBD+EdAAuIbi/EusNzYHoFa7j7AbcgyHBJXx81pUAYCj4O8FgNEEHgcBB4HF/sUVRLDI1WxJctwivhCZHJrIxUk2YAfwGcH1j+fFMrrE3VXGmaPlKv6L0NKy88bmw3gS7N+p9dl/aIsvzh826luEXGx2fjcjVA+2CviQLILSDbYEK4FNzFwaZaW4ud6WBQkAmlF0boeWQfJC+cWzMFAS5SWzGZTSzPEYVmBHO8TGUParDTTQxjoH5V+sKnInKn090LVYrF+rOnj4+Pj4wPV4T9tFdM+mRCyHAAAAABJRU5ErkJggg=="
+        }
+      ],
+      "view": "top-down"
+    }
   }
 }
