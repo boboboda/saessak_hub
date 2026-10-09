@@ -13,6 +13,7 @@ import '../systems/input_system.dart';
 import '../systems/interact_system.dart';
 import '../systems/ops_system.dart';
 import '../systems/path_system.dart';
+import '../systems/rating_system.dart';
 import '../systems/save_system.dart';
 import '../systems/guide_system.dart';
 import '../systems/staff_system.dart';
@@ -28,6 +29,7 @@ export '../systems/input_system.dart';
 export '../systems/interact_system.dart';
 export '../systems/ops_system.dart';
 export '../systems/path_system.dart';
+export '../systems/rating_system.dart';
 export '../systems/save_system.dart';
 export '../systems/guide_system.dart';
 export '../systems/staff_system.dart';
@@ -70,7 +72,11 @@ class HubGame extends FlameGame {
   int fame = 0; // 명성 (지역을 여는 조건)
   int nextUnitId = 1;
   bool showMap = false; // 전체화면 노선 지도
-  final Set<int> claimed = {}; // 보상을 받은 목표
+    final Set<int> claimed = {}; // 보상을 받은 업적
+  final RateState rt = RateState(); // 하루 평가·올해 목표·업적 기록
+  int tickets = 0; // 전직서 (직업 Lv5 직원을 상위 직업으로 전직할 때 1장)
+  (int, int, int, int, int, double, int)? pendingReport; // 월급 정산 전 하루 평가
+  DayReport? report; // 하루 정산 카드 (null 이면 안 보임)
   double fever = 0; // 수익 부스트(광고) 남은 시간(초)
 
   // 배송 기한: 택배마다 접수 시각을 단계마다 넘겨준다 (먼저 들어온 것부터 나감)
@@ -312,8 +318,9 @@ class HubGame extends FlameGame {
 
     // 달력: 하루가 끝나면 월급 정산
     dayTimer += d;
-    if (dayTimer >= Cfg.dayLength) {
+        if (dayTimer >= Cfg.dayLength) {
       dayTimer = 0;
+      this.endOfDay(day);
       day++;
       this.payroll();
       final h = holiday;
@@ -349,7 +356,8 @@ class HubGame extends FlameGame {
     _tickAcc += dt;
     if (_tickAcc >= 0.2) {
       _tickAcc = 0;
-      this.refreshAlerts();
+            this.refreshAlerts();
+      this.checkGoals();
       ui();
     }
   }

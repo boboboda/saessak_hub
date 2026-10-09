@@ -30,7 +30,7 @@ class TopBar extends StatelessWidget {
                   children: [
                     const Text('새싹 택배 허브', style: Tx.title),
                     Text(
-                      '${Cfg.areaName[g.areaLevel]} · ${g.day}일차',
+                      '${Cfg.areaName[g.areaLevel]} · ${g.year}년차 ${Cfg.seasonName[(g.dayOfYear - 1) ~/ 7]} ${(g.dayOfYear - 1) % 7 + 1}일',
                       style: Tx.sub,
                     ),
                   ],

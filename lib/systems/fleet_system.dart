@@ -248,7 +248,7 @@ extension FleetSystem on HubGame {
         }
       }
       u.load.clear();
-      final pay = payD.round();
+      final pay = (payD * this.perkMul).round(); // 업적 영구 수익 보너스
       money += pay;
       dayEarn += pay;
       delivered += n;

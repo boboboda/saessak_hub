@@ -47,7 +47,9 @@ extension SaveSystem on HubGame {
             'cg': u.state == 1 ? u.cargo : _dockLoaded(u),
           }
       ],
-      'claimed': claimed.toList(),
+            'claimed': claimed.toList(),
+      'rate': rt.toJson(),
+      'tickets': tickets,
       'routes': [
         for (final r in routes)
           {'on': r.on, 'v': r.vehicle, 'w': r.wait, 'p': r.prio}
@@ -209,6 +211,14 @@ extension SaveSystem on HubGame {
       claimed
         ..clear()
         ..addAll(((j['claimed'] as List?) ?? const []).map((e) => e as int));
+            // 하루 평가·업적 기록 (예전 저장엔 없음 → 새로 시작)
+      try {
+        final r = j['rate'];
+        if (r is Map<String, dynamic>) rt.load(r);
+      } catch (e) {
+        debugPrint('평가 기록 불러오기 실패: $e');
+      }
+      tickets = (j['tickets'] as num?)?.toInt() ?? 0;
       aisles
         ..clear()
         ..addAll(((j['aisles'] as List?) ?? const []).map((e) => e as int));

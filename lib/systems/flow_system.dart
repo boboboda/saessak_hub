@@ -128,7 +128,8 @@ extension FlowSystem on HubGame {
           if (customers.length < 4 + counters.length * 3) {
             spawnCustomer(behind: k);
           } else {
-            lost++; // 줄이 너무 길어 그냥 돌아감
+                        lost++; // 줄이 너무 길어 그냥 돌아감
+            this.rateLost();
           }
         }
       }
@@ -163,7 +164,8 @@ extension FlowSystem on HubGame {
         c.counter = _bestCounter(counters, load);
         c.serveT = 0;
         if (c.counter == null) {
-          lost++; // 받아 줄 창구가 없어 그냥 돌아감
+                    lost++; // 받아 줄 창구가 없어 그냥 돌아감
+          this.rateLost();
           c.state = 2;
           continue;
         }
@@ -180,8 +182,9 @@ extension FlowSystem on HubGame {
 
       if (canServe && cnt.mine && c.tapped) {
         // 내가 직접 탭해서 접수: 기다리지 않고 바로 끝, 보너스
-        cnt.outbox.add(_mkParcel(c));
+                cnt.outbox.add(_mkParcel(c));
         done++;
+        this.rateServed(c);
         money += Cfg.tapBonus;
         dayEarn += Cfg.tapBonus;
         c.tapped = false;
@@ -194,14 +197,16 @@ extension FlowSystem on HubGame {
         }
         c.serveT += dt * _rate(cnt) * (c.pre ? Cfg.storyServeBoost : 1.0);
         if (c.serveT >= Cfg.serveTime) {
-          cnt.outbox.add(_mkParcel(c));
+                    cnt.outbox.add(_mkParcel(c));
           done++;
+          this.rateServed(c);
           c.state = 2;
         }
       } else {
         c.patience -= dt * _calm(cnt) * (c.pre ? Cfg.storyDrain : 1.0);
-        if (c.patience <= 0) {
+                if (c.patience <= 0) {
           lost++;
+          this.rateLost();
           c.state = 2;
         }
       }
@@ -220,8 +225,9 @@ extension FlowSystem on HubGame {
         if (b.progress >= Cfg.packTime) {
           if (_slipped(b)) {
             // 포장 실수: 처음부터 다시 (파손주의 택배는 배상)
-            b.progress = 0;
+                        b.progress = 0;
             b.flash = 1.5;
+            this.rateMistake();
             final act = b.active;
             act[rnd.nextInt(act.length)].mistakes++;
             if (p.kind == 2) {
@@ -230,8 +236,9 @@ extension FlowSystem on HubGame {
               showToast('파손! 배상 -$pen원');
             }
           } else {
-            p.stage = 3;
+                        p.stage = 3;
             p.reserved = false;
+            rt.packed++;
             if (p.kind == 2) {
               money += Cfg.fragileBonus;
               dayEarn += Cfg.fragileBonus;

@@ -25,6 +25,8 @@ class OpsSheet extends StatelessWidget {
         children: [
           _intake(),
           const SizedBox(height: 10),
+          _goals(),
+          const SizedBox(height: 10),
           _fever(),
           const SizedBox(height: 16),
           CardBox(
@@ -59,7 +61,17 @@ class OpsSheet extends StatelessWidget {
             const SizedBox(height: 8),
           ],
           const SizedBox(height: 8),
-          const Text('목표', style: Tx.h2),
+                    Row(
+            children: [
+              const Text('업적', style: Tx.h2),
+              const Spacer(),
+              Pill(Icons.trending_up, '수익 +${g.perkPct}%', color: C.good),
+              const SizedBox(width: 6),
+              Pill(Icons.description, '전직서 ${g.tickets}', color: C.blue),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text('업적마다 돈, 일부는 전직서·영구 수익 보너스(최대 +${Cfg.perkCap}%)', style: Tx.sub),
           const SizedBox(height: 8),
           for (var i = 0; i < Cfg.missions.length; i++) ...[
             _mission(i),
@@ -173,6 +185,50 @@ class OpsSheet extends StatelessWidget {
     );
   }
 
+    /// 오늘 만족도 + 올해 목표 3개
+  Widget _goals() {
+    final gs = g.goals;
+    final st = g.todayStars;
+    return CardBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text('${g.year}년차 목표', style: Tx.h2),
+              const Spacer(),
+              Text(
+                st == null
+                    ? '오늘 만족도 -'
+                    : '오늘 ★${st.toStringAsFixed(1)} · 예상 ${Cfg.gradeName[g.gradeOf(st, g.rt.served + g.rt.lost == 0 ? 0 : g.rt.lost / (g.rt.served + g.rt.lost))]}',
+                style: const TextStyle(color: C.gold, fontWeight: FontWeight.w800),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text('셋 다 달성하면 명성 +${Cfg.yearAllFame} · 전직서 +${Cfg.yearAllTicket} (해가 바뀌면 새 목표)', style: Tx.sub),
+          for (var i = 0; i < gs.length; i++) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  g.rt.yearDone.contains(i) ? Icons.check_circle : Icons.radio_button_unchecked,
+                  color: g.rt.yearDone.contains(i) ? C.good : C.sub,
+                  size: 18,
+                ),
+                const SizedBox(width: 6),
+                Expanded(child: Text(gs[i].text, style: Tx.body)),
+                Text('${g.goalProgress(gs[i]).clamp(0, gs[i].target)}/${gs[i].target}', style: Tx.sub),
+                const SizedBox(width: 8),
+                Text('+${g.fmt(gs[i].reward)}원', style: const TextStyle(color: C.gold, fontSize: 12)),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _mission(int i) {
     final m = Cfg.missions[i];
     final got = g.claimed.contains(i);
@@ -209,7 +265,7 @@ class OpsSheet extends StatelessWidget {
           if (got)
             const Pill(Icons.check, '완료', color: C.good)
           else
-            AppButton('+${g.fmt(m.reward)}원',
+                        AppButton('+${g.fmt(m.reward)}원${m.ticket > 0 ? ' · 전직서' : ''}${m.perk > 0 ? ' · +${m.perk}%' : ''}',
                 small: true,
                 color: C.gold.withOpacity(0.9),
                 onTap: done ? () => g.claimMission(i) : null),

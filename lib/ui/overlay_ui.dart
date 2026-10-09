@@ -6,6 +6,7 @@ import 'bottom_bar.dart';
 import 'build_sheet.dart';
 import 'building_sheet.dart';
 import 'ops_sheet.dart';
+import 'report_card.dart';
 import 'staff_sheet.dart';
 import 'theme.dart';
 import 'top_bar.dart';
@@ -81,8 +82,13 @@ class OverlayUi extends StatelessWidget {
               child: Container(color: Colors.black38),
             ),
           ),
-        if (sheet != null)
+                if (sheet != null)
           Positioned(left: 0, right: 0, bottom: 0, child: sheet),
+        // 하루 정산 카드 (맨 위)
+        if (g.report != null) ...[
+          Positioned.fill(child: Container(color: Colors.black45)),
+          Positioned.fill(child: Center(child: ReportCard(g))),
+        ],
       ],
     );
   }

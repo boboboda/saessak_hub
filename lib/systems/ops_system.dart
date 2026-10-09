@@ -74,8 +74,22 @@ extension OpsSystem on HubGame {
         return staff.fold<int>(0, (a, s) => s.level > a ? s.level : a);
       case 7:
         return upgrades;
-      case 8:
+            case 8:
         return urgentOk;
+      case 9:
+        return rt.grades[0];
+      case 10:
+        return rt.bestClean;
+      case 11:
+        return rt.fiveStars;
+      case 12:
+        return rt.yearsAll;
+      case 13:
+        return rt.promotions;
+      case 14:
+        return rt.foundSets.length;
+      case 15:
+        return done;
       default:
         return areaLevel;
     }
@@ -94,9 +108,15 @@ extension OpsSystem on HubGame {
 
   void claimMission(int i) {
     if (claimed.contains(i) || !missionDone(i)) return;
-    claimed.add(i);
-    money += Cfg.missions[i].reward;
-    showToast('목표 달성! +${fmt(Cfg.missions[i].reward)}원');
+        claimed.add(i);
+    final m = Cfg.missions[i];
+    money += m.reward;
+    tickets += m.ticket;
+    final extra = [
+      if (m.ticket > 0) '전직서 +${m.ticket}',
+      if (m.perk > 0) '수익 +${m.perk}% 영구',
+    ];
+    showToast('업적 달성! +${fmt(m.reward)}원${extra.isEmpty ? '' : ' · ${extra.join(' · ')}'}');
     ui();
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../models/building.dart';
@@ -246,25 +247,64 @@ class Cfg {
   static const double adCooldown = 300; // 광고 재사용 대기(초)
 
   // ---- 목표 ----
+  // 업적 30개. 앞 17개는 예전 '목표'와 같은 순서 (저장된 받은 목록을 그대로 씀)
   static const List<Mission> missions = [
     Mission('건물을 3개 설치하세요', 1, 3, 1000),
     Mission('택배 20건 배송', 0, 20, 1500),
     Mission('직원 4명 모으기', 2, 4, 1500),
-    Mission('택배 100건 배송', 0, 100, 4000),
+    Mission('택배 100건 배송', 0, 100, 4000, perk: 1),
     Mission('3일차 도달', 3, 3, 2000),
-    Mission('배송 지역 2곳 열기', 4, 2, 3000),
-    Mission('중형 창고로 확장', 5, 1, 5000),
-    Mission('택배 500건 배송', 0, 500, 12000),
-    Mission('배송 지역 4곳 열기', 4, 4, 15000),
-    Mission('대형 창고로 확장', 5, 2, 20000),
-    Mission('택배 2,000건 배송', 0, 2000, 50000),
-    Mission('모든 배송 지역 열기', 4, 5, 60000),
+    Mission('배송 지역 2곳 열기', 4, 2, 3000, perk: 1),
+    Mission('중형 창고로 확장', 5, 1, 5000, perk: 1),
+    Mission('택배 500건 배송', 0, 500, 12000, perk: 1),
+    Mission('배송 지역 4곳 열기', 4, 4, 15000, perk: 1),
+    Mission('대형 창고로 확장', 5, 2, 20000, perk: 1),
+    Mission('택배 2,000건 배송', 0, 2000, 50000, perk: 1),
+    Mission('모든 배송 지역 열기', 4, 5, 60000, ticket: 1, perk: 1),
     Mission('직원 레벨 3 달성', 6, 3, 3000),
     Mission('건물 업그레이드 3번', 7, 3, 5000),
     Mission('급송 택배 5건 성공', 8, 5, 4000),
-    Mission('직원 레벨 6 달성', 6, 6, 30000),
-    Mission('급송 택배 30건 성공', 8, 30, 25000),
+    Mission('직원 레벨 6 달성', 6, 6, 30000, ticket: 1),
+    Mission('급송 택배 30건 성공', 8, 30, 25000, ticket: 1),
+    // ---- 새 업적 ----
+    Mission('처음으로 S등급 받기', 9, 1, 3000, ticket: 1),
+    Mission('S등급 10번', 9, 10, 20000, ticket: 1, perk: 1),
+    Mission('포장 실수 없는 날 3일 연속', 10, 3, 4000),
+    Mission('포장 실수 없는 날 7일 연속', 10, 7, 12000, perk: 1),
+    Mission('별 5점 손님 50명', 11, 50, 5000),
+    Mission('별 5점 손님 500명', 11, 500, 30000, perk: 1),
+    Mission('올해 목표를 모두 달성', 12, 1, 10000, perk: 1),
+    Mission('3년 연속 목표 모두 달성', 12, 3, 40000, ticket: 1, perk: 1),
+    Mission('첫 전직', 13, 1, 5000),
+    Mission('전직 5번', 13, 5, 25000, perk: 1),
+    Mission('세트 3개 발견', 14, 3, 6000),
+    Mission('세트 10개 모두 발견', 14, 10, 50000, ticket: 1, perk: 1),
+    Mission('누적 접수 10,000건', 15, 10000, 80000, perk: 1),
   ];
+  static const int perkCap = 15; // 업적 영구 수익 보너스 상한(%)
+
+  // ---- 하루 평가 (하루가 끝나면 등급) ----
+  // 손님마다 별 1~5점: 남은 인내심 비율로 정함. 놓친 손님·포장 실수는 1점으로 셈.
+  static const List<double> starCut = [0.8, 0.6, 0.4, 0.2]; // 이 비율 이상이면 5·4·3·2점
+  static const List<String> gradeName = ['S', 'A', 'B', 'C', 'D'];
+  static const List<double> gradeStar = [4.5, 4.0, 3.3, 2.5]; // 평균 별 기준 (S·A·B·C)
+  static const List<double> gradeMiss = [0.05, 0.12, 1, 1]; // 놓친 비율 상한 (S·A)
+  // 등급별 명성. 제안서 예시(+30/−10)는 접수량 구간(25·60·120…)에 비해 커서 줄임
+  static const List<int> gradeFame = [8, 4, 1, 0, -4];
+  static const List<int> gradeColor = [0xFFFFD166, 0xFF7BD389, 0xFF8EC5FF, 0xFFF0963A, 0xFFE5484D];
+
+  // ---- 계절 (1년 28일 = 7일씩) ----
+  static const List<String> seasonName = ['봄', '여름', '가을', '겨울'];
+
+  /// y년차 목표 3개
+  static List<YearGoal> yearGoals(int y) => [
+    YearGoal('하루 접수 ${15 + 8 * (y - 1)}건', 0, 15 + 8 * (y - 1), 2000 * y),
+    YearGoal('B등급 이상인 날 ${6 + 2 * (y - 1)}일', 1, 6 + 2 * (y - 1), 2000 * y),
+    YearGoal('배송 지역 ${min(5, y + 1)}곳 열기', 2, min(5, y + 1), 2000 * y),
+  ];
+  static const int yearAllFame = 50; // 올해 목표 3개 모두 달성: 명성
+  static const int yearAllTicket = 1; // + 전직서
+
 
   // ---- 편의 시설 ----
   static const double vendingCalm = 0.15; // 자판기 1대당 손님 짜증 속도 감소 (2대까지)

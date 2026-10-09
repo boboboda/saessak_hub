@@ -319,17 +319,16 @@ extension StaffSystem on HubGame {
     }
     final total = dailyWages;
     lastPayroll = total;
-    final earned = dayEarn;
+        final earned = dayEarn;
     dayEarn = 0;
-    if (total == 0) return;
+    var paidAll = true;
     if (money >= total) {
       money -= total;
-      showToast('${day - 1}일차 결산: 수익 +${fmt(earned)} · 월급 -${fmt(total)}원');
     } else {
-      final paid = money;
-      money = 0;
-      showToast('월급을 다 못 줬어요! (${fmt(paid)}/${fmt(total)}원)');
+      paidAll = false;
+      money = 0; // 파산은 없음: 다 못 준 만큼은 사라지고 정산 카드에 표시
     }
+    this.finishReport(earned, total, paidAll); // 하루 정산 카드 (등급·수익·월급)
   }
 
   /// 운반 담당 직원 ↔ 맵의 Carrier 맞추기
