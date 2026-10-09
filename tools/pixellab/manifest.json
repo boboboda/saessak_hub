@@ -1120,5 +1120,96 @@
       "description": "pixel art, black outline, flat orthographic top-down game tile, no perspective, no isometric angle, rectangular truck loading bay floor: concrete floor with yellow painted parking bay lines and yellow black hazard stripes along the left edge, a grey roll-up shutter door strip on the left edge, empty, nothing parked, wider than tall",
       "size": 128
     }
+  },
+  "road_car_down": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 도로: 승용차 (아래로 달림, 운전자 보임)",
+    "body": {
+      "description": "pixel art, black outline, high top-down three-quarter view, same style as reference, game asset, small red hatchback car driving down the screen toward the viewer, vertical orientation, front bumper headlights and windshield visible, roof seen from above, a driver clearly visible through the windshield holding the steering wheel",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8f76KAy0CKoln1ZzVNce0CIEXR3t/7oaXMC9ueNywCBpcxNjEB3wwOSvu6H+4ouIbA42BwIeyXntDqhJ6ZAlkFPBQAzQKhayEL8sZbOzSrhUHgcXC5ttXVuuWw3eSfe+2lko3s2bVbW6yLgO0ExmK/gJtBcBXTuiZCA5zszxP3AePnf4JvD70OmUwGop0b4NzQMXq9bcs7ukz4ukb3LACS/LKRjgf1+k1331ogS+79HS0AKkO0t6Ic+kdiMYiduaC3tzz5KJw6eojW123shu9ODOt9Bw4O6PXmSAM81N5hsM+CMmbOHf/gKagPNUIwkIFEEgPGGO7q3gnlgmxVglqTovqdQv2JJ6Dtmb3S/tnpf2k5dPBjqEHyRLNiWYiWZI6MB7bvp5lJ96S5qR4S8Tgk5nLtDOQGWTH925her7++1VL20s8TeYeargWnMH+cMJfVTBeBUR9QYTqZ1tuYVSbPXxSUTdlOnp/0xR9Pww2r20zlrSY99cfflrZQSHyoyfP9rxlD+45m892Vjc/AVHzGoA87cbDS2NkOhoKmfa/u+bwkO9hqwOl920zPHmE9twNISiJ/Mg6/shEqAR/oigXbbcOv3n7c0A6vjNC8y+daRuyTNyF7ZQ7+nPq9cOtJ9Nv98mwMP/bOtS25a//ELcca9PwvS85+dr5HIChsv9bHdkqDIHXuiR20HPv0ZRq5dQIqFIPo074DfcXpCS3PB/qAapgTths8emocEvmgSVnftcnQbgjOQSQSofUjn30BJ0+M632p9BWI3myfUewCX+/WTujZtRuK5aNnu4w/itMjEL3tRhg9O2k4z5vfPWJqqG+78by333cLlArZuq1tq6EXAHr6h3Q7ZHHNSKKAHiDJ5Fdcs0RPf3waVAw3Qg63Kq/ADKe65oMTu059IsE9y98IrYk2OVYUhupQDrtLw6sMbcwqXx4+CYsVTc3FAyU9U7IOgDPyBdDUugID+UHOkTlZjB6RWnUJpKDOkZwMFi/EfkV8WlOhog+FRZHm3t7b+cfL8vLidfY0qPAXySIcvT+gt0M14Do6B5PW/xtc25LbZvu/vlxxZ3rac2/keoezC2IrtbSBJEjDdSwK1s7+pddffPreijn0Xt+Iob2Qtniw3eD0D6Pl9gfU2++pui3Tt8Ipuk3cCdndYhBF4HEQeAiyu8V0iMBD+EdAAuIbi/EusNzYHoFa7j7AbcgyHBJXx81pUAYCj4O8FgNEEHgcBB4HF/sUVRLDI1WxJctwivhCZHJrIxUk2YAfwGcH1j+fFMrrE3VXGmaPlKv6L0NKy88bmw3gS7N+p9dl/aIsvzh826luEXGx2fjcjVA+2CviQLILSDbYEK4FNzFwaZaW4ud6WBQkAmlF0boeWQfJC+cWzMFAS5SWzGZTSzPEYVmBHO8TGUParDTTQxjoH5V+sKnInKn090LVYrF+rOnj4+Pj4wPV4T9tFdM+mRCyHAAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "road_car_down2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 도로: 승용차 2차 (위에서 본 세로 차체)",
+    "body": {
+      "description": "pixel art, black outline, top-down view from high above at a steep angle, game asset, a small red hatchback car seen from above driving downward on a vertical road, long vertical car body, red roof and hood visible from above, windshield near the bottom end with a driver visible through it, headlights at the bottom, narrow car in the middle of the image, transparent background",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8f76KAy0CKoln1ZzVNce0CIEXR3t/7oaXMC9ueNywCBpcxNjEB3wwOSvu6H+4ouIbA42BwIeyXntDqhJ6ZAlkFPBQAzQKhayEL8sZbOzSrhUHgcXC5ttXVuuWw3eSfe+2lko3s2bVbW6yLgO0ExmK/gJtBcBXTuiZCA5zszxP3AePnf4JvD70OmUwGop0b4NzQMXq9bcs7ukz4ukb3LACS/LKRjgf1+k1331ogS+79HS0AKkO0t6Ic+kdiMYiduaC3tzz5KJw6eojW123shu9ODOt9Bw4O6PXmSAM81N5hsM+CMmbOHf/gKagPNUIwkIFEEgPGGO7q3gnlgmxVglqTovqdQv2JJ6Dtmb3S/tnpf2k5dPBjqEHyRLNiWYiWZI6MB7bvp5lJ96S5qR4S8Tgk5nLtDOQGWTH925her7++1VL20s8TeYeargWnMH+cMJfVTBeBUR9QYTqZ1tuYVSbPXxSUTdlOnp/0xR9Pww2r20zlrSY99cfflrZQSHyoyfP9rxlD+45m892Vjc/AVHzGoA87cbDS2NkOhoKmfa/u+bwkO9hqwOl920zPHmE9twNISiJ/Mg6/shEqAR/oigXbbcOv3n7c0A6vjNC8y+daRuyTNyF7ZQ7+nPq9cOtJ9Nv98mwMP/bOtS25a//ELcca9PwvS85+dr5HIChsv9bHdkqDIHXuiR20HPv0ZRq5dQIqFIPo074DfcXpCS3PB/qAapgTths8emocEvmgSVnftcnQbgjOQSQSofUjn30BJ0+M632p9BWI3myfUewCX+/WTujZtRuK5aNnu4w/itMjEL3tRhg9O2k4z5vfPWJqqG+78by333cLlArZuq1tq6EXAHr6h3Q7ZHHNSKKAHiDJ5Fdcs0RPf3waVAw3Qg63Kq/ADKe65oMTu059IsE9y98IrYk2OVYUhupQDrtLw6sMbcwqXx4+CYsVTc3FAyU9U7IOgDPyBdDUugID+UHOkTlZjB6RWnUJpKDOkZwMFi/EfkV8WlOhog+FRZHm3t7b+cfL8vLidfY0qPAXySIcvT+gt0M14Do6B5PW/xtc25LbZvu/vlxxZ3rac2/keoezC2IrtbSBJEjDdSwK1s7+pddffPreijn0Xt+Iob2Qtniw3eD0D6Pl9gfU2++pui3Tt8Ipuk3cCdndYhBF4HEQeAiyu8V0iMBD+EdAAuIbi/EusNzYHoFa7j7AbcgyHBJXx81pUAYCj4O8FgNEEHgcBB4HF/sUVRLDI1WxJctwivhCZHJrIxUk2YAfwGcH1j+fFMrrE3VXGmaPlKv6L0NKy88bmw3gS7N+p9dl/aIsvzh826luEXGx2fjcjVA+2CviQLILSDbYEK4FNzFwaZaW4ud6WBQkAmlF0boeWQfJC+cWzMFAS5SWzGZTSzPEYVmBHO8TGUParDTTQxjoH5V+sKnInKn090LVYrF+rOnj4+Pj4wPV4T9tFdM+mRCyHAAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "road_car_down3": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 도로: 승용차 3차 (운전자 강조)",
+    "body": {
+      "description": "pixel art, black outline, top-down view from high above at a steep angle, game asset, a small red hatchback car seen from above driving downward, long vertical car body, red roof and hood visible from above, large light blue glass windshield near the bottom end, the driver's head with brown hair and both hands on the steering wheel clearly visible through the windshield, headlights at the bottom, one single car centered, transparent background",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8f76KAy0CKoln1ZzVNce0CIEXR3t/7oaXMC9ueNywCBpcxNjEB3wwOSvu6H+4ouIbA42BwIeyXntDqhJ6ZAlkFPBQAzQKhayEL8sZbOzSrhUHgcXC5ttXVuuWw3eSfe+2lko3s2bVbW6yLgO0ExmK/gJtBcBXTuiZCA5zszxP3AePnf4JvD70OmUwGop0b4NzQMXq9bcs7ukz4ukb3LACS/LKRjgf1+k1331ogS+79HS0AKkO0t6Ic+kdiMYiduaC3tzz5KJw6eojW123shu9ODOt9Bw4O6PXmSAM81N5hsM+CMmbOHf/gKagPNUIwkIFEEgPGGO7q3gnlgmxVglqTovqdQv2JJ6Dtmb3S/tnpf2k5dPBjqEHyRLNiWYiWZI6MB7bvp5lJ96S5qR4S8Tgk5nLtDOQGWTH925her7++1VL20s8TeYeargWnMH+cMJfVTBeBUR9QYTqZ1tuYVSbPXxSUTdlOnp/0xR9Pww2r20zlrSY99cfflrZQSHyoyfP9rxlD+45m892Vjc/AVHzGoA87cbDS2NkOhoKmfa/u+bwkO9hqwOl920zPHmE9twNISiJ/Mg6/shEqAR/oigXbbcOv3n7c0A6vjNC8y+daRuyTNyF7ZQ7+nPq9cOtJ9Nv98mwMP/bOtS25a//ELcca9PwvS85+dr5HIChsv9bHdkqDIHXuiR20HPv0ZRq5dQIqFIPo074DfcXpCS3PB/qAapgTths8emocEvmgSVnftcnQbgjOQSQSofUjn30BJ0+M632p9BWI3myfUewCX+/WTujZtRuK5aNnu4w/itMjEL3tRhg9O2k4z5vfPWJqqG+78by333cLlArZuq1tq6EXAHr6h3Q7ZHHNSKKAHiDJ5Fdcs0RPf3waVAw3Qg63Kq/ADKe65oMTu059IsE9y98IrYk2OVYUhupQDrtLw6sMbcwqXx4+CYsVTc3FAyU9U7IOgDPyBdDUugID+UHOkTlZjB6RWnUJpKDOkZwMFi/EfkV8WlOhog+FRZHm3t7b+cfL8vLidfY0qPAXySIcvT+gt0M14Do6B5PW/xtc25LbZvu/vlxxZ3rac2/keoezC2IrtbSBJEjDdSwK1s7+pddffPreijn0Xt+Iob2Qtniw3eD0D6Pl9gfU2++pui3Tt8Ipuk3cCdndYhBF4HEQeAiyu8V0iMBD+EdAAuIbi/EusNzYHoFa7j7AbcgyHBJXx81pUAYCj4O8FgNEEHgcBB4HF/sUVRLDI1WxJctwivhCZHJrIxUk2YAfwGcH1j+fFMrrE3VXGmaPlKv6L0NKy88bmw3gS7N+p9dl/aIsvzh826luEXGx2fjcjVA+2CviQLILSDbYEK4FNzFwaZaW4ud6WBQkAmlF0boeWQfJC+cWzMFAS5SWzGZTSzPEYVmBHO8TGUParDTTQxjoH5V+sKnInKn090LVYrF+rOnj4+Pj4wPV4T9tFdM+mRCyHAAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "road_van_down": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 도로: 배달 밴 (위에서 본 세로 차체)",
+    "body": {
+      "description": "pixel art, black outline, top-down view from high above at a steep angle, game asset, a white delivery van with an orange side stripe seen from above driving downward on a vertical road, long vertical boxy body, white roof visible from above, windshield near the bottom end with a driver visible through it, headlights at the bottom, one single van centered, transparent background",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8f76KAy0CKoln1ZzVNce0CIEXR3t/7oaXMC9ueNywCBpcxNjEB3wwOSvu6H+4ouIbA42BwIeyXntDqhJ6ZAlkFPBQAzQKhayEL8sZbOzSrhUHgcXC5ttXVuuWw3eSfe+2lko3s2bVbW6yLgO0ExmK/gJtBcBXTuiZCA5zszxP3AePnf4JvD70OmUwGop0b4NzQMXq9bcs7ukz4ukb3LACS/LKRjgf1+k1331ogS+79HS0AKkO0t6Ic+kdiMYiduaC3tzz5KJw6eojW123shu9ODOt9Bw4O6PXmSAM81N5hsM+CMmbOHf/gKagPNUIwkIFEEgPGGO7q3gnlgmxVglqTovqdQv2JJ6Dtmb3S/tnpf2k5dPBjqEHyRLNiWYiWZI6MB7bvp5lJ96S5qR4S8Tgk5nLtDOQGWTH925her7++1VL20s8TeYeargWnMH+cMJfVTBeBUR9QYTqZ1tuYVSbPXxSUTdlOnp/0xR9Pww2r20zlrSY99cfflrZQSHyoyfP9rxlD+45m892Vjc/AVHzGoA87cbDS2NkOhoKmfa/u+bwkO9hqwOl920zPHmE9twNISiJ/Mg6/shEqAR/oigXbbcOv3n7c0A6vjNC8y+daRuyTNyF7ZQ7+nPq9cOtJ9Nv98mwMP/bOtS25a//ELcca9PwvS85+dr5HIChsv9bHdkqDIHXuiR20HPv0ZRq5dQIqFIPo074DfcXpCS3PB/qAapgTths8emocEvmgSVnftcnQbgjOQSQSofUjn30BJ0+M632p9BWI3myfUewCX+/WTujZtRuK5aNnu4w/itMjEL3tRhg9O2k4z5vfPWJqqG+78by333cLlArZuq1tq6EXAHr6h3Q7ZHHNSKKAHiDJ5Fdcs0RPf3waVAw3Qg63Kq/ADKe65oMTu059IsE9y98IrYk2OVYUhupQDrtLw6sMbcwqXx4+CYsVTc3FAyU9U7IOgDPyBdDUugID+UHOkTlZjB6RWnUJpKDOkZwMFi/EfkV8WlOhog+FRZHm3t7b+cfL8vLidfY0qPAXySIcvT+gt0M14Do6B5PW/xtc25LbZvu/vlxxZ3rac2/keoezC2IrtbSBJEjDdSwK1s7+pddffPreijn0Xt+Iob2Qtniw3eD0D6Pl9gfU2++pui3Tt8Ipuk3cCdndYhBF4HEQeAiyu8V0iMBD+EdAAuIbi/EusNzYHoFa7j7AbcgyHBJXx81pUAYCj4O8FgNEEHgcBB4HF/sUVRLDI1WxJctwivhCZHJrIxUk2YAfwGcH1j+fFMrrE3VXGmaPlKv6L0NKy88bmw3gS7N+p9dl/aIsvzh826luEXGx2fjcjVA+2CviQLILSDbYEK4FNzFwaZaW4ud6WBQkAmlF0boeWQfJC+cWzMFAS5SWzGZTSzPEYVmBHO8TGUParDTTQxjoH5V+sKnInKn090LVYrF+rOnj4+Pj4wPV4T9tFdM+mRCyHAAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "road_moto_down": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 도로: 배달 오토바이 (위에서, 운전자 탑승)",
+    "body": {
+      "description": "pixel art, black outline, top-down view from high above at a steep angle, game asset, a delivery rider on an orange scooter motorcycle seen from above driving downward on a vertical road, rider wearing a navy blue helmet and orange safety vest, both arms on the handlebar, a brown parcel box strapped on the rear rack, narrow vertical shape, one single scooter centered, transparent background",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8f76KAy0CKoln1ZzVNce0CIEXR3t/7oaXMC9ueNywCBpcxNjEB3wwOSvu6H+4ouIbA42BwIeyXntDqhJ6ZAlkFPBQAzQKhayEL8sZbOzSrhUHgcXC5ttXVuuWw3eSfe+2lko3s2bVbW6yLgO0ExmK/gJtBcBXTuiZCA5zszxP3AePnf4JvD70OmUwGop0b4NzQMXq9bcs7ukz4ukb3LACS/LKRjgf1+k1331ogS+79HS0AKkO0t6Ic+kdiMYiduaC3tzz5KJw6eojW123shu9ODOt9Bw4O6PXmSAM81N5hsM+CMmbOHf/gKagPNUIwkIFEEgPGGO7q3gnlgmxVglqTovqdQv2JJ6Dtmb3S/tnpf2k5dPBjqEHyRLNiWYiWZI6MB7bvp5lJ96S5qR4S8Tgk5nLtDOQGWTH925her7++1VL20s8TeYeargWnMH+cMJfVTBeBUR9QYTqZ1tuYVSbPXxSUTdlOnp/0xR9Pww2r20zlrSY99cfflrZQSHyoyfP9rxlD+45m892Vjc/AVHzGoA87cbDS2NkOhoKmfa/u+bwkO9hqwOl920zPHmE9twNISiJ/Mg6/shEqAR/oigXbbcOv3n7c0A6vjNC8y+daRuyTNyF7ZQ7+nPq9cOtJ9Nv98mwMP/bOtS25a//ELcca9PwvS85+dr5HIChsv9bHdkqDIHXuiR20HPv0ZRq5dQIqFIPo074DfcXpCS3PB/qAapgTths8emocEvmgSVnftcnQbgjOQSQSofUjn30BJ0+M632p9BWI3myfUewCX+/WTujZtRuK5aNnu4w/itMjEL3tRhg9O2k4z5vfPWJqqG+78by333cLlArZuq1tq6EXAHr6h3Q7ZHHNSKKAHiDJ5Fdcs0RPf3waVAw3Qg63Kq/ADKe65oMTu059IsE9y98IrYk2OVYUhupQDrtLw6sMbcwqXx4+CYsVTc3FAyU9U7IOgDPyBdDUugID+UHOkTlZjB6RWnUJpKDOkZwMFi/EfkV8WlOhog+FRZHm3t7b+cfL8vLidfY0qPAXySIcvT+gt0M14Do6B5PW/xtc25LbZvu/vlxxZ3rac2/keoezC2IrtbSBJEjDdSwK1s7+pddffPreijn0Xt+Iob2Qtniw3eD0D6Pl9gfU2++pui3Tt8Ipuk3cCdndYhBF4HEQeAiyu8V0iMBD+EdAAuIbi/EusNzYHoFa7j7AbcgyHBJXx81pUAYCj4O8FgNEEHgcBB4HF/sUVRLDI1WxJctwivhCZHJrIxUk2YAfwGcH1j+fFMrrE3VXGmaPlKv6L0NKy88bmw3gS7N+p9dl/aIsvzh826luEXGx2fjcjVA+2CviQLILSDbYEK4FNzFwaZaW4ud6WBQkAmlF0boeWQfJC+cWzMFAS5SWzGZTSzPEYVmBHO8TGUParDTTQxjoH5V+sKnInKn090LVYrF+rOnj4+Pj4wPV4T9tFdM+mRCyHAAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "road_van_down2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 도로: 배달 밴 2차 (승용차 참조)",
+    "body": {
+      "description": "pixel art, black outline, straight top-down view exactly like the reference car, same angle and style as reference, game asset, a white delivery van with an orange stripe seen from directly above, driving downward, long vertical boxy body longer than the reference car, flat white roof, windshield at the bottom end with a driver visible, headlights at the bottom, one single van centered",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "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"
+        }
+      ]
+    }
+  },
+  "road_moto_down2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 도로: 배달 오토바이 2차 (승용차 참조)",
+    "body": {
+      "description": "pixel art, black outline, straight top-down view exactly like the reference car, same angle and style as reference, game asset, a delivery scooter motorcycle seen from directly above driving downward, rider seen from above wearing a navy blue helmet and orange safety vest, arms reaching the handlebar at the bottom, small brown parcel box on the rear rack at the top, very narrow vertical shape, one single scooter centered",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "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"
+        }
+      ]
+    }
   }
 }

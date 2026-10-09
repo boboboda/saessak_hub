@@ -24,6 +24,8 @@ class Sprites {
   /// 허브 개편 그림: 모두 같은 시점(내려다보기 3/4)·같은 배율(도트 1px = 1칸의 1/32)
   static ui.Image? hubCounter, hubPack, hubShelf, hubLounge, hubDock;
   static ui.Image? wangFloor; // 창고 바닥(콘크리트) / 노란 통로
+  /// 허브 도로 배경 차량 (위에서 본 모습, 아래로 달리는 방향. 위로 갈 땐 상하 반전)
+  static final List<ui.Image> roadCars = [];
 
   /// 노선 지도 지역센터 건물 (assets/sprites/map/center_<지역>.png). 없으면 null → 도형으로 그림.
   static final List<ui.Image?> centers = List.filled(5, null);
@@ -36,22 +38,60 @@ class Sprites {
   /// 노선 지도 지역 소품 (assets/sprites/map/prop_<이름>.png). 없는 건 빠짐
   static final Map<String, ui.Image> mapProps = {};
   static const List<String> mapPropNames = [
-    'mailbox', 'vending', 'busstop', 'billboard', 'haystack', 'fence', 'crops', 'fountain', 'gas',
-    'hwsign', 'container', 'crane', 'boat', 'factory', 'tank',
+    'mailbox',
+    'vending',
+    'busstop',
+    'billboard',
+    'haystack',
+    'fence',
+    'crops',
+    'fountain',
+    'gas',
+    'hwsign',
+    'container',
+    'crane',
+    'boat',
+    'factory',
+    'tank',
   ];
 
   /// 노선 지도 배달지 집 (assets/sprites/map/house_<이름>.png). d0~d11 단독주택, v0~v2 빌라
   static final Map<String, ui.Image> mapHouses = {};
   static const List<String> mapHouseNames = [
-    'd0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9', 'd10', 'd11',
-    'v0', 'v1', 'v2', 'apt',
+    'd0',
+    'd1',
+    'd2',
+    'd3',
+    'd4',
+    'd5',
+    'd6',
+    'd7',
+    'd8',
+    'd9',
+    'd10',
+    'd11',
+    'v0',
+    'v1',
+    'v2',
+    'apt',
   ];
 
   /// 배경 장식 도트 (assets/sprites/decor/<이름>.png). 없는 건 null.
   static final Map<String, ui.Image> decor = {};
   static const List<String> decorNames = [
-    'tree', 'tree2', 'bush', 'lamp', 'light', 'bench', 'cone', 'sign',
-    'house1', 'house2', 'house3', 'pallet', 'flower',
+    'tree',
+    'tree2',
+    'bush',
+    'lamp',
+    'light',
+    'bench',
+    'cone',
+    'sign',
+    'house1',
+    'house2',
+    'house3',
+    'pallet',
+    'flower',
   ];
 
   /// 시트: 가로 7프레임, 세로 4방향 (0 남, 1 서, 2 동, 3 북). 프레임 56x56.
@@ -82,13 +122,20 @@ class Sprites {
     motoFull = await _img('assets/sprites/props/moto_full.png');
     boxS = await _img('assets/sprites/props/box_s.png');
     boxOpen = await _img('assets/sprites/props/box_open.png');
-    packEmpty = await _img('assets/sprites/props/pack_empty.png'); // 있으면 포장 상자가 동적으로 생김
+    packEmpty = await _img(
+      'assets/sprites/props/pack_empty.png',
+    ); // 있으면 포장 상자가 동적으로 생김
     hubCounter = await _img('assets/sprites/props/hub_counter.png');
     hubPack = await _img('assets/sprites/props/hub_pack.png');
     hubShelf = await _img('assets/sprites/props/hub_shelf.png');
     hubLounge = await _img('assets/sprites/props/hub_lounge.png');
     hubDock = await _img('assets/sprites/props/hub_dock.png');
     wangFloor = await _img('assets/sprites/tiles/wang_floor.png');
+    roadCars.clear();
+    for (final n in const ['car', 'van', 'moto']) {
+      final im = await _img('assets/sprites/props/road_$n.png');
+      if (im != null) roadCars.add(im);
+    }
     grass = await _img('assets/sprites/tiles/grass.png');
     asphalt = await _img('assets/sprites/tiles/asphalt.png');
     sidewalk = await _img('assets/sprites/tiles/sidewalk.png');
@@ -126,9 +173,18 @@ class Sprites {
   }
 
   /// 직원 한 명을 그린다. (x,y)는 발 위치. dir 0남 1서 2동 3북, moving이면 걷기 모션.
-  static void drawStaff(ui.Canvas c, double x, double y, int dir, bool moving,
-      double clock,
-      {int look = 0, double alpha = 1, bool work = false, double workHz = 7}) {
+  static void drawStaff(
+    ui.Canvas c,
+    double x,
+    double y,
+    int dir,
+    bool moving,
+    double clock, {
+    int look = 0,
+    double alpha = 1,
+    bool work = false,
+    double workHz = 7,
+  }) {
     if (staffLooks.isEmpty) return;
     final img = staffLooks[look % staffLooks.length];
     final cw = img.width / frames, ch = img.height / 4;
@@ -155,8 +211,15 @@ class Sprites {
   }
 
   /// 손님/행인 한 명. 전용 시트가 있으면 그것을, 없으면 직원 시트를 색만 바꿔 그림.
-  static void drawPerson(ui.Canvas c, double x, double y, int dir, bool moving,
-      double clock, int look) {
+  static void drawPerson(
+    ui.Canvas c,
+    double x,
+    double y,
+    int dir,
+    bool moving,
+    double clock,
+    int look,
+  ) {
     final own = custWalk[look % custLooks];
     final img = own ?? staffWalk;
     if (img == null) return;
@@ -171,13 +234,26 @@ class Sprites {
       final a = hues[look % hues.length] * math.pi / 180;
       final co = math.cos(a), si = math.sin(a);
       p.colorFilter = ui.ColorFilter.matrix(<double>[
-        0.213 + co * 0.787 - si * 0.213, 0.715 - co * 0.715 - si * 0.715,
-        0.072 - co * 0.072 + si * 0.928, 0, 0,
-        0.213 - co * 0.213 + si * 0.143, 0.715 + co * 0.285 + si * 0.140,
-        0.072 - co * 0.072 - si * 0.283, 0, 0,
-        0.213 - co * 0.213 - si * 0.787, 0.715 - co * 0.715 + si * 0.715,
-        0.072 + co * 0.928 + si * 0.072, 0, 0,
-        0, 0, 0, 1, 0,
+        0.213 + co * 0.787 - si * 0.213,
+        0.715 - co * 0.715 - si * 0.715,
+        0.072 - co * 0.072 + si * 0.928,
+        0,
+        0,
+        0.213 - co * 0.213 + si * 0.143,
+        0.715 + co * 0.285 + si * 0.140,
+        0.072 - co * 0.072 - si * 0.283,
+        0,
+        0,
+        0.213 - co * 0.213 - si * 0.787,
+        0.715 - co * 0.715 + si * 0.715,
+        0.072 + co * 0.928 + si * 0.072,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
       ]);
     }
     c.drawImageRect(img, src, dst, p);
@@ -188,13 +264,16 @@ class Sprites {
     final img = box;
     if (img == null) return false;
     c.drawImageRect(
-        img,
-        ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-        r,
-        _np);
+      img,
+      ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+      r,
+      _np,
+    );
     final s = r.width * 0.3;
-    c.drawRect(ui.Rect.fromLTWH(r.center.dx - s / 2, r.center.dy - s * 0.1, s, s * 0.8),
-        ui.Paint()..color = ui.Color(stickerColor));
+    c.drawRect(
+      ui.Rect.fromLTWH(r.center.dx - s / 2, r.center.dy - s * 0.1, s, s * 0.8),
+      ui.Paint()..color = ui.Color(stickerColor),
+    );
     return true;
   }
 
@@ -203,10 +282,11 @@ class Sprites {
     final img = floor;
     if (img == null) return false;
     c.drawImageRect(
-        img,
-        ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-        ui.Rect.fromLTWH(x, y, t, t),
-        _np);
+      img,
+      ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+      ui.Rect.fromLTWH(x, y, t, t),
+      _np,
+    );
     return true;
   }
 
@@ -230,14 +310,26 @@ class Sprites {
 
   /// 칸(r) 안에 비율 유지로 넣고 아래에 붙임 (칸 밖으로 넘치지 않음). 1:1 보다 크게는 안 키움.
   static ui.Rect fitBottom(ui.Image img, ui.Rect r, {bool left = false}) {
-    var k = (r.width / img.width) < (r.height / img.height) ? r.width / img.width : r.height / img.height;
+    var k = (r.width / img.width) < (r.height / img.height)
+        ? r.width / img.width
+        : r.height / img.height;
     if (k > 1) k = 1;
     final w = img.width * k, h = img.height * k;
     final x = left ? r.left : r.center.dx - w / 2;
-    return ui.Rect.fromLTWH(x.roundToDouble(), (r.bottom - h).roundToDouble(), w, h);
+    return ui.Rect.fromLTWH(
+      x.roundToDouble(),
+      (r.bottom - h).roundToDouble(),
+      w,
+      h,
+    );
   }
 
-  static ui.Rect drawFitBottom(ui.Canvas c, ui.Image img, ui.Rect r, {bool left = false}) {
+  static ui.Rect drawFitBottom(
+    ui.Canvas c,
+    ui.Image img,
+    ui.Rect r, {
+    bool left = false,
+  }) {
     final dst = fitBottom(img, r, left: left);
     _blit(c, img, dst);
     return dst;
@@ -294,7 +386,13 @@ class Sprites {
 
   /// 차량 짐칸에 실린 만큼 상자를 쌓아 그림 (아래 칸부터)
   static void drawCargo(
-      ui.Canvas c, String typeName, ui.Image img, ui.Rect drawn, int loaded, int cap) {
+    ui.Canvas c,
+    String typeName,
+    ui.Image img,
+    ui.Rect drawn,
+    int loaded,
+    int cap,
+  ) {
     final sp = cargoSpec[typeName];
     final bx = boxS;
     if (sp == null || bx == null || loaded <= 0) return;
@@ -304,13 +402,18 @@ class Sprites {
     final side = sp[4] * k;
     for (var i = 0; i < slots; i++) {
       final row = i ~/ cols, col = i % cols;
-      final dst = ui.Rect.fromLTWH(drawn.left + sp[0] * k + col * side,
-          drawn.top + sp[3] * k - (row + 1) * side, side, side);
+      final dst = ui.Rect.fromLTWH(
+        drawn.left + sp[0] * k + col * side,
+        drawn.top + sp[3] * k - (row + 1) * side,
+        side,
+        side,
+      );
       c.drawImageRect(
-          bx,
-          ui.Rect.fromLTWH(0, 0, bx.width.toDouble(), bx.height.toDouble()),
-          dst,
-          _np);
+        bx,
+        ui.Rect.fromLTWH(0, 0, bx.width.toDouble(), bx.height.toDouble()),
+        dst,
+        _np,
+      );
     }
   }
 
@@ -319,28 +422,40 @@ class Sprites {
         ? r.width / img.width
         : r.height / img.height;
     final w = img.width * k, h = img.height * k;
-    _blit(c, img,
-        ui.Rect.fromLTWH(r.center.dx - w / 2, r.center.dy - h / 2, w, h));
+    _blit(
+      c,
+      img,
+      ui.Rect.fromLTWH(r.center.dx - w / 2, r.center.dy - h / 2, w, h),
+    );
   }
 
   static void _blit(ui.Canvas c, ui.Image img, ui.Rect dst) {
     c.drawImageRect(
-        img,
-        ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-        dst,
-        _np);
+      img,
+      ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+      dst,
+      _np,
+    );
   }
 
   /// 32x32 바닥 한 칸. variants>1이면 가로로 이어진 시트에서 v번째를 그림.
-  static bool drawTile(ui.Canvas c, ui.Image? img, double x, double y,
-      double t, [int variants = 1, int v = 0]) {
+  static bool drawTile(
+    ui.Canvas c,
+    ui.Image? img,
+    double x,
+    double y,
+    double t, [
+    int variants = 1,
+    int v = 0,
+  ]) {
     if (img == null) return false;
     final w = img.width / variants;
     c.drawImageRect(
-        img,
-        ui.Rect.fromLTWH(w * v, 0, w, img.height.toDouble()),
-        ui.Rect.fromLTWH(x, y, t, t),
-        _np);
+      img,
+      ui.Rect.fromLTWH(w * v, 0, w, img.height.toDouble()),
+      ui.Rect.fromLTWH(x, y, t, t),
+      _np,
+    );
     return true;
   }
 
@@ -349,10 +464,11 @@ class Sprites {
     final img = boxS;
     if (img == null) return false;
     c.drawImageRect(
-        img,
-        ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-        ui.Rect.fromLTWH(x, y, img.width.toDouble(), img.height.toDouble()),
-        _np);
+      img,
+      ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+      ui.Rect.fromLTWH(x, y, img.width.toDouble(), img.height.toDouble()),
+      _np,
+    );
     return true;
   }
 }

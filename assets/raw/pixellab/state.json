@@ -307,5 +307,26 @@
   },
   "hub_dock2": {
     "object_id": "cbabc1d4-1a0d-49ec-b2a8-915f36af9bf4"
+  },
+  "road_car_down": {
+    "object_id": "92a14074-ca0f-4b11-99f0-5de1b09333c8"
+  },
+  "road_car_down2": {
+    "object_id": "a6998c10-c49c-4c38-987a-38f0b01a3075"
+  },
+  "road_car_down3": {
+    "object_id": "2b8d77a9-216b-4a38-8c0c-c9dea617fb1d"
+  },
+  "road_van_down": {
+    "object_id": "1973c3e3-e2ad-414f-be57-8b0751a072cc"
+  },
+  "road_moto_down": {
+    "object_id": "e48ba02e-8049-473c-bce3-421f7a7fcc77"
+  },
+  "road_van_down2": {
+    "object_id": "e7e1c93d-5ca3-4d86-9096-e5582a7ae0b7"
+  },
+  "road_moto_down2": {
+    "object_id": "f5719e52-d17b-4810-b471-2eb12b49689c"
   }
 }

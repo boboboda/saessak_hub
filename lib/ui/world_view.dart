@@ -165,6 +165,7 @@ extension WorldView on HubGame {
       }
     }
     label(c, '→ 운송', rd.left + 4, area.top * t, size: 11);
+    _drawTraffic(c);
 
     // 도크 마당 바닥
     final y = Cfg.yard;
@@ -211,6 +212,44 @@ extension WorldView on HubGame {
       Paint()..color = const Color(0xF2FFD166),
     );
     labelIn(c, '④ 출고 도크', dt, size: 11, color: const Color(0xFF2A2438));
+  }
+
+  /// 도로를 오가는 차량 (배경 연출). 왼쪽 차선은 아래로, 오른쪽 차선은 위로. 화면 밖은 건너뜀
+  void _drawTraffic(Canvas c) {
+    const t = Cfg.tile;
+    final cars = Sprites.roadCars;
+    if (cars.isEmpty) return;
+    final rd = Cfg.road;
+    final view = Rect.fromLTWH(cam.dx, cam.dy, size.x, size.y).inflate(t * 2);
+    final p = Paint()..filterQuality = FilterQuality.none;
+    for (var lane = 0; lane < 2; lane++) {
+      final lx = lane == 0
+          ? rd.left + rd.width * 0.27
+          : rd.right - rd.width * 0.27;
+      for (var i = 0; i < Cfg.trafficPerLane; i++) {
+        final img = cars[(lane * 2 + i * 3) % cars.length];
+        // 차선 안에서 같은 속도·같은 간격이라 서로 겹치지 않는다
+        final u =
+            (clock * Cfg.trafficSpeed[lane] +
+                i * Cfg.trafficLoop / Cfg.trafficPerLane +
+                lane * 13) %
+            Cfg.trafficLoop;
+        final ty = lane == 0 ? u - 4 : Cfg.rows + 4 - u; // 월드 위·아래 밖에서 나타나고 사라짐
+        final w = img.width.toDouble(), h = img.height.toDouble();
+        final dst = Rect.fromLTWH(lx * t - w / 2, ty * t - h / 2, w, h);
+        if (!dst.overlaps(view)) continue;
+        final src = Rect.fromLTWH(0, 0, w, h);
+        if (lane == 0) {
+          c.drawImageRect(img, src, dst, p);
+        } else {
+          c.save();
+          c.translate(0, dst.center.dy * 2);
+          c.scale(1, -1); // 위로 달리는 차는 상하 반전 (위에서 본 그림이라 그대로 맞음)
+          c.drawImageRect(img, src, dst, p);
+          c.restore();
+        }
+      }
+    }
   }
 
   // ---------------- 창고 건물 ----------------
