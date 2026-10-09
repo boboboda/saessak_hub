@@ -81,6 +81,9 @@ class TopBar extends StatelessWidget {
                       }
                       g.tickets++;
                       break;
+                    case 9:
+                      g.debugProps();
+                      break;
                   }
                   g.ui();
                 },
@@ -113,6 +116,10 @@ class TopBar extends StatelessWidget {
                   PopupMenuItem(
                     value: 8,
                     child: Text('직업 Lv5 + 전직서 1장', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 9,
+                    child: Text('세트 소품 6종 놓기', style: Tx.body),
                   ),
                   PopupMenuItem(
                     value: 4,

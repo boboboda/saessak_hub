@@ -256,6 +256,20 @@ extension BuildSystem on HubGame {
     ui();
   }
 
+  /// (디버그) 창고 아래쪽 빈 줄에 세트 소품 6종을 한 칸씩 띄워 놓음 (그림 확인용)
+  void debugProps() {
+    var x = area.left.toInt() + 1;
+    final y = area.bottom.toInt() - 2;
+    for (final id in const ['bin', 'chair', 'plant', 'board', 'aircon', 'conveyor']) {
+      final t = Cfg.types.firstWhere((t) => t.id == id);
+      final r = Rect.fromLTWH(x.toDouble(), y.toDouble(), t.w.toDouble(), t.h.toDouble());
+      if (!buildings.any((b) => b.rect.overlaps(r))) buildings.add(Building(t, x, y));
+      x += t.w + 1;
+    }
+    showToast('소품 6종 배치');
+    ui();
+  }
+
   /// (디버그) 빈자리에 휴게실을 하나 놓고 모든 직원을 지치게 해서 쉬러 가는 모습을 확인
   void debugRestCheck() {
     if (ofType('lounge').isEmpty) {
