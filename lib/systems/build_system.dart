@@ -155,6 +155,14 @@ extension BuildSystem on HubGame {
     }
     ghostX = best?.$1 ?? ox;
     ghostY = best?.$2 ?? oy;
+    // 추천 자리가 화면 밖이면 카메라를 옮겨 보여 줌
+    final g = Rect.fromLTWH(ghostX * Cfg.tile, ghostY * Cfg.tile, t.w * Cfg.tile, t.h * Cfg.tile);
+    final view = Rect.fromLTWH(cam.dx, cam.dy + insetTop / zoom, viewW,
+        viewH - (insetTop + insetBottom + 80) / zoom);
+    if (!view.contains(g.topLeft) || !view.contains(g.bottomRight)) {
+      cam += g.center - view.center;
+      clampCam();
+    }
   }
 
   /// 통로 깔기 모드 시작
