@@ -172,11 +172,10 @@ extension BuildSystem on HubGame {
       nb.mine = true; // 첫 접수 창구는 내 자리
     }
     buildings.add(nb);
-    this.autoAssign(nb);
     final needStaff = t.slots > 0;
     cancelPlacing();
     showToast(
-      needStaff ? '${t.name} 설치! 직원이 모자라면 건물을 눌러 배치하세요' : '${t.name} 설치 완료!',
+      needStaff ? '${t.name} 설치! 시설을 눌러 직원을 배치하세요' : '${t.name} 설치 완료!',
     );
   }
 

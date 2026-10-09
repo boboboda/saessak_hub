@@ -475,14 +475,21 @@ extension WorldView on HubGame {
         );
       }
       // 배치된 직원이 없으면 건물 위쪽 바깥에 표시. (자리 비움은 직원 머리 위에 표시)
-      if (b.type.slots > 0 && b.crew.isEmpty && !b.mine) {
-        box(c, r.center.dx - 22, r.top - 17, 44, 15, 0xFFE5484D);
-        labelIn(
-          c,
-          '직원 필요',
-          Rect.fromLTWH(r.center.dx - 22, r.top - 17, 44, 15),
-          size: 10,
+      if (b.type.slots > 0 && b.crew.isEmpty) {
+        final blink = 0.75 + 0.25 * sin(clock * 4);
+        final tag = Rect.fromLTWH(r.center.dx - 26, r.top - 18, 52, 16);
+        c.drawRRect(
+          RRect.fromRectAndRadius(tag, const Radius.circular(4)),
+          Paint()..color = Color(0xFFE5484D).withValues(alpha: blink),
         );
+        labelIn(c, '직원 없음', tag, size: 10);
+      }
+      // 직원을 고른 중이면 배치할 수 있는 시설을 테두리로 강조
+      if (picking != null &&
+          (b.type.slots > b.crew.length ||
+              b.type.id == 'shelf' ||
+              b.type.id == 'dock')) {
+        strokeBox(c, r.inflate(2), 0xFFFFD166, 2);
       }
 
       // 포장 실수 표시
@@ -1089,7 +1096,37 @@ extension WorldView on HubGame {
     final bs = breakSpot;
     final bsPos = Offset(bs.dx * t, bs.dy * t);
     _bench(c, bsPos);
-    label(c, '휴식', bs.dx * t - 12, bs.dy * t + 14, size: 11);
+    if (!staff.any((s) => s.idle)) {
+      label(c, '휴식', bs.dx * t - 12, bs.dy * t + 14, size: 11);
+    }
+
+    // 대기 직원: 휴식 벤치 둘레에 서 있음 (탭해서 고른 뒤 시설을 탭하면 배치)
+    for (final s in staff) {
+      if (!s.idle) continue;
+      final fp = this.benchSpot(s);
+      final p = Offset(fp.dx * t, fp.dy * t);
+      if (picking == s) {
+        c.drawOval(
+          Rect.fromCenter(center: p + const Offset(0, 9), width: 30, height: 12),
+          Paint()
+            ..color = const Color(0xFFFFD166)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2,
+        );
+      }
+      _person(c, p, s.initial, 0xFFE0E0E0, 0xFF555555,
+          energy: s.energyPct, key: s);
+    }
+    if (staff.any((s) => s.idle)) {
+      final bp = this.benchSpot(staff.firstWhere((s) => s.idle));
+      final tag = Rect.fromCenter(
+          center: Offset(breakSpot.dx * t, (bp.dy - 2.3) * t),
+          width: 64,
+          height: 15);
+      c.drawRRect(RRect.fromRectAndRadius(tag, const Radius.circular(4)),
+          Paint()..color = const Color(0xCC2A2438));
+      labelIn(c, '대기 ${staff.where((s) => s.idle).length}명 · 탭', tag, size: 10);
+    }
 
     // 자리를 비운 직원 (쉬러 가는 중·쉬는 중·돌아오는 중)
     for (final s in staff) {

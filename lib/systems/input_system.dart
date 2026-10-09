@@ -23,11 +23,32 @@ extension InputSystem on HubGame {
       return;
     }
 
+    final tx = (w.dx / Cfg.tile).floor();
+    final ty = (w.dy / Cfg.tile).floor();
+
+    // 직원을 먼저 골랐으면: 다음에 탭한 시설에 배치 (빈 곳이면 취소)
+    if (picking != null) {
+      final b = this.buildingAt(tx, ty);
+      if (b == null || !this.placePicked(b)) {
+        picking = null;
+      }
+      ui();
+      return;
+    }
+
     // 내 자리 손님을 눌렀으면 접수
     if (this.tapCustomer(w)) return;
 
-    final tx = (w.dx / Cfg.tile).floor();
-    final ty = (w.dy / Cfg.tile).floor();
+    // 대기·운반 직원을 탭: 고른 뒤 시설을 탭하면 배치
+    final s = this.staffAt(w);
+    if (s != null) {
+      picking = s;
+      sheet = null;
+      selected = null;
+      ui();
+      return;
+    }
+
     sheet = null;
     selected = this.buildingAt(tx, ty);
     ui();

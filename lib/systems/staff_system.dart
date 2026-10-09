@@ -27,18 +27,16 @@ extension StaffSystem on HubGame {
         40 + total * 11);
   }
 
-  /// 게임 시작 때 이미 있는 직원 3명 (건물과 무관, 대기 상태)
+  /// 게임 시작 때 이미 있는 직원 3명. 모두 대기(휴식 벤치)에서 시작하고, 유저가 직접 배치한다.
   void addStarters() {
     staff.add(Staff(nextStaffId++, '김신입', 3, 2, 3, 3, 2, 0, 100));
     staff.add(Staff(nextStaffId++, '이성실', 2, 3, 4, 2, 4, 0, 110));
-    final fast = Staff(nextStaffId++, '박쾌속', 4, 4, 2, 4, 1, 0, 130);
-    fast.carrier = true; // 걸음이 빠른 직원은 처음부터 운반 담당
-    staff.add(fast);
+    staff.add(Staff(nextStaffId++, '박쾌속', 4, 4, 2, 4, 1, 0, 130));
     syncCarriers();
     if (fleet.isEmpty) grantStarterUnits(0); // 기본 차량: 대형 트럭 + 오토바이
   }
 
-  /// 새로 설치한 건물에 대기 중인 직원이 있으면 자동으로 한 명 배치
+  /// (디버그 시작 구성 전용) 대기 중인 직원을 한 명 배치. 일반 건설은 유저가 직접 배치한다.
   void autoAssign(Building b) {
     if (b.type.slots == 0) return;
     for (final s in staff) {
@@ -142,7 +140,53 @@ extension StaffSystem on HubGame {
   int get loungeBonus => min(Cfg.loungeMax, ofType('lounge').length);
 
   /// 창고 밖 휴식 자리 (휴게실이 없거나 꽉 찼을 때)
-  Offset get breakSpot => Offset(area.left - 1.6, area.center.dy + 2.2);
+  Offset get breakSpot => Offset(area.left - 2.0, area.center.dy + 2.7);
+
+  /// 대기 직원이 서 있는 자리: 휴식 벤치 둘레 (발끝 위치, 타일 좌표)
+  Offset benchSpot(Staff s) {
+    final idle = staff.where((x) => x.idle).toList();
+    final i = max(0, idle.indexOf(s));
+    // 벤치 앞에 3명씩 줄지어 섬
+    final o = Offset(-0.9 + 0.9 * (i % 3), 1.25 + 0.95 * (i ~/ 3));
+    return breakSpot + o;
+  }
+
+  /// 화면을 탭한 곳에 있는 직원 (대기 직원·운반 직원). 없으면 null
+  Staff? staffAt(Offset world) {
+    final tp = Offset(world.dx / Cfg.tile, world.dy / Cfg.tile);
+    bool hit(Offset feet) =>
+        (tp - (feet - const Offset(0, 0.45))).distance < 0.6;
+    for (final s in staff) {
+      if (s.idle && hit(benchSpot(s))) return s;
+    }
+    for (final c in carriers) {
+      if (!c.staff.away && hit(c.pos)) return c.staff;
+    }
+    return null;
+  }
+
+  /// 먼저 고른 직원을 시설에 배치. 선반·도크를 고르면 운반 담당. 배치했으면 true
+  bool placePicked(Building b) {
+    final s = picking;
+    if (s == null) return false;
+    picking = null;
+    if (b.type.slots > 0) {
+      if (b.crew.length >= b.type.slots && !b.crew.contains(s)) {
+        showToast('${b.type.name}에 빈 자리가 없어요');
+        return true;
+      }
+      assignTo(s, b);
+      showToast('${s.name} → ${b.type.name} 배치');
+      return true;
+    }
+    if (b.type.id == 'shelf' || b.type.id == 'dock') {
+      setCarrier(s);
+      showToast('${s.name} → 운반 담당');
+      return true;
+    }
+    showToast('직원을 배치할 수 없는 시설이에요');
+    return true;
+  }
 
   Offset _homeOf(Staff s) {
     final p = s.post;

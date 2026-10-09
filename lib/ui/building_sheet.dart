@@ -21,7 +21,9 @@ class BuildingSheet extends StatelessWidget {
 
     return SheetFrame(
       title: '${t.name} #${g.typeIndex(b)}',
-      heightFactor: hasSlots ? 0.62 : 0.34,
+      heightFactor: hasSlots
+          ? 0.62
+          : (t.id == 'shelf' || t.id == 'dock' ? 0.55 : 0.34),
       onClose: g.closeAll,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
@@ -78,6 +80,7 @@ class BuildingSheet extends StatelessWidget {
               ),
             ),
           if (t.id == 'dock') const SizedBox(height: 8),
+          if (t.id == 'shelf' || t.id == 'dock') ..._carrierSection(),
           if (t.id == 'vending')
             CardBox(
               child: Row(
@@ -145,6 +148,61 @@ class BuildingSheet extends StatelessWidget {
     );
   }
 
+  /// 직원 고르기 목록 (대기 → 다른 일 순). 누르면 onPick
+  List<Widget> _pickRows(void Function(Staff) onPick, bool Function(Staff) ok) {
+    final list = g.staff.where(ok).toList()
+      ..sort((a, b) => (a.idle ? 0 : 1).compareTo(b.idle ? 0 : 1));
+    if (list.isEmpty) {
+      return [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 6),
+          child: Text('고를 직원이 없어요. 직원 메뉴에서 고용하세요', style: Tx.sub),
+        ),
+      ];
+    }
+    final out = <Widget>[];
+    for (final s in list) {
+      out.add(Material(
+        color: C.card,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => onPick(s),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            child: Row(
+              children: [
+                StaffAvatar(s, size: 30),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text('${s.name} Lv.${s.level}', style: Tx.h2),
+                ),
+                RoleChip(g, s),
+                const SizedBox(width: 8),
+                Text('${(s.energyPct * 100).round()}%', style: Tx.sub),
+                const SizedBox(width: 8),
+                const Icon(Icons.add_circle, color: C.accent, size: 22),
+              ],
+            ),
+          ),
+        ),
+      ));
+      out.add(const SizedBox(height: 6));
+    }
+    return out;
+  }
+
+  /// 선반·도크: 운반 담당 현황 + 운반 직원 고르기
+  List<Widget> _carrierSection() {
+    final n = g.staff.where((s) => s.carrier).length;
+    return [
+      const SizedBox(height: 8),
+      Text('운반 담당 $n명 (접수 → 포장 → 선반 → 도크를 나름)', style: Tx.h2),
+      const SizedBox(height: 6),
+      ..._pickRows((s) => g.setCarrier(s), (s) => !s.carrier),
+    ];
+  }
+
   String _upgradeText(Building b) {
     switch (b.type.id) {
       case 'counter':
@@ -210,29 +268,11 @@ class BuildingSheet extends StatelessWidget {
       rows.add(const SizedBox(height: 8));
     }
 
-    for (var i = b.crew.length; i < t.slots; i++) {
-      rows.add(Material(
-        color: C.card,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () => showAssignStaffDialog(context, g, b),
-          child: Container(
-            height: 52,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: C.line),
-            ),
-            child: const Text(
-              '+ 직원 배치',
-              style: TextStyle(
-                  color: C.accent, fontSize: 13, fontWeight: FontWeight.w800),
-            ),
-          ),
-        ),
-      ));
-      rows.add(const SizedBox(height: 8));
+    // 빈 자리가 있으면 직원 목록을 바로 보여 줌: 고르면 배치 (대기 직원이 위)
+    if (b.crew.length < t.slots) {
+      rows.add(Text('직원 고르기 · 빈 자리 ${t.slots - b.crew.length}', style: Tx.sub));
+      rows.add(const SizedBox(height: 6));
+      rows.addAll(_pickRows((s) => g.assignTo(s, b), (s) => !b.crew.contains(s)));
     }
 
     if (b.crew.isEmpty) {

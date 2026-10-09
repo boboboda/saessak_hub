@@ -145,6 +145,7 @@ class HubGame extends FlameGame {
   double trafficTimer = 0;
   double walkAll = 0, walkOnAisle = 0; // 최근 걸은 거리 (통로 위 비율 표시용)
   Building? selected;
+  Staff? picking; // 먼저 탭한 직원 (다음에 탭한 시설에 배치)
 
   // 시트: null / 'build' / 'staff'
   String? sheet;
@@ -268,13 +269,14 @@ class HubGame extends FlameGame {
   void pinchUpdate(Offset focal, double scale) =>
       zoomAt(focal, _pinchZoom * scale);
 
-  /// 창고 작업 구역(접수~보관)이 보이도록 처음 위치를 잡음
+  /// 처음 카메라 위치
   void centerCamOnArea() {
     final a = area;
     zoom = zoomDefault;
     final visibleH = size.y - insetTop - insetBottom;
     cam = Offset(
-      (a.right - 4.5) * Cfg.tile - viewW / 2,
+      // 새 게임(건물 없음)은 휴식 벤치와 접수 구역이 보이게, 아니면 접수~보관 쪽
+      (buildings.isEmpty ? a.left + 1.5 : a.right - 4.5) * Cfg.tile - viewW / 2,
       a.center.dy * Cfg.tile - (insetTop + visibleH / 2) / zoom,
     );
     clampCam();
