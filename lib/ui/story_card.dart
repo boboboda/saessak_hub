@@ -178,7 +178,7 @@ class PostcardCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      r.ok ? d.thanks : d.sorry,
+                      r.ok ? d.thanks : (r.stamp == 2 ? Cfg.storyLateText : d.sorry),
                       style: const TextStyle(color: Color(0xFF3D3020), fontSize: 14, height: 1.45, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 10),

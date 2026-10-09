@@ -1632,5 +1632,122 @@
         }
       ]
     }
+  },
+  "story_letter": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 손편지",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, white paper envelope with a red heart seal and a folded pair of socks beside it",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "story_teddy": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 곰인형",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, small cute brown teddy bear sitting, slightly worn",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "story_kimchi": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 김장 김치",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, korean kimchi in a clear plastic container with a red lid, red cabbage kimchi visible inside",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "story_cake": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 생일 케이크",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, small round birthday cake with white cream, strawberries and one candle",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "story_vase": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 도자기",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, elegant blue and white porcelain ceramic vase",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "decor_extinguisher": {
+    "endpoint": "/create-1-direction-object",
+    "note": "배경 소품: 소화기",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game asset, single object, high top-down view facing south, front-facing, red fire extinguisher standing on the floor",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "ui_bubble": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 말풍선",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game UI icon, single object, centered, front view, no background, no text, empty round white speech bubble with a small tail at the bottom center, cream white fill, plain inside",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "ui_alert": {
+    "endpoint": "/create-1-direction-object",
+    "note": "알림 느낌표",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game UI icon, single object, centered, front view, no background, no text, small round red badge with a white exclamation mark",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "decor_locker": {
+    "endpoint": "/create-1-direction-object",
+    "note": "배경 소품: 사물함",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game asset, single object, high top-down view facing south, front-facing, tall grey metal staff locker with two doors and vent slits",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
   }
 }

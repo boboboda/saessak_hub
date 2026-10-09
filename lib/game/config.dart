@@ -503,6 +503,7 @@ class Cfg {
         'pack', 3, ['wrap', 'wrap', 'tape'], 1500, 8, '금 하나 없이 도착. 딸이 거실 한가운데에 두었대요.', '이가 조금 나갔지만, 딸은 "50년 이야기가 하나 더 생겼다"고 했대요.'),
   ];
   static const List<String> storyStamp = ['배송 완료', '파손', '지연'];
+  static const String storyLateText = '하루 늦게 도착했지만, 기다린 만큼 더 반가웠대요.'; // 지연 엽서 글
 
   // ---- 직접 개입 ----
   static const int tapBonus = 10; // 내 자리에서 손님을 직접 탭해 접수하면 받는 보너스(원)

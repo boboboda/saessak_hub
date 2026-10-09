@@ -1223,6 +1223,23 @@ extension WorldView on HubGame {
 
     _drawPedestrians(c);
 
+    // 창고 밖 휴식 자리 옆 소품: 바깥 벽에 붙은 자판기·사물함, 입구 안쪽 소화기
+    final a = area;
+    for (final (k, x, y) in [
+      ('vend', a.left - 0.6, a.center.dy + 4.4),
+      ('locker', a.left - 0.6, a.center.dy + 5.7),
+      ('extinguisher', door.left + 0.25, door.top + 0.4),
+    ]) {
+      final img = Sprites.decor[k];
+      if (img == null) continue;
+      final w = img.width.toDouble(), h = img.height.toDouble(); // 도트 원본 크기
+      final r = Rect.fromLTWH(x * t - w / 2, y * t - h, w, h);
+      _at(y * t, () {
+        shadowAt(c, Offset(x * t, y * t), w * 0.8);
+        Sprites.drawContain(c, img, r);
+      });
+    }
+
     // 창고 밖 휴식 자리 (벤치)
     final bs = breakSpot;
     final bsPos = Offset(bs.dx * t, bs.dy * t);
@@ -1516,7 +1533,7 @@ extension WorldView on HubGame {
               ..color = const Color(0xFFFFD166),
           );
         }
-        if (cu.kind > 0 && cu.state != 2) {
+        if (cu.kind > 0 && cu.state != 2 && cu.story < 0) {
           label(
             c,
             Cfg.kindName[cu.kind],

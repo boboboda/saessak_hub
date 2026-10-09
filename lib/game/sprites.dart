@@ -104,6 +104,8 @@ class Sprites {
     // 길가 건물 후보 (높이 다양화: 가게 86~102 · 주택 96~104 · 아파트 114~119 px)
     'shop1', 'shop2', 'shop3', 'home0', 'home1', 'home3', 'bake1', 'bake2', 'bake3',
     'apt0', 'apt1', 'apt2', 'apt3',
+    // 배경 소품 (창고 밖 휴식 자리 옆 · 입구 안쪽)
+    'vend', 'locker', 'extinguisher',
     'pallet',
     'flower',
   ];

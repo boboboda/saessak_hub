@@ -87,7 +87,11 @@ class TopBar extends StatelessWidget {
                                         case 11:
                       g.rp += 1000;
                       break;
-                                                            case 15:
+                                                            case 16:
+                      // 실패 엽서 미리보기 (파손 → 지연 차례로)
+                      g.postcard = StoryResult(g.debugStory % Cfg.storyDefs.length, false, 1 + g.debugStory++ % 2, false, 0, 0);
+                      break;
+                    case 15:
                       // 사연 손님 부르기 (차례로, 확률·날짜 무시)
                       if (g.storyBusy) {
                         g.showToast('진행 중인 사연이 있어요');
@@ -176,6 +180,10 @@ class TopBar extends StatelessWidget {
                     child: Text('회사 등급 +1', style: Tx.body),
                   ),
                                     PopupMenuItem(
+                    value: 16,
+                    child: Text('실패 엽서 보기 (파손·지연)', style: Tx.body),
+                  ),
+                  PopupMenuItem(
                     value: 15,
                     child: Text('사연 손님 부르기 (차례로)', style: Tx.body),
                   ),

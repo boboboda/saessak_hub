@@ -409,5 +409,50 @@
   "cust_k_walk": {
     "animation_group_id": "de9d9657-a193-4eea-80a9-5748ff9ed93e",
     "for_character": "8ae10da9-615a-4420-8dc7-1f5c7e004e63"
+  },
+  "fx_ice": {
+    "object_id": "037d2334-eb98-4441-842e-6b9d198d8736"
+  },
+  "fx_wrap": {
+    "object_id": "81eabcf9-3e57-4dbe-8682-e605241b6ff8"
+  },
+  "fx_tape": {
+    "object_id": "ef17dcd9-3bef-4f5c-972b-10fc5b76badc"
+  },
+  "st_done": {
+    "object_id": "48b1e828-6d73-4b84-ba9c-173274287df0"
+  },
+  "st_broken": {
+    "object_id": "aaa88567-c691-42e0-ad67-83f7cc3a6ee3"
+  },
+  "st_late": {
+    "object_id": "62208503-09ec-49d8-abd3-03a6f11e84cd"
+  },
+  "story_letter": {
+    "object_id": "795abe00-9e59-43d9-8a5d-80d8596b5b7d"
+  },
+  "story_teddy": {
+    "object_id": "ebc91c64-ad36-4d2a-bbf3-205372be9ca0"
+  },
+  "story_kimchi": {
+    "object_id": "c9fc0df4-c001-4b2c-ad3f-ba1ccf7aac4f"
+  },
+  "story_cake": {
+    "object_id": "312064d9-e689-4d3d-804c-9ac20715572f"
+  },
+  "story_vase": {
+    "object_id": "49929755-0769-45d1-b149-c80c0d662997"
+  },
+  "decor_extinguisher": {
+    "object_id": "3723fe31-b770-4925-89b7-835387b69c94"
+  },
+  "ui_bubble": {
+    "object_id": "f748cc44-c1d7-4962-bd77-92198383d390"
+  },
+  "ui_alert": {
+    "object_id": "a54b41fa-4e8b-4d2b-9e16-d3b69b1f58a8"
+  },
+  "decor_locker": {
+    "object_id": "8d4687ea-9e1d-4da2-9717-365d30de38ea"
   }
 }
