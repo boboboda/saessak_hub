@@ -2,7 +2,6 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 
 import 'config.dart';
 
@@ -644,10 +643,6 @@ class RegionMap {
       placed++;
     }
     m.decor.sort((a, b) => a.y.compareTo(b.y));
-    debugPrint(
-      'MAPGEN r=$r ${gw}x$gh trunk=${m.trunkLen.round()} towns=${towns.length} houses=${m.houses.length} '
-      'paths=${m.courier.length} lights=${m.lights.length} cross=${m.cross.length} trip=${m.tripSec.round()}s',
-    );
     return m;
   }
 
