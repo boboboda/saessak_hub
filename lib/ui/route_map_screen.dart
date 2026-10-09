@@ -337,9 +337,9 @@ class _RouteMapScreenState extends State<RouteMapScreen>
               ],
             ),
           ),
-        Positioned(left: 8, bottom: 8, child: _camButtons()),
+        Positioned(left: 8, bottom: 8 + navInset(context), child: _camButtons()),
         if (open && cam.pick != null) Positioned(left: 8, top: 40, child: _unitInfo()),
-        Positioned(right: 8, bottom: 8, child: _miniMap()),
+        Positioned(right: 8, bottom: 8 + navInset(context), child: _miniMap()),
         if (!open)
           Positioned.fill(
             child: Container(

@@ -166,7 +166,7 @@ class SheetFrame extends StatelessWidget {
           const Divider(height: 1, color: C.line),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: mq.padding.bottom),
+              padding: EdgeInsets.only(bottom: navInset(context)),
               child: child,
             ),
           ),
@@ -174,6 +174,14 @@ class SheetFrame extends StatelessWidget {
       ),
     );
   }
+}
+
+/// 화면 아래 시스템 내비게이션 바(제스처 막대·3버튼)가 가리는 높이
+double navInset(BuildContext context) {
+  final m = MediaQuery.of(context);
+  return m.viewPadding.bottom > m.padding.bottom
+      ? m.viewPadding.bottom
+      : m.padding.bottom;
 }
 
 /// 카드 배경

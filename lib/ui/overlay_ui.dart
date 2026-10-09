@@ -7,6 +7,7 @@ import 'build_sheet.dart';
 import 'building_sheet.dart';
 import 'ops_sheet.dart';
 import 'staff_sheet.dart';
+import 'theme.dart';
 import 'top_bar.dart';
 
 /// 게임 위에 겹치는 모든 위젯 (상단 바, 하단 바, 시트, 안내 메시지)
@@ -69,7 +70,7 @@ class OverlayUi extends StatelessWidget {
           Positioned(
             left: 16,
             right: 16,
-            bottom: mq.padding.bottom + (g.mode == 0 ? 96 : 160),
+            bottom: navInset(context) + (g.mode == 0 ? 96 : 160),
             child: Center(child: _Toast(g.toast)),
           ),
         if (sheet != null)

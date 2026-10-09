@@ -15,7 +15,7 @@ class BottomBar extends StatelessWidget {
     final expandSub = g.canExpand ? '${g.nextAreaCost}원' : '최대 크기';
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+      padding: EdgeInsets.fromLTRB(10, 8, 10, 8 + navInset(context)),
       decoration: const BoxDecoration(
         color: C.panel,
         border: Border(top: BorderSide(color: C.line)),
@@ -89,7 +89,8 @@ class ActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (g.mode == 4) return _aisleBar();
+    final nav = navInset(context);
+    if (g.mode == 4) return _aisleBar(nav);
     String info;
     Color infoColor;
     String okLabel;
@@ -127,7 +128,7 @@ class ActionBar extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: EdgeInsets.fromLTRB(12, 10, 12, 10 + nav),
       decoration: const BoxDecoration(
         color: C.panel,
         border: Border(top: BorderSide(color: C.line)),
@@ -183,7 +184,7 @@ class ActionBar extends StatelessWidget {
 
 extension on ActionBar {
   /// 통로 모드 하단 바: 도구(깔기·철거·화면 이동) + 동선 효율 + 완료
-  Widget _aisleBar() {
+  Widget _aisleBar(double nav) {
     final pct = g.walkAll < 1
         ? null
         : (g.walkOnAisle / g.walkAll * 100).round();
@@ -193,7 +194,7 @@ extension on ActionBar {
       ('화면 이동', Icons.pan_tool),
     ];
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: EdgeInsets.fromLTRB(12, 10, 12, 10 + nav),
       decoration: const BoxDecoration(
         color: C.panel,
         border: Border(top: BorderSide(color: C.line)),

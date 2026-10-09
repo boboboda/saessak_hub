@@ -16,7 +16,7 @@ class GameScreen extends StatelessWidget {
     final mq = MediaQuery.of(context);
     // 위젯이 가리는 높이를 게임에 알려 카메라가 그만큼 비켜 있게 함
     game.insetTop = mq.padding.top + 92;
-    game.insetBottom = mq.padding.bottom + 88;
+    game.insetBottom = navInset(context) + 88;
     if (game.camInit) game.clampCam();
 
     return Material(
