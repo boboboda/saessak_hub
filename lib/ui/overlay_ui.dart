@@ -11,6 +11,7 @@ import 'ops_sheet.dart';
 import 'event_card.dart';
 import 'report_card.dart';
 import 'staff_sheet.dart';
+import 'story_card.dart';
 import 'theme.dart';
 import 'top_bar.dart';
 
@@ -108,6 +109,24 @@ class OverlayUi extends StatelessWidget {
             child: TapGuard(
               key: ValueKey('evt${g.evtNow!.kind}${g.evtLastAt}'),
               child: Center(child: SingleChildScrollView(child: EventCard(g))),
+            ),
+          ),
+        ],
+        // 사연 택배: 접수 선택 카드 → (포장) → 결과 엽서
+        if (g.storyAsk != null && g.report == null) ...[
+          Positioned.fill(child: Container(color: Colors.black45)),
+          Positioned.fill(
+            child: TapGuard(
+              key: ValueKey('story${g.storyAsk.hashCode}'),
+              child: Center(child: SingleChildScrollView(child: StoryCard(g))),
+            ),
+          ),
+        ] else if (g.postcardShown && g.report == null && g.evtNow == null) ...[
+          Positioned.fill(child: Container(color: Colors.black54)),
+          Positioned.fill(
+            child: TapGuard(
+              key: ValueKey('post${g.postcard.hashCode}'),
+              child: Center(child: SingleChildScrollView(child: PostcardCard(g))),
             ),
           ),
         ],

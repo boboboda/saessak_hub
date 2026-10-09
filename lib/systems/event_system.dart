@@ -51,6 +51,8 @@ extension EventSystem on HubGame {
       selected != null ||
       mode != 0 ||
       picking != null ||
+      storyAsk != null ||
+      postcard != null ||
       DateTime.now().millisecondsSinceEpoch - lastTouchMs < Cfg.evtTouchGrace;
 
   bool _eligible(int k) {

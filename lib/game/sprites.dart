@@ -15,6 +15,9 @@ class Sprites {
   static final List<ui.Image?> custWalk = List.filled(custLooks, null);
   static ui.Image? box;
   static ui.Image? floor;
+  // 사연 택배: 물건 아이콘(story_<item>) · 포장 효과(fx_<ice|wrap|tape>) · 도장(st_<done|broken|late>) · 말풍선·느낌표
+  static final Map<String, ui.Image> storyItems = {}, fxIcons = {}, stamps = {};
+  static ui.Image? storyBubble, storyAlert;
   static ui.Image? wallBack, wallItems, floorVar; // 절차 생성 (tools/hubgen): 뒷벽 4종 · 벽걸이 4종 · 바닥 변형 4종
   static ui.Image? counter, pack, shelf, van, truck, moto;
   static final ui.Paint _np = ui.Paint()..filterQuality = ui.FilterQuality.none;
@@ -158,6 +161,20 @@ class Sprites {
       if (im != null) roadCars.add(im);
     }
     grass = await _img('assets/sprites/tiles/grass.png');
+    for (final n in const ['letter', 'teddy', 'kimchi', 'cake', 'vase']) {
+      final im = await _img('assets/sprites/props/story_$n.png');
+      if (im != null) storyItems[n] = im;
+    }
+    for (final n in const ['ice', 'wrap', 'tape']) {
+      final im = await _img('assets/sprites/props/fx_$n.png');
+      if (im != null) fxIcons[n] = im;
+    }
+    for (final n in const ['done', 'broken', 'late']) {
+      final im = await _img('assets/sprites/props/st_$n.png');
+      if (im != null) stamps[n] = im;
+    }
+    storyBubble = await _img('assets/sprites/props/ui_bubble.png');
+    storyAlert = await _img('assets/sprites/props/ui_alert.png');
     wallBack = await _img('assets/sprites/tiles/wall_back.png');
     wallItems = await _img('assets/sprites/tiles/wall_items.png');
     floorVar = await _img('assets/sprites/tiles/floor_var.png');

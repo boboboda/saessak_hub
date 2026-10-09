@@ -77,6 +77,22 @@ class BookSheet extends StatelessWidget {
               Icons.auto_awesome,
             ),
           const SizedBox(height: 14),
+          Text('사연 엽서 ${rt.storyDone.length}/${Cfg.storyDefs.length}', style: Tx.h2),
+          const SizedBox(height: 6),
+          for (var k = 0; k < Cfg.storyDefs.length; k++)
+            _row(
+              rt.storyDone.contains(k),
+              rt.storySeen.contains(k) || rt.storyLocked.contains(k) ? Cfg.storyDefs[k].bubble : '???',
+              rt.storyDone.contains(k)
+                  ? '엽서: ${Cfg.storyDefs[k].thanks}'
+                  : rt.storyLocked.contains(k)
+                      ? '잠김 · ${Cfg.types.firstWhere((t) => t.id == Cfg.storyDefs[k].need).name} Lv${Cfg.storyDefs[k].needLv}이 되면 다시 찾아와요'
+                      : rt.storyTried.contains(k)
+                          ? '아쉬웠던 사연 · 다시 오면 숙련 포장에 도전해요'
+                          : '사연 손님을 기다려요',
+              rt.storyLocked.contains(k) && !rt.storyDone.contains(k) ? Icons.lock : Icons.mail,
+            ),
+          const SizedBox(height: 14),
           Text('세트 도감 ${rt.foundSets.length}/${Cfg.sets.length}', style: Tx.h2),
           const SizedBox(height: 6),
           for (var i = 0; i < Cfg.sets.length; i++)

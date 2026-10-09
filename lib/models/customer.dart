@@ -15,9 +15,10 @@ class Customer {
   bool vip = false; // VIP: 인내심이 짧지만 접수하면 팁
   final int region;
   int look = 0; // 외형 (Sprites.custLooks 중 하나)
-    int story = -1; // 사연 (Cfg.stories 번호)
+  int story = -1; // 사연 택배 (Cfg.storyDefs 번호, 사연 손님만)
+  double storyT = 0; // 문 앞에서 기다린 시간
   int guest = -1; // 숨은 손님 (Cfg.guestName 번호)
-  bool pre = false; // 말풍선을 탭해 미리 처리함
+  bool pre = false; // 사연을 들어 줌 (별점 +0.5)
   Rect? bubble; // 마지막으로 그린 말풍선 (월드 픽셀, 탭 판정용)
   Customer(this.pos, this.region);
 }

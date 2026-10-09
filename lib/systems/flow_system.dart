@@ -20,10 +20,10 @@ extension FlowSystem on HubGame {
         cu.look = rnd.nextInt(6);
     cu.guest = this.pickGuest();
     if (cu.guest >= 0) {
-      cu.look = Cfg.guestLook0 + cu.guest;
-      cu.story = -1; // 숨은 손님은 사연 대신 이름표
+      cu.look = Cfg.guestLook0 + cu.guest; // 숨은 손님은 사연 대신 이름표
+    } else if (behind == 0) {
+      cu.story = this.pickStory(); // 사연 손님만 말풍선 (일반 손님은 없음)
     }
-    cu.story = _pickStory(cu.region);
     final r = rnd.nextDouble();
     if (day >= 2) {
       cu.kind = r < 0.08 ? 1 : (r < 0.16 ? 2 : (r < 0.22 ? 3 : 0));
@@ -33,26 +33,6 @@ extension FlowSystem on HubGame {
       cu.patience *= Cfg.vipPatience;
     }
     customers.add(cu);
-  }
-
-  /// 사연 고르기: 이 지역·오늘 성수기에 맞는 사연은 더 자주 나옴
-  int _pickStory(int region) {
-    final h = holiday?.$1;
-    final idx = <int>[];
-    final w = <double>[];
-    for (var i = 0; i < Cfg.stories.length; i++) {
-      final s = Cfg.stories[i];
-      if (s.$3 >= 0 && s.$3 != region) continue;
-      if (s.$4 != null && s.$4 != h) continue;
-      idx.add(i);
-      w.add(s.$4 != null ? 5 : (s.$3 >= 0 ? 2 : 1));
-    }
-    var r = rnd.nextDouble() * w.fold<double>(0, (a, b) => a + b);
-    for (var i = 0; i < idx.length; i++) {
-      r -= w[i];
-      if (r <= 0) return idx[i];
-    }
-    return idx.last;
   }
 
   Building? _bestCounter(List<Building> counters, Map<Building, int> load) {
@@ -165,6 +145,12 @@ extension FlowSystem on HubGame {
         continue;
       }
 
+      // 사연 손님: 줄을 서지 않고 문 앞에서 기다림 (탭하면 선택 카드)
+      if (c.story >= 0) {
+        this.storyCustomerStep(c, dt);
+        continue;
+      }
+
       // 창구 배정 (없거나 철거되거나 자리 직원이 없으면 다시)
       final cur = c.counter;
       if (cur == null ||
@@ -205,7 +191,7 @@ extension FlowSystem on HubGame {
         for (final s in cnt.active) {
           s.working = true;
         }
-        c.serveT += dt * _rate(cnt) * (c.pre ? Cfg.storyServeBoost : 1.0);
+        c.serveT += dt * _rate(cnt);
         if (c.serveT >= Cfg.serveTime) {
                               cnt.outbox.add(_mkParcel(c));
           done++;
@@ -214,7 +200,7 @@ extension FlowSystem on HubGame {
           c.state = 2;
         }
       } else {
-        c.patience -= dt * _calm(cnt) * (c.pre ? Cfg.storyDrain : 1.0);
+        c.patience -= dt * _calm(cnt);
                 if (c.patience <= 0) {
           lost++;
           this.rateLost();

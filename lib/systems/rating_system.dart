@@ -172,6 +172,10 @@ class RateState {
   int promotions = 0; // 전직 횟수
       final Set<int> foundSets = {}; // 발견한 세트
   final Set<int> foundGuests = {}; // 만난 숨은 손님
+  final Set<int> storySeen = {}; // 접수해 본 사연 택배
+  final Set<int> storyDone = {}; // 성공한 사연 (엽서)
+  final Set<int> storyTried = {}; // 해 봤지만 실패한 사연
+  final Set<int> storyLocked = {}; // 거절해서 잠긴 사연 (조건이 차면 다시 옴)
   final Set<int> seenJobs = {}; // 본 직업 (숨은 직업은 자격이 생기면)
   final Set<int> seenPromo = {}; // 본 상위 직업
   int bulkDone = 0; // 대형 택배 누적 접수
@@ -184,7 +188,8 @@ class RateState {
     'gr': grades, 'fs': fiveStars, 'cs': cleanStreak, 'bc': bestClean,
     'bd': bestDay, 'yg': yGood, 'yd': yearDone.toList(), 'ya': yearsAll,
         'pr': promotions, 'set': foundSets.toList(),
-        'fg': foundGuests.toList(), 'sj': seenJobs.toList(), 'sp': seenPromo.toList(),
+        'ss': storySeen.toList(), 'sd': storyDone.toList(), 'sx': storyTried.toList(), 'sl': storyLocked.toList(),
+    'fg': foundGuests.toList(), 'sj': seenJobs.toList(), 'sp': seenPromo.toList(),
     'bk': bulkDone, 'lg': legendGiven,
     'ys': yServed, 'yd2': yDays, 'be': bestEver, 'yst': yStarSum,
   };
@@ -214,6 +219,12 @@ class RateState {
     foundGuests
       ..clear()
       ..addAll(setOf('fg'));
+    bool okStory(int k) => k >= 0 && k < Cfg.storyDefs.length;
+    for (final (set, key) in [(storySeen, 'ss'), (storyDone, 'sd'), (storyTried, 'sx'), (storyLocked, 'sl')]) {
+      set
+        ..clear()
+        ..addAll(setOf(key).where(okStory));
+    }
     seenJobs
       ..clear()
       ..addAll(setOf('sj'));

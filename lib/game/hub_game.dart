@@ -21,6 +21,7 @@ import '../systems/rating_system.dart';
 import '../systems/research_system.dart';
 import '../systems/save_system.dart';
 import '../systems/set_system.dart';
+import '../systems/story_system.dart';
 import '../systems/guide_system.dart';
 import '../systems/staff_system.dart';
 import '../systems/worker_system.dart';
@@ -43,6 +44,7 @@ export '../systems/rating_system.dart';
 export '../systems/research_system.dart';
 export '../systems/save_system.dart';
 export '../systems/set_system.dart';
+export '../systems/story_system.dart';
 export '../systems/guide_system.dart';
 export '../systems/staff_system.dart';
 export '../systems/fleet_system.dart';
@@ -94,6 +96,10 @@ class HubGame extends FlameGame {
   final List<double> evtTimes = []; // 오늘 사건이 뜰 시각(하루 초)
   final Map<int, int> evtLast = {}; // 사건별 마지막으로 뜬 날
   HubEvent? evtNow; // 고르는 중인 사건 (게임 멈춤)
+  // 사연 택배
+  Customer? storyAsk; // 접수 선택 카드를 연 사연 손님 (게임 멈춤)
+  StoryJob? storyJob; // 포장대에서 포장 중인 사연 택배
+  StoryResult? postcard; // 결과 엽서 (닫을 때까지 게임 멈춤)
   double evtLastAt = -1e9; // 마지막 사건이 뜬 시각 (게임 초, 날짜 포함)
   int lastTouchMs = 0; // 마지막으로 화면을 만진 시각 (실제 ms, 팝업 유예용)
   final List<ActiveEvt> evts = []; // 진행 중인 사건
@@ -113,6 +119,7 @@ class HubGame extends FlameGame {
     int? gradeUp; // 승급 카드 (오른 등급)
     final Map<int, int> guestLast = {}; // 숨은 손님이 마지막으로 온 날
   int debugGuest = 0;
+  int debugStory = 0;
   double fever = 0; // 수익 부스트(광고) 남은 시간(초)
 
   // 배송 기한: 택배마다 접수 시각을 단계마다 넘겨준다 (먼저 들어온 것부터 나감)
@@ -352,7 +359,7 @@ class HubGame extends FlameGame {
     super.update(dt);
     clock += dt;
     if (toastTime > 0) toastTime -= dt;
-        final d = evtNow != null ? 0.0 : dt * speedMul; // 사건을 고르는 동안 멈춤
+        final d = (evtNow != null || storyAsk != null || this.postcardShown) ? 0.0 : dt * speedMul; // 사건·사연 카드·엽서를 보는 동안 멈춤
 
     // 달력: 하루가 끝나면 월급 정산
     dayTimer += d;
@@ -383,6 +390,7 @@ class HubGame extends FlameGame {
     gt += d;
         this.updateFever(d);
         this.updateEvents(d);
+        this.updateStory(d);
     this.updateResearch(d);
     if (sootheCd > 0) sootheCd = max(0.0, sootheCd - d);
 

@@ -6,6 +6,7 @@ import '../models/mission.dart';
 import '../models/vehicle.dart';
 import '../systems/research_system.dart';
 import '../systems/set_system.dart';
+import '../systems/story_system.dart';
 import 'region_map.dart';
 
 class Cfg {
@@ -479,60 +480,29 @@ class Cfg {
   // ---- 저장 ----
   static const double autosaveSec = 10;
 
-  // ---- 손님 사연 (말풍선) ----
-  // 손님마다 사연 하나. 말풍선을 탭하면 '미리 처리': 접수가 빨라지고 인내심이 덜 줄며, 사연 종류별 보너스.
-  // 탭해도 손님 수(접수량)는 늘지 않는다 — 접수량은 명성·성수기로만 정해짐.
-  // 효과: 0 팁(소액 돈), 1 만족(인내심 가득 회복), 2 명성 소폭
-  static const int storyTip = 30; // 팁(원)
-  static const int storyFame = 1; // 명성
-  static const double storyServeBoost = 2.0; // 미리 처리한 손님 접수 속도 배수
-  static const double storyDrain = 0.5; // 미리 처리한 손님 인내심 줄어드는 속도 배수
-  static const List<String> storyEffectName = ['팁', '만족', '명성'];
-  static const List<int> storyColor = [0xFFFFE08A, 0xFFFFC2D1, 0xFFB8E1FF];
-  // (말풍선 글, 효과, 지역(-1 어디나), 성수기 이름(null 언제나))
-  static const List<(String, int, int, String?)> stories = [
-    ('급한 선물이에요', 0, -1, null),
-    ('생일 선물이요!', 0, -1, null),
-    ('반품하러 왔어요', 1, -1, null),
-    ('택배가 없어졌어요', 1, -1, null),
-    ('포장 꼼꼼히요!', 1, -1, null),
-    ('빨리 좀 해 주세요', 1, -1, null),
-    ('서류 급송이요', 0, -1, null),
-    ('손편지 넣었어요', 2, -1, null),
-    ('첫 택배예요', 2, -1, null),
-    ('할머니 김치요', 2, -1, null),
-    ('중고거래 물건', 0, -1, null),
-    ('깨지기 쉬워요', 1, -1, null),
-    ('결혼 축하 선물', 0, -1, null),
-    ('출산 선물이에요', 2, -1, null),
-    ('수험생 응원 간식', 2, -1, null),
-    ('옷 교환하려고요', 1, -1, null),
-    ('반려견 간식이요', 0, -1, null),
-    ('졸업 선물이에요', 0, -1, null),
-    ('주소가 맞나요?', 1, -1, null),
-    // 지역
-    ('아이 학교 준비물', 0, 0, null),
-    ('이웃집 대신 왔어요', 2, 0, null),
-    ('가게 재고 반품', 1, 1, null),
-    ('신상품 샘플 발송', 0, 1, null),
-    ('생선 아이스박스', 1, 2, null),
-    ('배 탄 아들에게', 2, 2, null),
-    ('기계 부품 급송', 0, 3, null),
-    ('작업복 반품이요', 1, 3, null),
-    ('집들이 선물이요', 0, 4, null),
-    ('새 아파트 첫 택배', 2, 4, null),
-    // 성수기
-    ('설 선물 세트', 0, -1, '설 연휴'),
-    ('고향 부모님께', 2, -1, '설 연휴'),
-    ('어버이날 꽃바구니', 2, -1, '가정의 달'),
-    ('어린이날 장난감', 0, -1, '가정의 달'),
-    ('추석 한과 세트', 0, -1, '추석'),
-    ('명절 선물 늦었어요', 1, -1, '추석'),
-    ('직구 반품이요', 1, -1, '블랙프라이데이'),
-    ('할인 득템 보내요', 0, -1, '블랙프라이데이'),
-    ('크리스마스 선물', 0, -1, '연말 성수기'),
-    ('연하장 한 묶음', 2, -1, '연말 성수기'),
+  // ---- 사연 택배 (사연 손님만 말풍선, 문 앞에서 기다림) ----
+  static const int storyFromDay = 2; // 이 날부터 사연 손님이 옴
+  static const double storyChance = 0.12; // 새 손님이 사연 손님일 확률 (한 번에 한 명)
+  static const double storyWait = 35; // 문 앞에서 기다리는 시간(게임 초). 지나면 돌아감
+  static const double storyTouchDp = 48; // 사연 손님 터치 영역 최소 크기(dp)
+  static const double storyPackTime = 4.0; // 포장 연출 시간(게임 초)
+  static const double storyNormalOk = 0.45, storyTempOk = 0.75; // 조건 미달 때 성공 확률
+  static const int storyTempCost = 300; // 임시 포장 재료비
+  static const int storySkillBonus = 500; // 숙련 포장 보너스
+  // 초기 5개 (재미를 보고 늘림). 1단계는 포장대 레벨만 요구
+  static const List<StoryDef> storyDefs = [
+    StoryDef('letter', '군대 간 아들에게', '엄마', '손편지랑 양말 몇 켤레예요. 구겨지지 않게만 부탁해요.',
+        'pack', 1, ['tape'], 600, 3, '아들이 편지를 받고 전화했대요. "엄마 글씨 그대로네!"', '봉투가 조금 젖었지만, 아들은 편지를 다 읽었대요.'),
+    StoryDef('teddy', '아이 곰인형이요', '꼬마 지우', '할머니 댁에 두고 온 곰인형을 보내 주세요. 매일 밤 안고 자요.',
+        'pack', 1, ['wrap', 'tape'], 700, 4, '곰인형이 무사히 도착! 지우가 오늘 밤 푹 잤대요.', '귀가 조금 눌렸지만, 지우는 곰인형을 꼭 안아 줬대요.'),
+    StoryDef('kimchi', '할머니 김장 김치', '할머니', '손주들 먹으라고 담근 김장 김치예요. 국물이 새면 큰일이에요.',
+        'pack', 2, ['ice', 'wrap', 'tape'], 900, 5, '김치 국물 한 방울 안 샜대요. 손주가 밥 두 공기 먹었대요.', '국물이 조금 샜지만, 손주들은 "할머니 맛"이라며 다 먹었대요.'),
+    StoryDef('cake', '생일 케이크요', '단골 빵집', '딸 생일 케이크를 시골 부모님께요. 크림이 녹으면 안 돼요.',
+        'pack', 2, ['ice', 'wrap'], 1000, 5, '촛불까지 멀쩡! 부모님이 영상 통화로 노래를 불러 줬대요.', '크림이 조금 녹았지만, 부모님은 "세상에서 제일 맛있다"고 했대요.'),
+    StoryDef('vase', '결혼 기념 도자기', '노부부', '50년 전 결혼 선물로 받은 도자기예요. 딸에게 물려주려고요.',
+        'pack', 3, ['wrap', 'wrap', 'tape'], 1500, 8, '금 하나 없이 도착. 딸이 거실 한가운데에 두었대요.', '이가 조금 나갔지만, 딸은 "50년 이야기가 하나 더 생겼다"고 했대요.'),
   ];
+  static const List<String> storyStamp = ['배송 완료', '파손', '지연'];
 
   // ---- 직접 개입 ----
   static const int tapBonus = 10; // 내 자리에서 손님을 직접 탭해 접수하면 받는 보너스(원)

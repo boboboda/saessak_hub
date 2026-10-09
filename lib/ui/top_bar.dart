@@ -87,7 +87,18 @@ class TopBar extends StatelessWidget {
                                         case 11:
                       g.rp += 1000;
                       break;
-                                                            case 14:
+                                                            case 15:
+                      // 사연 손님 부르기 (차례로, 확률·날짜 무시)
+                      if (g.storyBusy) {
+                        g.showToast('진행 중인 사연이 있어요');
+                        break;
+                      }
+                      g.spawnCustomer();
+                      final sc = g.customers.last;
+                      sc.guest = -1;
+                      sc.story = g.debugStory++ % Cfg.storyDefs.length;
+                      break;
+                    case 14:
                       // 숨은 손님 차례로 부르기 (조건 무시)
                       g.spawnCustomer();
                       final cu = g.customers.last;
@@ -165,6 +176,10 @@ class TopBar extends StatelessWidget {
                     child: Text('회사 등급 +1', style: Tx.body),
                   ),
                                     PopupMenuItem(
+                    value: 15,
+                    child: Text('사연 손님 부르기 (차례로)', style: Tx.body),
+                  ),
+                  PopupMenuItem(
                     value: 14,
                     child: Text('숨은 손님 부르기 (차례로)', style: Tx.body),
                   ),

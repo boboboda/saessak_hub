@@ -137,8 +137,9 @@ extension WorldView on HubGame {
       e.$2();
     }
     _drawLights(c);
-    for (final f in _tags) {
-      f();
+    // 표시를 그리다가 표시가 더 생길 수 있어서(사연 말풍선 등) 번호로 돎
+    for (var i = 0; i < _tags.length; i++) {
+      _tags[i]();
     }
 
     // 배치 목업
@@ -652,7 +653,12 @@ extension WorldView on HubGame {
             }
             break;
         }
-        if (b.type.id == 'pack') _drawPackContent(c, b);
+        final sj = storyJob;
+        if (b.type.id == 'pack' && sj != null && sj.table == b) {
+          _drawStoryPack(c, b, sj);
+        } else if (b.type.id == 'pack') {
+          _drawPackContent(c, b);
+        }
       });
     }
   }
@@ -1024,34 +1030,100 @@ extension WorldView on HubGame {
     }
   }
 
-  /// 손님 사연 말풍선: 머리 오른쪽 옆 (줄 선 손님끼리 위아래로 겹치지 않게). 탭하면 미리 처리.
+  /// 사연 손님 말풍선: 머리 위 둥근 말풍선 안에 사연 물건 아이콘 + 느낌표, 테두리 고리는 남은 기다림.
+  /// 말풍선은 손님이 문 앞에 멈춰 있어서 같이 흔들리지 않음 (살짝 위아래로만 떠 있음)
   void _storyBubble(Canvas c, Customer cu, Offset p) {
     const t = Cfg.tile;
-    final s = Cfg.stories[cu.story];
-    final text = cu.pre ? '고마워요!' : s.$1;
-    final w = textWidth(text, 10) + 10;
-    final r = Rect.fromLTWH(p.dx + 9, p.dy - t * 0.95, w, 15);
-    final col = Color(cu.pre ? 0xFFE6F4EA : Cfg.storyColor[s.$2]);
-    // 꼬리 (머리 쪽)
-    c.drawPath(
-      Path()
-        ..moveTo(r.left + 2, r.bottom - 5)
-        ..lineTo(r.left - 4, r.bottom + 2)
-        ..lineTo(r.left + 7, r.bottom - 1)
-        ..close(),
-      Paint()..color = col,
-    );
-    final rr = RRect.fromRectAndRadius(r, const Radius.circular(5));
-    c.drawRRect(rr, Paint()..color = col);
-    c.drawRRect(
-      rr,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = const Color(0xFF2A2438),
-    );
-    labelIn(c, text, r, size: 10, color: const Color(0xFF2A2438));
-    if (!cu.pre) cu.bubble = r;
+    final d = Cfg.storyDefs[cu.story];
+    final bob = sin(clock * 3) * 1.5;
+    final r = Rect.fromCenter(center: Offset(p.dx, p.dy - t * 1.6 + bob), width: 34, height: 30);
+    final bub = Sprites.storyBubble;
+    if (bub != null) {
+      Sprites.drawContain(c, bub, r.inflate(3));
+    } else {
+      c.drawPath(
+        Path()
+          ..moveTo(r.center.dx - 4, r.bottom - 1)
+          ..lineTo(r.center.dx, r.bottom + 6)
+          ..lineTo(r.center.dx + 5, r.bottom - 1)
+          ..close(),
+        Paint()..color = const Color(0xFFFFFBF0),
+      );
+      final rr = RRect.fromRectAndRadius(r, const Radius.circular(9));
+      c.drawRRect(rr, Paint()..color = const Color(0xFFFFFBF0));
+      c.drawRRect(
+        rr,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..color = const Color(0xFF2A2438),
+      );
+    }
+    final icon = Sprites.storyItems[d.item];
+    if (icon != null) Sprites.drawContain(c, icon, r.deflate(5).translate(0, -1));
+    // 남은 기다림: 말풍선 위 막대
+    final left = (1 - cu.storyT / Cfg.storyWait).clamp(0.0, 1.0);
+    box(c, r.left + 3, r.top - 6, r.width - 6, 3, 0xFF2A2438);
+    box(c, r.left + 3, r.top - 6, (r.width - 6) * left, 3, left > 0.35 ? 0xFFFFD166 : 0xFFE5484D);
+    // 느낌표 배지 (오른쪽 위, 깜빡임)
+    final ex = Sprites.storyAlert;
+    final er = Rect.fromCenter(center: r.topRight + const Offset(-2, 2), width: 16, height: 16);
+    if (ex != null) {
+      Sprites.drawContain(c, ex, er.translate(0, sin(clock * 6) * 1.2));
+    } else {
+      c.drawCircle(er.center, 7, Paint()..color = const Color(0xFFE5484D));
+      labelIn(c, '!', er, size: 11);
+    }
+    cu.bubble = r.inflate(4);
+  }
+
+  /// 포장대 위 사연 택배: 상자가 눌렸다 펴지며(찌그러짐) 포장 아이콘(얼음·뽁뽁이·테이프)이 차례로 튀어나옴
+  void _drawStoryPack(Canvas c, Building b, StoryJob j) {
+    final r0 = _px(b.rect).deflate(1);
+    final sp = Sprites.forBuilding('pack');
+    final top = sp == null ? r0.top : Sprites.fitBottom(sp, r0).top - 6;
+    final cx = r0.center.dx;
+    final live = b.active.isNotEmpty;
+    final k = (j.t / Cfg.storyPackTime).clamp(0.0, 1.0);
+    // 찌그러짐: 가로로 퍼지고 세로로 눌림 (직원이 일할 때만)
+    final sq = live ? sin(clock * 9).abs() * 0.18 : 0.0;
+    final w = 22 * (1 + sq * 0.6), h = 20 * (1 - sq);
+    final br = Rect.fromLTWH(cx - w / 2, top + 21 - h, w, h);
+    final img = Sprites.boxOpen ?? Sprites.box;
+    if (img != null) {
+      Sprites.drawContain(c, k > 0.8 && Sprites.box != null ? Sprites.box! : img, br);
+    } else {
+      box(c, br.left, br.top, br.width, br.height, 0xFFC8955E);
+    }
+    // 사연 물건 (상자 위로 살짝)
+    final d = Cfg.storyDefs[j.story];
+    final it = Sprites.storyItems[d.item];
+    if (it != null && k < 0.8) Sprites.drawContain(c, it, Rect.fromCenter(center: Offset(cx, br.top - 4), width: 16, height: 16));
+    // 아이콘 이펙트: 단계마다 하나씩 위로 떠오르며 사라짐
+    final n = d.fx.length;
+    for (var i = 0; i < n; i++) {
+      final t0 = i / n * 0.85;
+      final u = ((k - t0) / 0.3);
+      if (u < 0 || u > 1) continue;
+      final ic = Sprites.fxIcons[d.fx[i]];
+      final rr = Rect.fromCenter(center: Offset(cx + (i - (n - 1) / 2) * 14, br.top - 10 - u * 22), width: 18, height: 18);
+      final paint = Paint()..color = Color.fromRGBO(255, 255, 255, (1 - u * u).clamp(0.0, 1.0));
+      if (ic != null) {
+        c.saveLayer(rr.inflate(2), paint);
+        Sprites.drawContain(c, ic, rr);
+        c.restore();
+      }
+    }
+    // 진행 막대 + 직원이 없을 때 안내
+    box(c, r0.left + 6, r0.bottom - 6, r0.width - 12, 4, 0xFF2A2438);
+    box(c, r0.left + 6, r0.bottom - 6, (r0.width - 12) * k, 4, 0xFFFFD166);
+    if (!live) {
+      final tag = Rect.fromCenter(center: Offset(cx, top - 14), width: 70, height: 14);
+      _tag(() {
+        box(c, tag.left, tag.top, tag.width, tag.height, 0xEE2A2438);
+        labelIn(c, '직원을 기다려요', tag, size: 9);
+      });
+    }
   }
 
   /// 창구·포장대에서 직원이 서는 자리 (건물 왼쪽 위 기준, 칸). 책상 그림 뒤쪽, 칸 안.
@@ -1398,7 +1470,7 @@ extension WorldView on HubGame {
             f.until = clock + 0.25;
             f.last = p;
           }
-          if (!moved && clock > f.until + Cfg.faceIdle) f.dir = 3; // 서서 기다릴 땐 창구(위)를 봄
+          if (!moved && clock > f.until + Cfg.faceIdle) f.dir = cu.story >= 0 ? 0 : 3; // 서서 기다릴 땐 창구(위)를 봄, 사연 손님은 화면 쪽
           shadowAt(c, Offset(p.dx, p.dy + t * 0.35), 20);
           Sprites.drawPerson(
             c,
@@ -1482,8 +1554,8 @@ extension WorldView on HubGame {
           );
         }
         cu.bubble = null;
-        if (cu.state != 2 && cu.story >= 0) _storyBubble(c, cu, p);
-        if (cu.state != 2) {
+        if (cu.state != 2 && cu.story >= 0) _storyBubble(c, cu, p); // 이미 표시(맨 위) 단계
+        if (cu.state != 2 && cu.story < 0) {
           final ratio = (cu.patience / Cfg.patience).clamp(0.0, 1.0);
           box(c, p.dx - 12, p.dy + t * 0.34, 24, 3, 0xFF2A2438);
           box(
