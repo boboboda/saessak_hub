@@ -118,7 +118,43 @@ extension BuildSystem on HubGame {
     gy = gy.clamp(z.top.toInt(), (z.bottom - t.h).toInt()).toInt();
     ghostX = gx;
     ghostY = gy;
+    _suggestSpot(t, z);
     ui();
+  }
+
+  /// 추천 위치: 앞 단계 시설(접수 → 포장 → 선반) 오른쪽에 1칸 띄운 같은 줄,
+  /// 같은 종류가 있으면 그 아래(앞줄 1칸 띄움). 놓을 수 있는 칸 중 가장 가까운 곳으로.
+  void _suggestSpot(BuildingType t, Rect z) {
+    const prev = {'pack': 'counter', 'shelf': 'pack'};
+    Offset? anchor;
+    final same = ofType(t.id);
+    final pid = prev[t.id];
+    if (same.isNotEmpty) {
+      final b = same.last;
+      anchor = Offset(b.tx.toDouble(), b.ty + b.type.h + 1.0);
+    } else if (pid != null && ofType(pid).isNotEmpty) {
+      final b = ofType(pid).last;
+      anchor = Offset(b.tx + b.type.w + 1.0, b.ty.toDouble());
+    }
+    if (anchor == null) return;
+    final ox = ghostX, oy = ghostY;
+    (int, int)? best;
+    var bestD = double.infinity;
+    for (var y = z.top.toInt(); y <= z.bottom - t.h; y++) {
+      for (var x = z.left.toInt(); x <= z.right - t.w; x++) {
+        final d = (Offset(x.toDouble(), y.toDouble()) - anchor).distanceSquared;
+        if (d >= bestD) continue;
+        ghostX = x;
+        ghostY = y;
+        final why = ghostProblem;
+        if (why == null || why == '돈이 부족해요') {
+          best = (x, y);
+          bestD = d;
+        }
+      }
+    }
+    ghostX = best?.$1 ?? ox;
+    ghostY = best?.$2 ?? oy;
   }
 
   /// 통로 깔기 모드 시작
@@ -181,12 +217,13 @@ extension BuildSystem on HubGame {
 
   /// (디버그) 시작 구성 자동 배치: 접수 창구·포장대·선반·도크 1개씩, 남는 직원은 운반
   void debugStarterLayout() {
-    // 통로 바로 위에 앞줄 한 칸을 비우고 나란히 (접수 → 포장 → 선반 → 도크)
+    // 문 줄 바로 위에 앞줄 한 칸을 비우고 나란히 (접수 → 포장 → 선반 → 도크)
     final top = door.top.toInt();
     final plan = <(String, int, int)>[
+      // 시설 사이 1칸: 창구(3칸) | 1칸 | 포장대(2칸) | 1칸 | 선반(2칸)
       ('counter', Cfg.zoneX1.toInt() - 3, top - 3),
       ('pack', Cfg.zoneX1.toInt() + 1, top - 3),
-      ('shelf', Cfg.zoneX2.toInt() + 1, top - 4),
+      ('shelf', Cfg.zoneX2.toInt(), top - 3),
       ('dock', Cfg.wallX.toInt(), top - 1),
     ];
     for (final (id, x, yy) in plan) {
