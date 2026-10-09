@@ -87,7 +87,17 @@ class TopBar extends StatelessWidget {
                                         case 11:
                       g.rp += 1000;
                       break;
-                                        case 12:
+                                                            case 14:
+                      // 숨은 손님 차례로 부르기 (조건 무시)
+                      g.spawnCustomer();
+                      final cu = g.customers.last;
+                      final k = g.debugGuest++ % Cfg.guestName.length;
+                      cu.guest = k;
+                      cu.look = Cfg.guestLook0 + k;
+                      cu.story = -1;
+                      if (g.rt.foundGuests.add(k)) g.showToast('새 손님 발견! ${Cfg.guestName[k]}');
+                      break;
+                    case 12:
                       g.runAward(g.year); // 지금 기록으로 시상식 보기
                       break;
                     case 13:
@@ -153,6 +163,10 @@ class TopBar extends StatelessWidget {
                   PopupMenuItem(
                     value: 13,
                     child: Text('회사 등급 +1', style: Tx.body),
+                  ),
+                                    PopupMenuItem(
+                    value: 14,
+                    child: Text('숨은 손님 부르기 (차례로)', style: Tx.body),
                   ),
                   PopupMenuItem(
                     value: 4,

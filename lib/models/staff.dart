@@ -35,7 +35,7 @@ class Staff {
   double get jobXpNeed => jobLv >= Cfg.jobMaxLv ? 0 : Cfg.jobXpNeed[jobLv - 1];
   double get xpNeed => 120.0 * level;
   String get specName => specNames[spec];
-  bool get canPromote => jobLv >= Cfg.jobMaxLv && !promoted;
+    bool get canPromote => jobLv >= Cfg.jobMaxLv && !promoted && job < Cfg.baseJobs; // 숨은 직업은 전직 없음
 
   double energy; // 현재 체력 (일하면 줄고, 쉬면 참)
   bool working = false; // 이번 프레임에 일했는지 (체력 계산용)

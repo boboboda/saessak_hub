@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../models/models.dart';
 import '../systems/award_system.dart';
+import '../systems/book_system.dart';
 import '../systems/build_system.dart';
 import '../systems/dock_system.dart';
 import '../systems/event_system.dart';
@@ -28,6 +29,7 @@ import 'config.dart';
 import 'sprites.dart';
 
 export '../systems/award_system.dart';
+export '../systems/book_system.dart';
 export '../systems/build_system.dart';
 export '../systems/dock_system.dart';
 export '../systems/event_system.dart';
@@ -106,7 +108,9 @@ class HubGame extends FlameGame {
   int awardWins = 0; // 대상(1위) 횟수
   bool endless = false; // 전국 네트워크 뒤 무한 모드
   AwardResult? award; // 시상식 카드
-  int? gradeUp; // 승급 카드 (오른 등급)
+    int? gradeUp; // 승급 카드 (오른 등급)
+    final Map<int, int> guestLast = {}; // 숨은 손님이 마지막으로 온 날
+  int debugGuest = 0;
   double fever = 0; // 수익 부스트(광고) 남은 시간(초)
 
   // 배송 기한: 택배마다 접수 시각을 단계마다 넘겨준다 (먼저 들어온 것부터 나감)
@@ -397,7 +401,8 @@ class HubGame extends FlameGame {
       _tickAcc = 0;
             this.refreshAlerts();
             this.checkGoals();
-      this.checkGrade();
+            this.checkGrade();
+      this.updateBook();
       ui();
     }
   }

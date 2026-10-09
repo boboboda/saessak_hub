@@ -8,14 +8,14 @@ import '../models/models.dart';
 extension JobSystem on HubGame {
   /// 이 직원이 지금 자리에서 직업 효과를 내는지 (맞는 곳에서 일하는지)
   bool jobFits(Staff s) {
-    if (s.carrier) return s.job == 2 || s.job == 7;
+        if (s.carrier) return s.job == 2 || s.job == 7 || s.job == 9;
     final p = s.post;
     if (p == null) return false;
     switch (p.type.id) {
-      case 'counter':
-        return s.job == 0 || s.job == 4 || s.job == 7;
+            case 'counter':
+        return s.job == 0 || s.job == 4 || s.job == 7 || s.job == 8 || s.job == 10;
       case 'pack':
-        return s.job == 1 || s.job == 5 || s.job == 7;
+        return s.job == 1 || s.job == 5 || s.job == 7 || s.job == 8;
       case 'shelf':
         return s.job == 3;
       case 'dock':
@@ -40,8 +40,12 @@ extension JobSystem on HubGame {
         return 0.7; // 상담원: 손님 달래는 데 시간을 씀
       case 5:
         return t == 3 ? 0.85 : 0.7; // 검수원
-      case 7:
+            case 7:
         return 0.85; // 현장 반장
+      case 8:
+        return const [1.3, 1.35, 1.35, 1.4][t]; // 원스톱 사원
+      case 10:
+        return 1.1; // 고객 감동 매니저
     }
     return 1.0;
   }
@@ -53,7 +57,8 @@ extension JobSystem on HubGame {
       if (!jobFits(s)) continue;
       final t = _tier(s);
       if (s.job == 0 && t >= 2) m = min(m, 0.85);
-      if (s.job == 4) m = min(m, const [0.8, 0.7, 0.7, 0.55][t]);
+            if (s.job == 4) m = min(m, const [0.8, 0.7, 0.7, 0.55][t]);
+      if (s.job == 10) m = min(m, const [0.6, 0.55, 0.55, 0.5][t]);
     }
     return m;
   }
@@ -78,7 +83,8 @@ extension JobSystem on HubGame {
   double jobWalk(Staff s) {
     if (!jobFits(s)) return 1.0;
     if (s.job == 2) return const [1.0, 1.1, 1.25, 1.45][_tier(s)];
-    if (s.job == 7) return 0.9;
+        if (s.job == 7) return 0.9;
+    if (s.job == 9) return const [1.35, 1.4, 1.4, 1.45][_tier(s)];
     return 1.0;
   }
 
@@ -95,7 +101,11 @@ extension JobSystem on HubGame {
   double jobLoad(Building b) {
     var m = 1.0;
     for (final s in b.active) {
-      if (jobFits(s) && s.job == 6) m = max(m, const [1.2, 1.3, 1.45, 1.7][_tier(s)]);
+            if (jobFits(s) && s.job == 6) m = max(m, const [1.2, 1.3, 1.45, 1.7][_tier(s)]);
+    }
+    // 자동화 설계사(운반)가 있고 이 도크가 '빠른 출고' 세트면 싣기 +20%
+    if (b.sets.contains(6) && staff.any((s) => s.carrier && s.job == 9 && !s.away)) {
+      m *= 1.2;
     }
     return m;
   }
@@ -154,8 +164,12 @@ extension JobSystem on HubGame {
   }
 
   /// 직업 바꾸기: 새 직업은 Lv1부터 (예전 직업 레벨은 기록에 남음)
-  void changeJob(Staff s, int job) {
+    void changeJob(Staff s, int job) {
     if (job == s.job) return;
+    if (job >= Cfg.baseJobs && !this.hiddenJobOk(s, job)) {
+      showToast('숨은 직업은 조건을 채운 직원만 될 수 있어요');
+      return;
+    }
     s.jobHist[s.job] = max(s.jobHist[s.job] ?? 0, s.jobLv);
     s.job = job;
     s.jobLv = 1;

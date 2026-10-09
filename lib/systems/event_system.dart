@@ -191,7 +191,8 @@ extension EventSystem on HubGame {
     for (final e in evts) {
       if (e.kind == 0) m *= Cfg.evtTvIntake;
       if (e.kind == 1) m *= Cfg.evtRushIntake;
-      if (e.kind == 3) m *= Cfg.evtBulkIntake;
+            if (e.kind == 3) m *= Cfg.evtBulkIntake;
+      if (e.kind == 6 && e.from <= day) m *= Cfg.guestStreamIntake; // 유튜버 방송 다음 날
     }
     return m;
   }
@@ -238,8 +239,11 @@ extension EventSystem on HubGame {
             notes.add('대량 주문 실패 (배송 $got/${e.need}건). 명성 −${Cfg.evtBulkFail}');
           }
           break;
-        case 4:
+                case 4:
           notes.add('폭염이 지나갔어요');
+          break;
+        case 6:
+          notes.add('유튜버 방송 효과가 끝났어요');
           break;
       }
     }
@@ -253,7 +257,8 @@ extension EventSystem on HubGame {
         0 => 'TV 취재 중',
         1 => '명절 특근 ~${e.until}일차',
         2 => '직원 다툼 ~${e.until}일차',
-        3 => '대량 주문 ${delivered - e.base}/${e.need}',
+                3 => '대량 주문 ${delivered - e.base}/${e.need}',
+        6 => e.from <= day ? '방송 효과 손님 ×1.3' : '내일 방송 효과',
         _ => '폭염',
       },
   ];

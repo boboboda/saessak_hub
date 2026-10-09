@@ -1394,5 +1394,165 @@
       ],
       "view": "top-down"
     }
+  },
+  "cust_g_base": {
+    "endpoint": "/create-character-v3",
+    "note": "숨은 손님: 단골 할머니",
+    "body": {
+      "description": "elderly grandmother customer, gray hair bun, flower pattern apron over a pink blouse, holding a red cloth-wrapped kimchi box, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_g_walk": {
+    "endpoint": "/animate-character",
+    "note": "숨은 손님 걷기: 단골 할머니",
+    "character_of": "cust_g_base",
+    "body": {
+      "character_id": "{cust_g_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_h_base": {
+    "endpoint": "/create-character-v3",
+    "note": "숨은 손님: 유튜버",
+    "body": {
+      "description": "young video streamer customer, mint green hair, black baseball cap, yellow jacket, holding a phone on a selfie stick, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_h_walk": {
+    "endpoint": "/animate-character",
+    "note": "숨은 손님 걷기: 유튜버",
+    "character_of": "cust_h_base",
+    "body": {
+      "character_id": "{cust_h_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_i_base": {
+    "endpoint": "/create-character-v3",
+    "note": "숨은 손님: 이삿짐 센터 사장",
+    "body": {
+      "description": "burly middle-aged moving company boss customer, blue work overalls, white towel headband, work gloves, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_i_walk": {
+    "endpoint": "/animate-character",
+    "note": "숨은 손님 걷기: 이삿짐 센터 사장",
+    "character_of": "cust_i_base",
+    "body": {
+      "character_id": "{cust_i_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_j_base": {
+    "endpoint": "/create-character-v3",
+    "note": "숨은 손님: 꼬마 손님",
+    "body": {
+      "description": "little girl customer, red dress, yellow hair clips, two pigtails, holding a crayon drawing letter, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_j_walk": {
+    "endpoint": "/animate-character",
+    "note": "숨은 손님 걷기: 꼬마 손님",
+    "character_of": "cust_j_base",
+    "body": {
+      "character_id": "{cust_j_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
+  },
+  "cust_k_base": {
+    "endpoint": "/create-character-v3",
+    "note": "숨은 손님: 해외 바이어",
+    "body": {
+      "description": "foreign businesswoman customer, blonde hair, beige trench coat, sunglasses on head, pulling a small rolling suitcase, simple clean chibi pixel art, readable at small size",
+      "image_size": {
+        "width": 48,
+        "height": 48
+      },
+      "view": "low top-down",
+      "outline": "thin",
+      "detail": "medium"
+    }
+  },
+  "cust_k_walk": {
+    "endpoint": "/animate-character",
+    "note": "숨은 손님 걷기: 해외 바이어",
+    "character_of": "cust_k_base",
+    "body": {
+      "character_id": "{cust_k_base.character_id}",
+      "action_description": "walking",
+      "frame_count": 6,
+      "directions": [
+        "south",
+        "east",
+        "north",
+        "west"
+      ],
+      "mode": "v3"
+    },
+    "per_direction": true
   }
 }

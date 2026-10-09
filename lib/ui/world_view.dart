@@ -1388,6 +1388,17 @@ extension WorldView on HubGame {
         }
       });
       _tag(() {
+                if (cu.guest >= 0 && cu.state != 2) {
+          final nm = Cfg.guestName[cu.guest];
+          final r = Rect.fromCenter(
+            center: Offset(p.dx, p.dy - t * 1.25),
+            width: textWidth(nm, 10) + 12,
+            height: 15,
+          );
+          c.drawRRect(RRect.fromRectAndRadius(r, const Radius.circular(7)),
+              Paint()..color = const Color(0xEEFFD166));
+          labelIn(c, nm, r, size: 10, color: const Color(0xFF2A2438));
+        }
         if (cu.vip) {
           c.drawCircle(
             p,

@@ -65,7 +65,27 @@ class OpsSheet extends StatelessWidget {
           const SizedBox(height: 8),
                                         _research(),
           const SizedBox(height: 16),
-          _setBook(),
+                    CardBox(
+            child: Row(
+              children: [
+                const Icon(Icons.menu_book, color: C.good, size: 28),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('도감', style: Tx.h2),
+                      Text('손님 · 직업 · 세트 ${g.bookFound}/${g.bookTotal} (${(g.bookPct * 100).floor()}%)', style: Tx.sub),
+                    ],
+                  ),
+                ),
+                AppButton('열기', small: true, color: C.good, onTap: () {
+                  g.sheet = 'book';
+                  g.ui();
+                }),
+              ],
+            ),
+          ),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -342,49 +362,6 @@ class OpsSheet extends StatelessWidget {
           if (!done)
             AppButton(why == null ? '연구' : (g.resNow == i ? '진행 중' : why),
                 small: true, color: C.blue, onTap: why == null ? () => g.startResearch(i) : null),
-        ],
-      ),
-    );
-  }
-
-  /// 세트 도감: 공개 세트는 조건까지, 숨은 세트는 발견 전엔 ??? + 힌트
-  Widget _setBook() {
-    final found = g.rt.foundSets;
-    String need(Map<String, int> m) => m.entries
-        .map((e) => '${Cfg.types.firstWhere((t) => t.id == e.key).name}${e.value > 1 ? '×${e.value}' : ''}')
-        .join(' + ');
-    return CardBox(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text('세트 도감', style: Tx.h2),
-              const Spacer(),
-              Text('${found.length}/${Cfg.sets.length} 발견', style: const TextStyle(color: C.good, fontWeight: FontWeight.w800)),
-            ],
-          ),
-          const SizedBox(height: 2),
-          const Text('건물 테두리를 맞대어 놓으면 발동 (맞닿은 묶음 안에 재료가 다 있으면)', style: Tx.sub),
-          for (var i = 0; i < Cfg.sets.length; i++) ...[
-            const SizedBox(height: 6),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(found.contains(i) ? Icons.check_circle : (Cfg.sets[i].hidden ? Icons.help_outline : Icons.radio_button_unchecked),
-                    size: 18, color: found.contains(i) ? C.good : C.sub),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    Cfg.sets[i].hidden && !found.contains(i)
-                        ? '??? · 힌트: ${Cfg.sets[i].hint}'
-                        : '${Cfg.sets[i].name} · ${need(Cfg.sets[i].need)} → ${Cfg.sets[i].effect}',
-                    style: Tx.body,
-                  ),
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );

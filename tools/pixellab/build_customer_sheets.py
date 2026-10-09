@@ -4,8 +4,10 @@ from pathlib import Path
 from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 ORDER = ["south", "west", "east", "north"]
-for n, k in enumerate("abcdef"):
+for n, k in enumerate("abcdefghijk"):  # g~k = 숨은 손님 (cust_6..10)
     base = ROOT / f"assets/raw/pixellab/cust_{k}_walk/export/Idle/animations/walking"
+    if not base.exists():
+        continue
     frames = [[Image.open(base / d / f"frame_{i:03d}.png").convert("RGBA") for i in range(7)] for d in ORDER]
     w, h = frames[0][0].size
     sheet = Image.new("RGBA", (w * 7, h * 4))

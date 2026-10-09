@@ -17,7 +17,12 @@ extension FlowSystem on HubGame {
       exitPoint.translate(-0.9 * behind, 0),
       open[rnd.nextInt(open.length)],
     );
-    cu.look = rnd.nextInt(6);
+        cu.look = rnd.nextInt(6);
+    cu.guest = this.pickGuest();
+    if (cu.guest >= 0) {
+      cu.look = Cfg.guestLook0 + cu.guest;
+      cu.story = -1; // 숨은 손님은 사연 대신 이름표
+    }
     cu.story = _pickStory(cu.region);
     final r = rnd.nextDouble();
     if (day >= 2) {
@@ -186,9 +191,10 @@ extension FlowSystem on HubGame {
 
       if (canServe && cnt.mine && c.tapped) {
         // 내가 직접 탭해서 접수: 기다리지 않고 바로 끝, 보너스
-                cnt.outbox.add(_mkParcel(c));
+                        cnt.outbox.add(_mkParcel(c));
         done++;
         this.rateServed(c);
+        this.guestServed(c, cnt);
         money += Cfg.tapBonus;
         dayEarn += Cfg.tapBonus;
         c.tapped = false;
@@ -201,9 +207,10 @@ extension FlowSystem on HubGame {
         }
         c.serveT += dt * _rate(cnt) * (c.pre ? Cfg.storyServeBoost : 1.0);
         if (c.serveT >= Cfg.serveTime) {
-                    cnt.outbox.add(_mkParcel(c));
+                              cnt.outbox.add(_mkParcel(c));
           done++;
           this.rateServed(c);
+          this.guestServed(c, cnt);
           c.state = 2;
         }
       } else {

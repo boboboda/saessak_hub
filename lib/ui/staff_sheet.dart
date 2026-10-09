@@ -254,12 +254,17 @@ class _StaffCard extends StatelessWidget {
               const Text('새 직업은 Lv1부터 시작해요 (예전 직업 레벨은 기록에 남아요)', style: Tx.sub),
               const SizedBox(height: 8),
               for (var j = 0; j < Cfg.jobName.length; j++)
+                                if (j < Cfg.baseJobs || g.rt.seenJobs.contains(j))
                 ListTile(
                   dense: true,
-                  enabled: j != s.job,
+                  enabled: j != s.job && (j < Cfg.baseJobs || g.hiddenJobOk(s, j)),
                   leading: CircleAvatar(radius: 8, backgroundColor: Color(Cfg.jobColor[j])),
-                  title: Text('${Cfg.jobName[j]}${s.jobHist[j] != null ? ' (예전 Lv${s.jobHist[j]})' : ''}', style: Tx.body),
-                  subtitle: Text('${Cfg.jobWhere[j]} · ${Cfg.jobSkills[j][0]}', style: Tx.sub),
+                  title: Text('${j >= Cfg.baseJobs ? '✦' : ''}${Cfg.jobName[j]}${s.jobHist[j] != null ? ' (예전 Lv${s.jobHist[j]})' : ''}', style: Tx.body),
+                  subtitle: Text(
+                      j >= Cfg.baseJobs && !g.hiddenJobOk(s, j)
+                          ? '숨은 직업 · 이 직원은 아직 자격이 없어요'
+                          : '${Cfg.jobWhere[j]} · ${Cfg.jobSkills[j][0]}',
+                      style: Tx.sub),
                   onTap: () {
                     Navigator.pop(ctx);
                     g.changeJob(s, j);

@@ -1,0 +1,36 @@
+{
+  "group_id": "a533c311-5777-4575-b34f-80412fea758a",
+  "states": [
+    {
+      "character": {
+        "id": "d0f1a262-3c80-43a6-8b98-3f783b6a0ac4",
+        "name": "Idle",
+        "prompt": "elderly grandmother customer, gray hair bun, flower pattern apron over a pink blouse, holding a red cloth-wrapped kimchi box, simple clean chibi pixel art, readable at small size",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-09T16:02:56.669418+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-09T16:07:59.100163"
+}

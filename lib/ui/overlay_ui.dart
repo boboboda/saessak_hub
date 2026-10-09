@@ -5,6 +5,7 @@ import 'alert_bar.dart';
 import 'award_card.dart';
 import 'bottom_bar.dart';
 import 'build_sheet.dart';
+import 'book_sheet.dart';
 import 'building_sheet.dart';
 import 'ops_sheet.dart';
 import 'event_card.dart';
@@ -26,6 +27,8 @@ class OverlayUi extends StatelessWidget {
     Widget? sheet;
     if (g.sheet == 'build') {
       sheet = BuildSheet(g);
+        } else if (g.sheet == 'book') {
+      sheet = BookSheet(g);
     } else if (g.sheet == 'ops') {
       sheet = OpsSheet(g);
     } else if (g.sheet == 'staff') {

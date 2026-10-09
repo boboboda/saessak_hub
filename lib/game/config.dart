@@ -307,10 +307,14 @@ class Cfg {
 
   // ---- 직업 (8개) ----
   // 맞는 곳에서 일할 때만 직업 효과가 나고 직업 경험치가 쌓인다. Lv2·Lv4에 스킬, Lv5 + 전직서 1장으로 전직.
-  static const List<String> jobName = ['접수원', '포장사', '운반원', '분류사', '상담원', '검수원', '정비사', '현장 반장'];
-  static const List<String> jobPromo = ['창구 매니저', '포장 장인', '물류 달인', '출고 반장', '고객만족 팀장', '품질 관리자', '정비 반장', '현장 소장'];
-  static const List<String> jobWhere = ['접수 창구', '포장대', '운반', '선반(보조 자리)', '접수 창구', '포장대', '도크(보조 자리)', '창구·포장대·운반'];
-  static const List<int> jobColor = [0xFFF0963A, 0xFF5BA88A, 0xFF8EC5FF, 0xFFB98A5E, 0xFFE58FB0, 0xFF9AA7C7, 0xFF7A8FA6, 0xFFFFD166];
+    // 8~10 은 숨은 직업 (두 직업을 Lv5까지 키운 직원만, 전직 없음)
+  static const List<String> jobName = ['접수원', '포장사', '운반원', '분류사', '상담원', '검수원', '정비사', '현장 반장', '원스톱 사원', '자동화 설계사', '고객 감동 매니저'];
+    static const List<String> jobPromo = ['창구 매니저', '포장 장인', '물류 달인', '출고 반장', '고객만족 팀장', '품질 관리자', '정비 반장', '현장 소장', '원스톱 사원', '자동화 설계사', '고객 감동 매니저'];
+    static const List<String> jobWhere = ['접수 창구', '포장대', '운반', '선반(보조 자리)', '접수 창구', '포장대', '도크(보조 자리)', '창구·포장대·운반', '접수 창구·포장대', '운반', '접수 창구'];
+    static const List<int> jobColor = [0xFFF0963A, 0xFF5BA88A, 0xFF8EC5FF, 0xFFB98A5E, 0xFFE58FB0, 0xFF9AA7C7, 0xFF7A8FA6, 0xFFFFD166, 0xFFFF7EB6, 0xFF6FE3D2, 0xFFC59BFF];
+  static const int baseJobs = 8;
+  // 숨은 직업 조건: 이 두 직업을 Lv5까지 (접수원+포장사, 운반원+분류사, 상담원+접수원)
+  static const List<(int, int)> hiddenJobNeed = [(0, 1), (2, 3), (4, 0)];
   // 직업별 [기본, Lv2, Lv4, 전직] 효과 설명
   static const List<List<String>> jobSkills = [
     ['접수 창구에서 손님 접수', '빠른 손: 접수 +10%', '미소 응대: 창구 손님 인내심 감소 −15%', '창구 매니저: 접수 +40%'],
@@ -320,7 +324,10 @@ class Cfg {
     ['창구 손님 인내심 감소 −20% (접수는 느림)', '달래기: 인내심 감소 −30%', 'VIP 전담: VIP 팁 2배', '고객만족 팀장: 인내심 감소 −45%'],
     ['포장 실수 −50% (포장은 느림)', '꼼꼼 검사: 실수 −70%', '이중 확인: 실수 −90%', '품질 관리자: 실수 없음, 포장 덜 느림'],
     ['도크 싣기 +20%', '정비 요령: 싣기 +30%', '지게차 달인: 싣기 +45%', '정비 반장: 싣기 +70%'],
-    ['모든 직원 체력 소모 −8% (본인 일은 느림)', '격려: 체력 소모 −12%', '팀워크: 체력 소모 −18%', '현장 소장: 체력 소모 −25%'],
+        ['모든 직원 체력 소모 −8% (본인 일은 느림)', '격려: 체력 소모 −12%', '팀워크: 체력 소모 −18%', '현장 소장: 체력 소모 −25%'],
+    ['창구·포장대 어디서든 일 +30%', '일 +35%', '일 +40%', '-'],
+    ['운반 걸음 +35%, 컨베이어 세트 도크 싣기 +20%', '걸음 +40%', '걸음 +45%', '-'],
+    ['접수 +10%, 창구 손님 인내심 감소 −40%', '인내심 감소 −45%', '인내심 감소 −50%', '-'],
   ];
   static const List<double> jobXpNeed = [100, 250, 500, 900]; // 직업 Lv1→2, →3, →4, →5 (게임 초)
   static const int jobMaxLv = 5;
@@ -417,6 +424,25 @@ class Cfg {
     'lab': 1, 'chair': 1, 'plant': 1, 'classroom': 2, 'conveyor': 2,
   };
   static const int promoGrade = 2, nightShipGrade = 3;
+
+    // ---- 숨은 손님 (조건을 채우면 하루 한 번까지 확률로 옴, 처음 오면 손님 도감) ----
+  static const List<String> guestName = ['단골 할머니', '유튜버', '이삿짐 센터 사장', '꼬마 손님', '해외 바이어'];
+  static const List<String> guestHint = [
+    '대기 의자가 있는 창구에 친절한 직원이 있으면…',
+    '유명해진 뒤 수익 부스트가 켜져 있을 때…',
+    '대형 택배를 아주 많이 받으면…',
+    '창고에 화분이 많으면…',
+    '먼 지역까지 고급 배송을 하면…',
+  ];
+  static const List<String> guestEffect = [
+    '김치 택배 + 팁 500원',
+    '다음 날 손님 ×1.3',
+    '대형 택배 3건 + 2,000원',
+    '그림 편지, 명성 +10',
+    '해외 배송 +1,500원 · RP +100',
+  ];
+  static const double guestChance = 0.15, guestStreamIntake = 1.3;
+  static const int guestFoundFame = 15, guestLook0 = 6; // 숨은 손님 외형 = cust_6..10
 
   // ---- 계절 (1년 28일 = 7일씩) ----
   static const List<String> seasonName = ['봄', '여름', '가을', '겨울'];

@@ -11,7 +11,7 @@ class Sprites {
   static final List<ui.Image> staffLooks = [];
 
   /// 손님 걷기 시트 (assets/sprites/customer/cust_0..5.png, 직원 시트와 같은 배치). 없으면 null.
-  static const int custLooks = 6;
+    static const int custLooks = 11; // 0~5 일반 손님, 6~10 숨은 손님
   static final List<ui.Image?> custWalk = List.filled(custLooks, null);
   static ui.Image? box;
   static ui.Image? floor;

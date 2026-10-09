@@ -374,5 +374,12 @@
   },
   "hub_class": {
     "object_id": "e9ee92e3-7807-4466-8c1b-8afb6a4f1058"
+  },
+  "cust_g_base": {
+    "character_id": "d0f1a262-3c80-43a6-8b98-3f783b6a0ac4"
+  },
+  "cust_g_walk": {
+    "animation_group_id": "fc2ac98d-f4b1-489e-a566-2f1126476929",
+    "for_character": "d0f1a262-3c80-43a6-8b98-3f783b6a0ac4"
   }
 }

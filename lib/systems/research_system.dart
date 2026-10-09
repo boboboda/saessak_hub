@@ -47,7 +47,7 @@ extension ResearchSystem on HubGame {
   void updateResearch(double d) {
     final i = resNow;
     if (i == null) return;
-    resLeft -= d;
+        resLeft -= d * this.bookResearch; // 도감 50%: 연구 +10%
     if (resLeft > 0) return;
     researched.add(i);
     resNow = null;
