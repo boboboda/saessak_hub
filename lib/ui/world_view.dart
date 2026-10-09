@@ -963,10 +963,21 @@ extension WorldView on HubGame {
   List<Offset> _spots(Building b) {
     final w = _deskRect(b).width, h = b.type.h.toDouble();
     final sp = Sprites.forBuilding(b.type.id);
-    // 책상 윗면 뒤쪽 = 그림 위 끝에서 조금 아래
-    final topY = sp == null ? 0.1 : h - sp.height / Cfg.tile + 0.25;
+    if (sp == null) return [Offset(w - 0.5, 0.1), Offset(0.5, 0.1)];
+    // 발 = 책상 그림 위 끝 + _deskBack(px). 책상 뒤에 서고, 책상을 직원 위에 다시 그려 아래쪽을 가린다
+    final spriteTop = h * Cfg.tile - 1 - sp.height;
+    final feet = spriteTop + (_deskBack[b.type.id]?.$1 ?? 4);
+    final topY =
+        (feet - Cfg.tile * 0.35) / Cfg.tile; // drawStaff 는 (위치 + 0.35칸)을 발로 그림
     return [Offset(w - 0.5, topY), Offset(0.5, topY)];
   }
+
+  /// 책상 그림별 (직원 발 위치, 다시 그릴 때 위에서 빼는 높이) — 그림 위 끝 기준 px.
+  /// 창구는 윗면이 깊어 발을 앞쪽에 두고 윗면 뒤 1/5은 직원이 보이게, 포장대는 윗면이 얕아 맨 뒤에 서고 책상 전체를 앞에 그림
+  static const Map<String, (double, double)> _deskBack = {
+    'counter': (20, 11),
+    'pack': (4, 0),
+  };
 
   /// 포장대 위 상자(가운데)와 진행 막대. 직원·책상 앞면 위에 그린다.
   void _drawPackContent(Canvas c, Building b) {
@@ -1153,7 +1164,12 @@ extension WorldView on HubGame {
         // 책상(윗면 뒤 끝 아래부터)을 다시 그려 직원 다리를 가림
         c.save();
         c.clipRect(
-          Rect.fromLTRB(d.left, d.top + d.height * 0.22, d.right, d.bottom),
+          Rect.fromLTRB(
+            d.left,
+            d.top + (_deskBack[id]?.$2 ?? 0),
+            d.right,
+            d.bottom,
+          ),
         );
         Sprites.drawFitBottom(c, sp, r);
         c.restore();
@@ -1188,7 +1204,19 @@ extension WorldView on HubGame {
         sitAtBreak = true;
       } else {
         final o = Cfg.loungeSeats[s.seat];
-        _bench(c, Offset((l.tx + o.dx) * t, (l.ty + o.dy) * t), front: true);
+        final sp = Sprites.hubLounge;
+        if (sp == null) {
+          _bench(c, Offset((l.tx + o.dx) * t, (l.ty + o.dy) * t), front: true);
+        } else if (s.seat < 2) {
+          // 소파 자리: 소파 앞면(방석 아래)을 직원 위에 다시 그려 다리를 가림 → 앉은 모습
+          final r = _px(l.rect).deflate(1);
+          final d = Sprites.fitBottom(sp, r);
+          final x = (l.tx + o.dx) * t;
+          c.save();
+          c.clipRect(Rect.fromLTWH(x - 12, d.top + 31, 24, 12));
+          Sprites.drawFitBottom(c, sp, r);
+          c.restore();
+        }
       }
     }
     if (sitAtBreak) {

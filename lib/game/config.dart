@@ -96,12 +96,13 @@ class Cfg {
   static const double loungeRestMul = 3.0; // 휴게실 안에서 쉴 때 회복 배수
   static const double restBelow = 0.15; // 이 비율 이하가 되면 쉬러 감
   static const double restUntil = 0.85; // 이 비율까지 차면 돌아옴
-  // 휴게실(3×3) 안 앉는 자리 (건물 왼쪽 위 기준, 칸 단위)
+  // 휴게실(3×3) 안 쉬는 자리 (건물 왼쪽 위 기준, 칸 단위). hub_lounge 그림에 맞춤:
+  // 앞의 둘은 소파 방석 위(소파 앞면이 다리를 가림), 뒤의 둘은 탁자 양옆 바닥 (탁자·정수기 위에 서지 않게)
   static const List<Offset> loungeSeats = [
-    Offset(0.8, 0.8),
-    Offset(2.2, 0.8),
-    Offset(0.8, 2.2),
-    Offset(2.2, 2.2),
+    Offset(1.13, 1.28),
+    Offset(1.87, 1.28),
+    Offset(0.41, 2.34),
+    Offset(2.56, 2.34),
   ];
   static const double overnightRest = 0.5; // 하루가 지나면 최대 체력의 이만큼 회복
   static const double slipBase = 0.30; // 포장 실수 기본 확률

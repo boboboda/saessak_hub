@@ -29,20 +29,19 @@ class TopBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('새싹 택배 허브', style: Tx.title),
-                    Text('${Cfg.areaName[g.areaLevel]} · ${g.day}일차',
-                        style: Tx.sub),
+                    Text(
+                      '${Cfg.areaName[g.areaLevel]} · ${g.day}일차',
+                      style: Tx.sub,
+                    ),
                   ],
                 ),
               ),
               Pill(Icons.monetization_on, g.fmt(g.money), color: C.gold),
               const SizedBox(width: 6),
-              _SmallBtn(
-                'x${g.speedMul}',
-                    () {
-                  g.speedIdx = (g.speedIdx + 1) % Cfg.speeds.length;
-                  g.ui();
-                },
-              ),
+              _SmallBtn('x${g.speedMul}', () {
+                g.speedIdx = (g.speedIdx + 1) % Cfg.speeds.length;
+                g.ui();
+              }),
               PopupMenuButton<int>(
                 icon: const Icon(Icons.bug_report, color: C.sub),
                 color: C.panel,
@@ -72,17 +71,42 @@ class TopBar extends StatelessWidget {
                     case 6:
                       g.debugStarterLayout();
                       break;
+                    case 7:
+                      g.debugRestCheck();
+                      break;
                   }
                   g.ui();
                 },
                 itemBuilder: (_) => const [
-                  PopupMenuItem(value: 0, child: Text('돈 +10,000', style: Tx.body)),
-                  PopupMenuItem(value: 1, child: Text('후보 새로고침 (무료)', style: Tx.body)),
-                  PopupMenuItem(value: 2, child: Text('하루 넘기기 (월급)', style: Tx.body)),
+                  PopupMenuItem(
+                    value: 0,
+                    child: Text('돈 +10,000', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 1,
+                    child: Text('후보 새로고침 (무료)', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 2,
+                    child: Text('하루 넘기기 (월급)', style: Tx.body),
+                  ),
                   PopupMenuItem(value: 3, child: Text('손님 +3', style: Tx.body)),
-                  PopupMenuItem(value: 5, child: Text('명성 +500', style: Tx.body)),
-                  PopupMenuItem(value: 6, child: Text('시작 구성 자동 배치', style: Tx.body)),
-                  PopupMenuItem(value: 4, child: Text('저장 지우기 (다시 켜면 새로 시작)', style: Tx.body)),
+                  PopupMenuItem(
+                    value: 5,
+                    child: Text('명성 +500', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 6,
+                    child: Text('시작 구성 자동 배치', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 7,
+                    child: Text('휴게실 놓고 직원 지치게', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 4,
+                    child: Text('저장 지우기 (다시 켜면 새로 시작)', style: Tx.body),
+                  ),
                 ],
               ),
             ],
@@ -97,16 +121,26 @@ class TopBar extends StatelessWidget {
                 Pill(Icons.inbox, '접수 ${g.done}'),
                 Pill(Icons.inventory_2, '보관 ${g.totalStored}'),
                 Pill(Icons.local_shipping, '배송 ${g.delivered}'),
-                Pill(Icons.sentiment_dissatisfied, '놓침 ${g.lost}',
-                    color: g.lost > 0 ? C.bad : C.sub),
+                Pill(
+                  Icons.sentiment_dissatisfied,
+                  '놓침 ${g.lost}',
+                  color: g.lost > 0 ? C.bad : C.sub,
+                ),
                 Pill(Icons.groups, '직원 ${g.staff.length}'),
                 if (g.holiday != null)
-                  Pill(Icons.celebration, '${g.holiday!.$1} ×${g.holiday!.$4}', color: C.gold),
+                  Pill(
+                    Icons.celebration,
+                    '${g.holiday!.$1} ×${g.holiday!.$4}',
+                    color: C.gold,
+                  ),
                 if (g.streak >= 5)
                   Pill(Icons.bolt, '연속 정시 ${g.streak}', color: C.good),
                 if (g.fever > 0)
-                  Pill(Icons.local_fire_department, '부스트 ${g.fever.ceil()}초',
-                      color: C.bad),
+                  Pill(
+                    Icons.local_fire_department,
+                    '부스트 ${g.fever.ceil()}초',
+                    color: C.bad,
+                  ),
               ],
             ),
           ),
@@ -144,9 +178,14 @@ class _SmallBtn extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          child: Text(label,
-              style: const TextStyle(
-                  color: C.text, fontWeight: FontWeight.w700, fontSize: 13)),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: C.text,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
         ),
       ),
     );

@@ -35,8 +35,12 @@ extension BuildSystem on HubGame {
   }
 
   /// 배치 중인 목업의 타일 영역
-  Rect get ghostRect => Rect.fromLTWH(ghostX.toDouble(), ghostY.toDouble(),
-      placing!.w.toDouble(), placing!.h.toDouble());
+  Rect get ghostRect => Rect.fromLTWH(
+    ghostX.toDouble(),
+    ghostY.toDouble(),
+    placing!.w.toDouble(),
+    placing!.h.toDouble(),
+  );
 
   bool inRect(Rect r, Rect a) {
     return r.left >= a.left &&
@@ -135,9 +139,9 @@ extension BuildSystem on HubGame {
     this.autoAssign(nb);
     final needStaff = t.slots > 0;
     cancelPlacing();
-    showToast(needStaff
-        ? '${t.name} 설치! 직원이 모자라면 건물을 눌러 배치하세요'
-        : '${t.name} 설치 완료!');
+    showToast(
+      needStaff ? '${t.name} 설치! 직원이 모자라면 건물을 눌러 배치하세요' : '${t.name} 설치 완료!',
+    );
   }
 
   /// (디버그) 시작 구성 자동 배치: 접수 창구·포장대·선반·도크 1개씩, 남는 직원은 운반
@@ -152,10 +156,16 @@ extension BuildSystem on HubGame {
     ];
     for (final (id, x, yy) in plan) {
       final t = Cfg.types.firstWhere((t) => t.id == id);
-      final r = Rect.fromLTWH(x.toDouble(), yy.toDouble(), t.w.toDouble(), t.h.toDouble());
+      final r = Rect.fromLTWH(
+        x.toDouble(),
+        yy.toDouble(),
+        t.w.toDouble(),
+        t.h.toDouble(),
+      );
       if (buildings.any((b) => b.rect.overlaps(r))) continue;
       final nb = Building(t, x, yy);
-      if (id == 'counter' && !ofType('counter').any((b) => b.mine)) nb.mine = true;
+      if (id == 'counter' && !ofType('counter').any((b) => b.mine))
+        nb.mine = true;
       buildings.add(nb);
       this.autoAssign(nb);
     }
@@ -163,6 +173,36 @@ extension BuildSystem on HubGame {
       if (s.idle) this.setCarrier(s);
     }
     showToast('시작 구성 배치 완료');
+    ui();
+  }
+
+  /// (디버그) 빈자리에 휴게실을 하나 놓고 모든 직원을 지치게 해서 쉬러 가는 모습을 확인
+  void debugRestCheck() {
+    if (ofType('lounge').isEmpty) {
+      final t = Cfg.types.firstWhere((t) => t.id == 'lounge');
+      final a = area;
+      outer:
+      for (var y = a.bottom.toInt() - t.h; y >= a.top; y--) {
+        for (var x = a.left.toInt(); x + t.w <= a.right; x++) {
+          final r = Rect.fromLTWH(
+            x.toDouble(),
+            y.toDouble(),
+            t.w.toDouble(),
+            t.h.toDouble(),
+          );
+          if (buildings.any(
+            (b) => b.rect.overlaps(r) || frontRow(b.rect).overlaps(r),
+          ))
+            continue;
+          buildings.add(Building(t, x, y));
+          break outer;
+        }
+      }
+    }
+    for (final s in staff) {
+      s.energy = s.maxEnergy * Cfg.restBelow * 0.5;
+    }
+    showToast('휴게실 확인용: 직원이 쉬러 가요');
     ui();
   }
 
