@@ -85,7 +85,18 @@ class HubGame extends FlameGame {
   final List<(Offset, String, int, double)> hubFx = []; // 허브 위 떠오르는 글 (월드 픽셀, 글, 색, 생긴 시각)
   int fame = 0; // 명성 (지역을 여는 조건)
   int nextUnitId = 1;
-  bool showMap = false; // 전체화면 노선 지도
+  int screen = 0; // 보고 있는 화면: 0 허브 · 1 노선 지도 · 2 차고
+  bool get showMap => screen != 0; // 허브가 아닌 화면 (허브 그림은 쉼)
+  int mapSel = 0; // 노선 지도·차고에서 고른 지역
+  int? mapFollow; // 노선 지도에 들어가면 따라갈 차량 (차고 '지도에서 보기')
+
+  /// 화면 바꾸기 (시트·선택은 닫음)
+  void goScreen(int s) {
+    if (s == screen) return;
+    if (s != 0) closeAll();
+    screen = s;
+    ui();
+  }
     final Set<int> claimed = {}; // 보상을 받은 업적
   final RateState rt = RateState(); // 하루 평가·올해 목표·업적 기록
   int tickets = 0; // 전직서 (직업 Lv5 직원을 상위 직업으로 전직할 때 1장)

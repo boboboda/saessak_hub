@@ -8,10 +8,11 @@ import '../game/hub_game.dart';
 import '../game/region_map.dart';
 import '../game/sprites.dart';
 import '../models/models.dart';
+import 'fleet_widgets.dart';
 import 'theme.dart';
 
 /// 전체화면 노선 지도. 한 번에 한 지역만 보여 준다: 허브 → (도로) → 지역센터 → 동네 집들.
-/// 차량이 달리는 걸 실시간으로 보고, 노선·차량 배정·업그레이드·구입을 여기서 한다.
+/// 차량이 달리는 걸 실시간으로 보고 노선을 고친다. 차량 배정·업그레이드·구입은 차고 화면(garage_screen.dart).
 /// 지도는 화면보다 크고(타일 고정 크기), 드래그로 움직이거나 차량을 따라가며 본다.
 class RouteMapScreen extends StatefulWidget {
   final HubGame g;
@@ -24,7 +25,7 @@ class RouteMapScreen extends StatefulWidget {
 class _RouteMapScreenState extends State<RouteMapScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _anim;
-  int sel = 0; // 보고 있는 지역
+  late int sel = g.mapSel; // 보고 있는 지역 (차고와 같이 씀)
   final _Cam cam = _Cam();
   final Stopwatch _sw = Stopwatch()..start();
   double _last = 0;
@@ -37,6 +38,10 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     _anim = AnimationController(vsync: this, duration: const Duration(seconds: 1))
       ..addListener(_tick)
       ..repeat();
+    // 차고에서 '지도에서 보기'로 들어오면 그 차량을 따라감
+    cam.follow = g.mapFollow;
+    cam.pick = g.mapFollow;
+    g.mapFollow = null;
   }
 
   /// 매 프레임: 관성 스크롤 / 차량 따라가기 / 지도 경계
@@ -95,7 +100,6 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     setState(() => cam.pick = best);
   }
 
-  String _skillStars(int s) => '★' * s + '☆' * (5 - s);
 
   /// 고른 차량 정보: 기사 이름·능력, 차량 레벨·상태·적재, 따라가기
   Widget _unitInfo() {
@@ -105,7 +109,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     }
     if (u == null) return const SizedBox();
     final unit = u;
-    final img = _img(unit.type, full: unit.state == 1 && unit.cargo > 0);
+    final img = unitImage(unit.type, full: unit.state == 1 && unit.cargo > 0);
     final following = cam.follow == unit.id;
     return Container(
       width: 230,
@@ -133,9 +137,9 @@ class _RouteMapScreenState extends State<RouteMapScreen>
                 Text('${unit.driver} · ${Cfg.skillName[unit.skill]}',
                     style: const TextStyle(
                         color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
-                Text('${_skillStars(unit.skill)}  ${unit.name} Lv.${unit.level}',
+                Text('${skillStars(unit.skill)}  ${unit.name} Lv.${unit.level}',
                     style: const TextStyle(color: C.gold, fontSize: 10)),
-                Text(_state(unit), style: const TextStyle(color: C.sub, fontSize: 10)),
+                Text(unitState(unit), style: const TextStyle(color: C.sub, fontSize: 10)),
               ],
             ),
           ),
@@ -159,6 +163,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
   }
 
   void _select(int i) {
+    g.mapSel = i;
     setState(() => sel = i);
     cam.reset = true;
     cam.follow = null;
@@ -237,10 +242,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
           children: [
             IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                g.showMap = false;
-                g.ui();
-              },
+              onPressed: () => g.goScreen(0),
             ),
             const Expanded(child: Text('노선 지도', style: Tx.title)),
             Pill(Icons.star, '명성 ${g.fame}', color: C.accent),
@@ -464,25 +466,29 @@ class _RouteMapScreenState extends State<RouteMapScreen>
   }
 
   Widget _panel() {
-    return DefaultTabController(
-      length: 3,
-      child: Container(
-        color: C.panel,
-        child: Column(
-          children: [
-            const TabBar(
-              labelColor: Colors.white,
-              unselectedLabelColor: C.sub,
-              indicatorColor: C.accent,
-              tabs: [Tab(text: '노선'), Tab(text: '내 차량'), Tab(text: '차량 구입')],
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [_routeTab(), _fleetTab(), _buyTab()],
+    final n = g.fleet.where((u) => u.region == sel).length;
+    return Container(
+      color: C.panel,
+      child: Column(
+        children: [
+          // 차량 관리는 차고 화면으로 옮김
+          InkWell(
+            onTap: () => g.goScreen(2),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: C.line))),
+              child: Row(
+                children: [
+                  const Icon(Icons.local_shipping, color: C.accent, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('${Cfg.regionName[sel]} 노선 차량 $n대 · 업그레이드·구입은 차고에서', style: Tx.sub)),
+                  const Icon(Icons.chevron_right, color: C.sub),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          Expanded(child: _routeTab()),
+        ],
       ),
     );
   }
@@ -595,178 +601,6 @@ class _RouteMapScreenState extends State<RouteMapScreen>
   }
 
   // ---------------- 내 차량 탭 ----------------
-  Widget _fleetTab() {
-    if (g.fleet.isEmpty) {
-      return const Center(child: Text('차량이 없어요. 차량 구입 탭에서 사세요', style: Tx.sub));
-    }
-    final mine = g.fleet.where((u) => u.region == sel).toList();
-    final others = g.fleet.where((u) => u.region != sel).toList();
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
-      children: [
-        Text('${Cfg.regionName[sel]} 노선 차량 ${mine.length}대', style: Tx.h2),
-        const SizedBox(height: 6),
-        if (mine.isEmpty) const Text('배정된 차량이 없어요', style: Tx.sub),
-        for (final u in mine) ...[
-          _unitCard(u),
-          const SizedBox(height: 8),
-        ],
-        if (others.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          const Text('다른 노선 차량', style: Tx.h2),
-          const SizedBox(height: 6),
-          for (final u in others) ...[
-            _unitCard(u),
-            const SizedBox(height: 8),
-          ],
-        ],
-      ],
-    );
-  }
-
-  String _state(FleetUnit u) {
-    switch (u.state) {
-      case 1:
-        return u.isTrunk ? '센터로 가는 중 (${u.cargo}건)' : '배달 중 (${u.cargo}건)';
-      case 2:
-        return '돌아오는 중';
-      case 3:
-        return '허브 도크에서 싣는 중';
-      default:
-        return '대기';
-    }
-  }
-
-  ui.Image? _img(int type, {bool full = false}) {
-    switch (type) {
-      case 0:
-        return full ? (Sprites.truckFull ?? Sprites.truck) : Sprites.truck;
-      case 1:
-        return full ? (Sprites.vanFull ?? Sprites.van) : Sprites.van;
-      default:
-        return full ? (Sprites.motoFull ?? Sprites.moto) : Sprites.moto;
-    }
-  }
-
-  Widget _unitCard(FleetUnit u) {
-    final img = _img(u.type);
-    final color = Color(Cfg.regionColor[u.region]);
-    final upCost = Cfg.upgradeCost(u.type, u.level);
-    return CardBox(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 56,
-                height: 40,
-                child: img == null
-                    ? const SizedBox()
-                    : RawImage(
-                        image: img,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.none),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('${u.name} Lv.${u.level} · 적재 ${u.cap}', style: Tx.h2),
-                    Text(
-                        '기사 ${u.driver} · ${Cfg.skillName[u.skill]}(${'★' * u.skill}) · ${_state(u)}',
-                        style: Tx.sub),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () => g.cycleRegion(u),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                      color: color.withOpacity(0.85),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Text('${Cfg.regionName[u.region]} ▸',
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              AppButton(
-                  u.level >= Cfg.maxLevel ? '최고 레벨' : '업그레이드 ${g.fmt(upCost)}원',
-                  small: true,
-                  color: C.blue,
-                  onTap: (u.level >= Cfg.maxLevel || g.money < upCost)
-                      ? null
-                      : () => g.upgradeUnit(u)),
-              const SizedBox(width: 8),
-              AppButton(
-                  u.skill >= 5 ? '기사 달인' : '기사 훈련 ${g.fmt(Cfg.trainCost(u.skill))}원',
-                  small: true,
-                  color: C.good,
-                  onTap: (u.skill >= 5 || g.money < Cfg.trainCost(u.skill))
-                      ? null
-                      : () => g.trainDriver(u)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ---------------- 구입 탭 ----------------
-  Widget _buyTab() {
-    final r = g.regionOpen[sel] ? sel : 0;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
-      children: [
-        Text('${Cfg.regionName[r]} 노선에 배정돼요 (위에서 지역을 고르세요)', style: Tx.sub),
-        const SizedBox(height: 8),
-        for (var t = 0; t < Cfg.vehicles.length; t++) ...[
-          CardBox(
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 56,
-                  height: 40,
-                  child: RawImage(
-                      image: _img(t),
-                      fit: BoxFit.contain,
-                      filterQuality: FilterQuality.none),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(Cfg.vehicles[t].name, style: Tx.h2),
-                      Text(
-                          t == 0
-                              ? '허브→지역센터 간선 · 적재 ${Cfg.vehicles[t].cap}'
-                              : '센터→동네 배달 · 적재 ${Cfg.vehicles[t].cap}',
-                          style: Tx.sub),
-                    ],
-                  ),
-                ),
-                AppButton('${g.fmt(Cfg.unitCost[t])}원',
-                    small: true,
-                    color: C.accent,
-                    onTap: g.money >= Cfg.unitCost[t] ? () => g.buyUnit(t, r) : null),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-      ],
-    );
-  }
 }
 
 // ======================================================================

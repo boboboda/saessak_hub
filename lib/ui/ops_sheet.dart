@@ -46,9 +46,7 @@ class OpsSheet extends StatelessWidget {
                   ),
                 ),
                 AppButton('열기', small: true, color: C.blue, onTap: () {
-                  g.closeAll();
-                  g.showMap = true;
-                  g.ui();
+                  g.goScreen(1);
                 }),
               ],
             ),

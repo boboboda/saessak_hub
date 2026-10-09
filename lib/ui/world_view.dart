@@ -78,7 +78,8 @@ extension WorldView on HubGame {
     for (final d in Scenery.items) {
       final img = Sprites.decor[d.key];
       if (img == null) continue;
-      final w = img.width.toDouble(), h = img.height.toDouble(); // 도트 원본 크기 그대로
+      final k = key == 'extinguisher' ? 0.5 : 1.0; // 소화기는 문틀 옆이라 작게 (2:1 축소)
+      final w = img.width * k, h = img.height * k; // 도트 원본 크기 그대로
       final r = Rect.fromLTWH(d.x * t - w / 2, d.y * t - h, w, h);
       if (!r.overlaps(view) || r.overlaps(a)) continue;
       if (!Scenery.onPath.contains(d.key) &&
@@ -1225,14 +1226,15 @@ extension WorldView on HubGame {
 
     // 창고 밖 휴식 자리 옆 소품: 바깥 벽에 붙은 자판기·사물함, 입구 안쪽 소화기
     final a = area;
-    for (final (k, x, y) in [
+    for (final (key, x, y) in [
       ('vend', a.left - 0.6, a.center.dy + 4.4),
       ('locker', a.left - 0.6, a.center.dy + 5.7),
       ('extinguisher', door.left + 0.25, door.top + 0.4),
     ]) {
-      final img = Sprites.decor[k];
+      final img = Sprites.decor[key];
       if (img == null) continue;
-      final w = img.width.toDouble(), h = img.height.toDouble(); // 도트 원본 크기
+      final k = key == 'extinguisher' ? 0.5 : 1.0; // 소화기는 문틀 옆이라 작게 (2:1 축소)
+      final w = img.width * k, h = img.height * k; // 그 밖은 도트 원본 크기
       final r = Rect.fromLTWH(x * t - w / 2, y * t - h, w, h);
       _at(y * t, () {
         shadowAt(c, Offset(x * t, y * t), w * 0.8);
