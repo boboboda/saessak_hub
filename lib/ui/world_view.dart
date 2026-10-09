@@ -11,6 +11,7 @@ import '../models/customer.dart';
 import '../models/staff.dart';
 import 'draw_utils.dart';
 import 'floor_view.dart';
+import 'structure_view.dart';
 
 /// 게임 맵(캔버스). 메뉴·패널은 위젯이 따로 그림.
 extension WorldView on HubGame {
@@ -84,7 +85,12 @@ extension WorldView on HubGame {
           entrancePath.contains(Offset(d.x, d.y - 0.3))) {
         continue; // 입구 길 위의 나무 등은 숨김
       }
-      _at(d.y * t, () => Sprites.drawContain(c, img, r));
+      _at(d.y * t, () {
+        if (d.key != 'flower') {
+          shadowAt(c, Offset(d.x * t, d.y * t), min(w * 0.75, t * 2.6));
+        }
+        Sprites.drawContain(c, img, r);
+      });
     }
   }
 
@@ -113,13 +119,12 @@ extension WorldView on HubGame {
       }
     }
 
+    // 서 있는 것들(외벽·나무·가로등·시설·사람)은 발끝 y 순서로: 뒤(화면 위)에 있는 것부터 그림
+    _q.clear();
+    _tags.clear();
     _drawPaths(c);
     _drawRoadAndYard(c);
     _drawWarehouse(c);
-
-    // 서 있는 것들(나무·가로등·시설·사람)은 발끝 y 순서로: 뒤(화면 위)에 있는 것부터 그림
-    _q.clear();
-    _tags.clear();
     _drawDecor(c);
     _drawBuildings(c);
     _drawPeople(c);
@@ -322,28 +327,18 @@ extension WorldView on HubGame {
       );
     }
     if (mode == 4) _drawAisleOverlay(c);
-    // 벽: 두께 8px, 입구(왼쪽 벽의 통로 자리)와 도크 문(오른쪽 벽)은 뚫림
-    const wall = 0xFF7A5C3A, cap = 0xFF9C7A52;
-    box(c, ar.left - 4, ar.top - 4, ar.width + 8, 8, wall); // 위
-    box(c, ar.left - 4, ar.top - 4, ar.width + 8, 3, cap);
-    box(c, ar.left - 4, ar.bottom - 4, ar.width + 8, 8, wall); // 아래
+    // 건물 구조: 옆벽·남쪽 벽·모서리 기둥·입구 문틀 (바닥에 붙은 것), 북쪽 외벽과 입구 간판은 발끝 정렬
     final door = _px(ai);
-    box(c, ar.left - 4, ar.top, 8, door.top - ar.top, wall); // 왼쪽 (입구 위·아래)
-    box(c, ar.left - 4, door.bottom, 8, ar.bottom - door.bottom, wall);
-    final openings = <Rect>[
-      door, // 통로 끝 (도크로 나가는 길)
+    drawSideWalls(c, ar, door, [
+      door,
       for (final d in ofType('dock')) _px(d.rect),
-    ];
-    var y = ar.top;
-    final ys = <(double, double)>[];
-    for (final o in openings..sort((p, q) => p.top.compareTo(q.top))) {
-      ys.add((y, o.top));
-      y = max(y, o.bottom);
+    ]);
+    for (final d in ofType('dock')) {
+      drawDockStripes(c, _px(d.rect), ar.right);
     }
-    ys.add((y, ar.bottom));
-    for (final (y0, y1) in ys) {
-      if (y1 > y0) box(c, ar.right - 4, y0, 8, y1 - y0, wall);
-    }
+    _at(ar.top, () => drawFacade(c, ar));
+    final sf = Offset(ar.left - 1.4 * t, door.top - 0.15 * t);
+    _at(sf.dy, () => drawEntranceSign(c, sf));
     label(c, '입구', ar.left - 40, door.center.dy - 7, size: 12);
   }
 
@@ -387,12 +382,30 @@ extension WorldView on HubGame {
       // 발끝 = 건물 아래 끝. 그 뒤(위)에 선 직원은 먼저 그려져 책상에 가려짐
       _at((b.ty + b.type.h) * Cfg.tile, () {
         if (sp != null) {
-          Sprites.drawFitBottom(
-            c,
-            sp,
-            _px(_deskRect(b)).deflate(1),
-            left: b.type.id == 'dock',
-          );
+          final dr = _px(_deskRect(b)).deflate(1);
+          if (b.type.id != 'dock' && b.type.id != 'lounge') {
+            shadowUnder(c, Sprites.fitBottom(sp, dr));
+          }
+          Sprites.drawFitBottom(c, sp, dr, left: b.type.id == 'dock');
+          if (b.type.id == 'counter') {
+            final dd = Sprites.fitBottom(sp, dr);
+            drawCounterProps(c, dd);
+            // 접수 중이면 자리에 있는 직원마다 키보드를 두드리는 손
+            final busy = customers.any(
+              (cu) => cu.counter == b && cu.state != 2 && cu.serveT > 0,
+            );
+            final sx = _spots(b);
+            for (var i = 0; i < b.active.length && i < sx.length; i++) {
+              typingHands(
+                c,
+                Offset((b.tx + sx[i].dx) * Cfg.tile, dd.top + 17),
+                busy,
+                i * 0.37,
+              );
+            }
+          }
+          if (b.type.id == 'pack')
+            drawPackProps(c, Sprites.fitBottom(sp, dr), r);
         } else {
           box(c, r.left, r.top, r.width, r.height, b.type.color);
           strokeBox(c, r, 0xFF2A2438, 2);
@@ -411,8 +424,9 @@ extension WorldView on HubGame {
             if (sh != null && Sprites.boxS != null) {
               final d = Sprites.fitBottom(sh, r);
               final k = d.width / sh.width;
-              // 각 판 윗면 = 상자 바닥 (그림 기준 픽셀, 정면 선반 hub_shelf 62x57)
-              const tierBase = [47.0, 27.0, 7.0];
+              // 각 판 윗면 앞쪽 = 상자 바닥 (그림 기준 픽셀, 탑뷰 3/4 선반 hub_shelf 57x56: 아래·가운데·맨 위 판)
+              const tierBase = [47.0, 27.0, 11.0];
+              const hs = [12.0, 9.0, 11.0, 10.0]; // 상자마다 높이를 다르게
               const perTier = 4;
               final slots = (b.stored / b.cap * perTier * 3).ceil().clamp(
                 0,
@@ -420,10 +434,13 @@ extension WorldView on HubGame {
               );
               for (var i = 0; i < slots; i++) {
                 final tier = i ~/ perTier, col = i % perTier;
+                final bh = hs[(i * 3 + b.tx) % hs.length];
                 Sprites.drawSmallBox(
                   c,
-                  d.left + (7 + col * 12) * k,
-                  d.top + tierBase[tier] * k - 12,
+                  d.left + (6 + col * 12) * k,
+                  d.top + tierBase[tier] * k - bh,
+                  w: 11,
+                  h: bh,
                 );
               }
             }
@@ -681,6 +698,7 @@ extension WorldView on HubGame {
       }
       if (!moved && clock > f.until + 0.3) f.dir = 0; // 멈춰 있으면 정면(남쪽)을 봄
       f.last = p;
+      shadowAt(c, Offset(p.dx, p.dy + t * 0.35), 20);
       Sprites.drawStaff(
         c,
         p.dx,
@@ -821,9 +839,9 @@ extension WorldView on HubGame {
     }
     list.sort((a, b) => a.$1.compareTo(b.$1));
     for (final e in list) {
-      _at(
-        e.$2.dy * t,
-        () => Sprites.drawPerson(
+      _at(e.$2.dy * t, () {
+        shadowAt(c, e.$2 * t, 18);
+        Sprites.drawPerson(
           c,
           e.$2.dx * t,
           e.$2.dy * t,
@@ -831,8 +849,8 @@ extension WorldView on HubGame {
           true,
           clock,
           e.$5,
-        ),
-      );
+        );
+      });
     }
   }
 
@@ -987,16 +1005,16 @@ extension WorldView on HubGame {
     final feet = spriteTop + (_deskBack[b.type.id] ?? 4);
     final topY =
         (feet - Cfg.tile * 0.35) / Cfg.tile; // drawStaff 는 (위치 + 0.35칸)을 발로 그림
-    // 접수 창구는 모니터(왼쪽 끝) 뒤를 피해서 섬
+    // 접수 창구: 첫 자리는 모니터와 저울 사이 (얼굴이 소품에 가리지 않게)
     if (b.type.id == 'counter') {
-      return [Offset(w - 0.45, topY), Offset(1.05, topY)];
+      return [Offset(1.12, topY), Offset(0.42, topY)];
     }
     return [Offset(w - 0.5, topY), Offset(0.5, topY)];
   }
 
   /// 책상 그림별 직원 발 위치 — 그림 위 끝 기준 px. 책상 뒤쪽 바닥(윗면 뒤 끝 + 앞면 높이 근처)에 서서
   /// 발끝 정렬로 책상이 나중에 그려지며 다리를 가림 → 책상 뒤에 서서 일하는 모습 (책상 위에 올라선 것처럼 안 보임)
-  static const Map<String, double> _deskBack = {'counter': 28, 'pack': 14};
+  static const Map<String, double> _deskBack = {'counter': 22, 'pack': 14};
 
   /// 포장대 위 상자(가운데)와 진행 막대. 직원·책상 앞면 위에 그린다.
   void _drawPackContent(Canvas c, Building b) {
@@ -1042,6 +1060,8 @@ extension WorldView on HubGame {
           h,
         );
         Sprites.drawContain(c, Sprites.boxOpen!, br);
+        // 테이프 건이 상자 윗면을 왔다 갔다 (직원이 있을 때)
+        if (live) tapeGun(c, br, clock);
         // 테이프가 위로 붙어 나가는 선 (진행도만큼)
         if (prog > 0.35) {
           final tp = ((prog - 0.35) / 0.65).clamp(0.0, 1.0);
@@ -1305,6 +1325,7 @@ extension WorldView on HubGame {
           }
           if (!moved && clock > f.until + 0.3) f.dir = 3; // 서서 기다릴 땐 창구(위)를 봄
           f.last = p;
+          shadowAt(c, Offset(p.dx, p.dy + t * 0.35), 20);
           Sprites.drawPerson(
             c,
             p.dx,
@@ -1427,8 +1448,10 @@ extension WorldView on HubGame {
       final dir = _faces[w.staff]?.dir ?? 0; // 0 남, 1 서, 2 동, 3 북
       void carried() {
         // 상자를 가슴 앞에 안고 있는 모습 (머리 위가 아님)
+        // 걸을 때 상자가 걸음에 맞춰 살짝 들썩임
+        final bob = w.path.isNotEmpty ? sin(clock * 14).abs() * -1.5 : 0.0;
         final cx = p.dx + (dir == 1 ? -9 : (dir == 2 ? 9 : 0));
-        final cy = p.dy + (dir == 0 ? 3 : 0);
+        final cy = p.dy + (dir == 0 ? 3 : 0) + bob;
         final r = Rect.fromCenter(
           center: Offset(cx, cy),
           width: 17,
@@ -1445,6 +1468,7 @@ extension WorldView on HubGame {
           );
           strokeBox(c, r, 0xFF2A2438, 1.5);
         }
+        if (dir != 3) liftHands(c, r); // 두 손으로 상자 양옆을 받쳐 듦
       }
 
       _at(p.dy + t * 0.35, () {

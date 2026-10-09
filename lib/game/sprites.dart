@@ -468,13 +468,13 @@ class Sprites {
   }
 
   /// 작은 상자(선반 칸용). 이미지 없으면 false.
-  static bool drawSmallBox(ui.Canvas c, double x, double y) {
+  static bool drawSmallBox(ui.Canvas c, double x, double y, {double? w, double? h}) {
     final img = boxS;
     if (img == null) return false;
     c.drawImageRect(
       img,
       ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-      ui.Rect.fromLTWH(x, y, img.width.toDouble(), img.height.toDouble()),
+      ui.Rect.fromLTWH(x, y, w ?? img.width.toDouble(), h ?? img.height.toDouble()),
       _np,
     );
     return true;
