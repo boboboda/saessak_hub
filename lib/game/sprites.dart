@@ -42,7 +42,8 @@ class Sprites {
   static ui.Image? wangWater; // 잔디/바다 (항구)
 
   /// 노선 지도 지역 소품 (assets/sprites/map/prop_<이름>.png). 없는 건 빠짐
-  static final Map<String, ui.Image> mapProps = {};
+    static final Map<String, ui.Image> mapProps = {};
+  static final Map<String, ui.Image> setProps = {}; // 세트 소품 (prop_*.png)
   static const List<String> mapPropNames = [
     'mailbox',
     'vending',
@@ -135,7 +136,11 @@ class Sprites {
     hubPack = await _img('assets/sprites/props/hub_pack.png');
     hubShelf = await _img('assets/sprites/props/hub_shelf.png');
     hubLounge = await _img('assets/sprites/props/hub_lounge.png');
-    hubDock = await _img('assets/sprites/props/hub_dock.png');
+        hubDock = await _img('assets/sprites/props/hub_dock.png');
+    for (final n in const ['bin', 'chair', 'plant', 'board', 'aircon', 'conveyor']) {
+      final im = await _img('assets/sprites/props/prop_$n.png');
+      if (im != null) setProps[n] = im;
+    }
     wangFloor = await _img('assets/sprites/tiles/wang_floor.png');
     dockTruck = await _img('assets/sprites/props/dock_truck.png');
     dockTruckFull = await _img('assets/sprites/props/dock_truck_full.png');
@@ -310,10 +315,10 @@ class Sprites {
         return hubLounge;
       case 'dock':
         return hubDock;
-      case 'vending':
+            case 'vending':
         return mapProps['vending'];
     }
-    return null;
+    return setProps[id];
   }
 
   /// 칸(r) 안에 비율 유지로 넣고 아래에 붙임 (칸 밖으로 넘치지 않음). 1:1 보다 크게는 안 키움.

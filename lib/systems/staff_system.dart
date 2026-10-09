@@ -291,11 +291,11 @@ extension StaffSystem on HubGame {
       double gain;
       if (s.idle || s.rest == 2) {
         final inLounge = s.rest == 2 && s.lounge != null;
-        gain = Cfg.restPerSec * (inLounge ? Cfg.loungeRestMul : 1.0);
+                gain = Cfg.restPerSec * (inLounge ? Cfg.loungeRestMul * s.lounge!.setRest : 1.0);
       } else {
         gain = Cfg.idleRestPerSec;
       }
-      s.energy += (s.working ? -drain : gain) * dt;
+            s.energy += (s.working ? -drain * this.drainAt(s) : gain) * dt; // 화분·에어컨·세트
       s.energy = s.energy.clamp(0.0, s.maxEnergy).toDouble();
       if (s.working) _grow(s, dt);
       s.working = false;

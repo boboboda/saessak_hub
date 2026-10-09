@@ -92,7 +92,7 @@ extension BuildSystem on HubGame {
       if (b.rect.overlaps(r)) return '다른 건물과 겹쳐요';
       if (t.zone != 3 && b.type.zone != 3) {
         if (frontRow(b.rect).overlaps(r)) return '다른 건물 앞줄(서는 자리)을 막아요';
-        if (frontRow(r).overlaps(b.rect)) return '이 건물 앞줄이 막혀요';
+                if (!Cfg.propIds.contains(t.id) && frontRow(r).overlaps(b.rect)) return '이 건물 앞줄이 막혀요';
       }
     }
     if (money < t.cost) return '돈이 부족해요';

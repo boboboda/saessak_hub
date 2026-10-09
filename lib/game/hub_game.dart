@@ -16,6 +16,7 @@ import '../systems/ops_system.dart';
 import '../systems/path_system.dart';
 import '../systems/rating_system.dart';
 import '../systems/save_system.dart';
+import '../systems/set_system.dart';
 import '../systems/guide_system.dart';
 import '../systems/staff_system.dart';
 import '../systems/worker_system.dart';
@@ -33,6 +34,7 @@ export '../systems/ops_system.dart';
 export '../systems/path_system.dart';
 export '../systems/rating_system.dart';
 export '../systems/save_system.dart';
+export '../systems/set_system.dart';
 export '../systems/guide_system.dart';
 export '../systems/staff_system.dart';
 export '../systems/fleet_system.dart';
@@ -78,7 +80,8 @@ class HubGame extends FlameGame {
   final RateState rt = RateState(); // 하루 평가·올해 목표·업적 기록
   int tickets = 0; // 전직서 (직업 Lv5 직원을 상위 직업으로 전직할 때 1장)
   (int, int, int, int, int, double, int)? pendingReport; // 월급 정산 전 하루 평가
-  DayReport? report; // 하루 정산 카드 (null 이면 안 보임)
+    DayReport? report; // 하루 정산 카드 (null 이면 안 보임)
+  double setTimer = 0; // 세트 다시 계산까지
   double fever = 0; // 수익 부스트(광고) 남은 시간(초)
 
   // 배송 기한: 택배마다 접수 시각을 단계마다 넘겨준다 (먼저 들어온 것부터 나감)

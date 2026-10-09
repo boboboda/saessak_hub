@@ -61,7 +61,9 @@ class OpsSheet extends StatelessWidget {
             const SizedBox(height: 8),
           ],
           const SizedBox(height: 8),
-                    Row(
+                              _setBook(),
+          const SizedBox(height: 16),
+          Row(
             children: [
               const Text('업적', style: Tx.h2),
               const Spacer(),
@@ -221,6 +223,49 @@ class OpsSheet extends StatelessWidget {
                 Text('${g.goalProgress(gs[i]).clamp(0, gs[i].target)}/${gs[i].target}', style: Tx.sub),
                 const SizedBox(width: 8),
                 Text('+${g.fmt(gs[i].reward)}원', style: const TextStyle(color: C.gold, fontSize: 12)),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+    /// 세트 도감: 공개 세트는 조건까지, 숨은 세트는 발견 전엔 ??? + 힌트
+  Widget _setBook() {
+    final found = g.rt.foundSets;
+    String need(Map<String, int> m) => m.entries
+        .map((e) => '${Cfg.types.firstWhere((t) => t.id == e.key).name}${e.value > 1 ? '×${e.value}' : ''}')
+        .join(' + ');
+    return CardBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('세트 도감', style: Tx.h2),
+              const Spacer(),
+              Text('${found.length}/${Cfg.sets.length} 발견', style: const TextStyle(color: C.good, fontWeight: FontWeight.w800)),
+            ],
+          ),
+          const SizedBox(height: 2),
+          const Text('건물 테두리를 맞대어 놓으면 발동 (맞닿은 묶음 안에 재료가 다 있으면)', style: Tx.sub),
+          for (var i = 0; i < Cfg.sets.length; i++) ...[
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(found.contains(i) ? Icons.check_circle : (Cfg.sets[i].hidden ? Icons.help_outline : Icons.radio_button_unchecked),
+                    size: 18, color: found.contains(i) ? C.good : C.sub),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    Cfg.sets[i].hidden && !found.contains(i)
+                        ? '??? · 힌트: ${Cfg.sets[i].hint}'
+                        : '${Cfg.sets[i].name} · ${need(Cfg.sets[i].need)} → ${Cfg.sets[i].effect}',
+                    style: Tx.body,
+                  ),
+                ),
               ],
             ),
           ],

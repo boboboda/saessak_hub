@@ -28,8 +28,28 @@ class BuildingSheet extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
         children: [
-          Text(t.desc, style: Tx.sub),
+                    Text(t.desc, style: Tx.sub),
           const SizedBox(height: 10),
+          if (b.sets.isNotEmpty) ...[
+            CardBox(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final si in b.sets)
+                    Row(
+                      children: [
+                        const Icon(Icons.link, size: 18, color: C.good),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text('세트 ${Cfg.sets[si].name} · ${Cfg.sets[si].effect}', style: Tx.body),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
           if (t.id == 'counter')
             CardBox(
               child: Row(

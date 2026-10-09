@@ -71,8 +71,9 @@ extension FlowSystem on HubGame {
         (a, s) =>
             a +
             s.workRate * this.jobRate(s),
-      ) *
-      b.speedMul;
+            ) *
+      b.speedMul *
+      b.setSpeed; // 세트 (포장 라인·공지 게시판 등)
 
   /// 손님이 맡긴 택배 만들기 (VIP 팁 포함)
   Parcel _mkParcel(Customer c) {
@@ -93,9 +94,9 @@ extension FlowSystem on HubGame {
     final act = b.active;
     final vend = ofType('vending').length.clamp(0, Cfg.vendingMax);
     final vm = 1.0 - Cfg.vendingCalm * vend;
-        if (act.isEmpty) return 1.0 * vm;
+        if (act.isEmpty) return 1.0 * vm * b.setCalm;
     final avg = act.fold<int>(0, (a, s) => a + s.kind) / act.length;
-    return (1.25 - 0.1 * avg) * vm * this.jobCalm(b); // 상담원·접수원 Lv4
+    return (1.25 - 0.1 * avg) * vm * this.jobCalm(b) * b.setCalm; // 상담원·접수원 Lv4·세트
   }
 
   /// 포장 실수 판정: 꼼꼼할수록 줄고, 지친 직원이 있으면 늘어남

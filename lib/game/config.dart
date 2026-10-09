@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/building.dart';
 import '../models/mission.dart';
 import '../models/vehicle.dart';
+import '../systems/set_system.dart';
 import 'region_map.dart';
 
 class Cfg {
@@ -51,7 +52,14 @@ class Cfg {
     BuildingType('shelf', '선반', 2, 2, 1500, 0xFF8B5E3C, '택배 20건 보관', 2, 0),
     BuildingType('vending', '자판기', 1, 1, 4000, 0xFF3B82D6, '인내심 감소 완화', -1, 0),
     BuildingType('lounge', '휴게실', 3, 3, 8000, 0xFFB06AB3, '지친 직원이 와서 쉼 (회복 3배)', -1, 0),
-    BuildingType('dock', '도크', 4, 3, 3000, 0xFF3D4466, '벽에 붙여 설치 · 차량이 서는 칸', 3, 0),
+        BuildingType('dock', '도크', 4, 3, 3000, 0xFF3D4466, '벽에 붙여 설치 · 차량이 서는 칸', 3, 0),
+    // ---- 세트 소품 (맞닿게 놓으면 세트, 화분·에어컨은 반경 효과도) ----
+    BuildingType('bin', '자재함', 1, 1, 600, 0xFFC8955E, '포장 자재. 포장대·선반 세트 재료', -1, 0),
+    BuildingType('chair', '대기 의자', 1, 1, 400, 0xFF3B82D6, '손님 대기 의자. 접수 창구 세트 재료', -1, 0),
+    BuildingType('plant', '화분', 1, 1, 300, 0xFF3FA34D, '반경 2칸 직원 체력 소모 −5% (3개까지)', -1, 0),
+    BuildingType('board', '게시판', 1, 1, 500, 0xFFB98A5E, '공지 게시판. 접수 창구 세트 재료', -1, 0),
+    BuildingType('aircon', '에어컨', 1, 1, 2500, 0xFFDDE6EE, '반경 3칸 체력 소모 −10% (여름 2배)', -1, 0),
+    BuildingType('conveyor', '컨베이어', 2, 1, 1500, 0xFF7A8FA6, '선반·포장대·도크를 잇는 세트 재료', -1, 0),
   ];
 
   // ---- 허브 배치 규칙 ----
@@ -312,6 +320,30 @@ class Cfg {
   ];
   static const List<double> jobXpNeed = [100, 250, 500, 900]; // 직업 Lv1→2, →3, →4, →5 (게임 초)
   static const int jobMaxLv = 5;
+
+    // ---- 세트 (맞닿은 묶음 안에 아래 종류가 모두 있으면 발동, 효과는 target 건물에) ----
+  static const List<SetDef> sets = [
+    SetDef('포장 라인', {'pack': 2, 'bin': 1}, 'pack', '포장 +15%', speed: 1.15),
+    SetDef('대기 공간', {'counter': 1, 'chair': 2}, 'counter', '손님 인내심 감소 −20%', calm: 0.8),
+    SetDef('물류 랙', {'shelf': 3}, 'shelf', '선반 용량 +5', cap: 5),
+    SetDef('공지 게시판', {'counter': 1, 'board': 1}, 'counter', '접수 +10%', speed: 1.1),
+    SetDef('자재 보급', {'shelf': 1, 'bin': 1}, 'shelf', '선반 용량 +3', cap: 3),
+    SetDef('직원 카페', {'lounge': 1, 'vending': 1, 'plant': 1}, 'lounge', '휴게실 회복 ×1.3',
+        hidden: true, hint: '휴게실 옆에 마실 것과 초록 식물', rest: 1.3),
+    SetDef('빠른 출고', {'shelf': 1, 'conveyor': 1, 'dock': 1}, 'dock', '도크 싣기 +30%',
+        hidden: true, hint: '선반에서 도크까지 굴러가는 길', load: 1.3),
+    SetDef('시원한 작업장', {'pack': 1, 'aircon': 1}, 'pack', '포장 직원 체력 소모 −20%',
+        hidden: true, hint: '더운 포장대에 바람을', drain: 0.8),
+    SetDef('초록 쉼터', {'counter': 1, 'chair': 1, 'plant': 1}, 'counter', '손님 인내심 감소 −15%',
+        hidden: true, hint: '기다리는 자리에 식물 하나', calm: 0.85),
+    SetDef('컨베이어 라인', {'pack': 1, 'conveyor': 1, 'shelf': 1}, 'pack', '포장 +10%',
+        hidden: true, hint: '포장대와 선반 사이를 잇는 벨트', speed: 1.1),
+  ];
+    static const int hiddenSetFame = 20; // 숨은 세트 처음 발견 명성
+  static const Set<String> propIds = {'bin', 'chair', 'plant', 'board', 'aircon', 'conveyor', 'vending'};
+  static const double plantRadius = 2, plantDrain = 0.05; // 화분: 반경 2칸, 소모 −5%
+  static const int plantMax = 3;
+  static const double airconRadius = 3, airconDrain = 0.10; // 에어컨: 반경 3칸, 소모 −10%
 
   // ---- 계절 (1년 28일 = 7일씩) ----
   static const List<String> seasonName = ['봄', '여름', '가을', '겨울'];

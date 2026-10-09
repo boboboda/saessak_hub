@@ -350,5 +350,23 @@
   },
   "hub_shelf_tq2": {
     "object_id": "e7e489f2-e727-43f3-aa03-8bf281eceee6"
+  },
+  "prop_bin": {
+    "object_id": "071b57eb-1b68-4c41-853d-04280a261b3b"
+  },
+  "prop_chair": {
+    "object_id": "a183c113-2ba4-424b-869e-8c65186e43ea"
+  },
+  "prop_plant": {
+    "object_id": "b0022a58-bc30-4552-9dcb-81cb22d7e7db"
+  },
+  "prop_board": {
+    "object_id": "763da418-3e39-4268-a42a-28f40b6df0e5"
+  },
+  "prop_aircon": {
+    "object_id": "fcc8683e-4ea7-4b5d-a467-f24cadef5474"
+  },
+  "prop_conveyor": {
+    "object_id": "08ca1fd3-fd00-41e2-a6a5-d2b13842a3e0"
   }
 }

@@ -141,8 +141,13 @@ extension WorldView on HubGame {
       final ok = this.ghostProblem == null;
       final r = _px(this.ghostRect);
       box(c, r.left, r.top, r.width, r.height, ok ? 0x9936C46A : 0x99E5484D);
-      strokeBox(c, r, ok ? 0xFF2E9E57 : 0xFFE5484D, 3);
+            strokeBox(c, r, ok ? 0xFF2E9E57 : 0xFFE5484D, 3);
       labelIn(c, placing!.name, r, size: 12);
+      // 맞닿는 이웃(세트 판정 대상)은 초록 테두리
+      final (near, _) = this.previewSets(placing!, ghostX, ghostY);
+      for (final b in near) {
+        strokeBox(c, _px(b.rect).inflate(1), 0xFF7BD389, 2);
+      }
     }
 
     c.restore();
@@ -609,7 +614,16 @@ extension WorldView on HubGame {
   }
 
   /// 건물 위 표시: 레벨·내 자리·직원 없음·선반 수량·선택 테두리 (모든 오브젝트 위)
-  void _buildingTags(Canvas c, Building b, Rect r) {
+    void _buildingTags(Canvas c, Building b, Rect r) {
+    // 세트 발동 중: 오른쪽 위에 초록 고리 표시
+    if (b.sets.isNotEmpty) {
+      final tag = Rect.fromLTWH(r.right - 30, r.bottom - 15, 28, 13);
+      c.drawRRect(
+        RRect.fromRectAndRadius(tag, const Radius.circular(6)),
+        Paint()..color = const Color(0xEE3FA34D),
+      );
+      labelIn(c, '세트${b.sets.length > 1 ? b.sets.length : ''}', tag, size: 9);
+    }
     if (b.level > 1) {
       box(c, r.left + 2, r.top + 2, 28, 13, 0xFFFFD166);
       labelIn(

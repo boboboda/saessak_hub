@@ -18,9 +18,10 @@ extension WorkerSystem on HubGame {
     // 이번 프레임의 일(접수·포장·운반)이 끝났으니 휴식과 체력 계산
         this.decayTraffic(dt);
     this.updateJobs(dt);
+        this.updateSets(dt);
     for (final b in buildings) {
-      if (b.type.id == 'shelf') b.capPlus = this.jobCap(b);
-      if (b.type.id == 'dock') b.loadPlus = this.jobLoad(b);
+      if (b.type.id == 'shelf') b.capPlus = this.jobCap(b) + b.setCap;
+      if (b.type.id == 'dock') b.loadPlus = this.jobLoad(b) * b.setLoad;
     }
     this.updateRest(dt);
     this.updateStaffEnergy(dt);

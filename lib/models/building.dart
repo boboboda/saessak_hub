@@ -69,7 +69,11 @@ class Building {
 
   /// 선반 용량
   int get cap => Cfg.shelfCap + 10 * (level - 1) + capPlus;
-  int capPlus = 0; // 직업(분류사)·세트로 늘어난 선반 용량 (매 프레임 다시 계산)
+    int capPlus = 0; // 직업(분류사)·세트로 늘어난 선반 용량 (매 프레임 다시 계산)
+  // 세트 효과 (SetSystem.updateSets 가 0.5초마다 다시 계산)
+  double setSpeed = 1, setCalm = 1, setRest = 1, setLoad = 1, setDrain = 1;
+  int setCap = 0;
+  final List<int> sets = []; // 발동 중인 세트 번호
   double loadPlus = 1; // 직업(정비사)·세트로 빨라진 도크 싣기
 
   /// 접수 창구 대기 택배 한도

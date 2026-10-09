@@ -1282,5 +1282,89 @@
       ],
       "view": "top-down"
     }
+  },
+  "prop_bin": {
+    "endpoint": "/create-1-direction-object",
+    "note": "세트 소품: 자재함",
+    "body": {
+      "description": "pixel art, black outline, high top-down view facing straight south like the reference, front-facing, symmetrical, axis-aligned, not rotated, same style and palette as reference, game asset, single object, small open wooden supply crate filled with packing materials: tape rolls, bubble wrap and folded cardboard",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACz0lEQVR4nGNgGAWjYIABIxMjI0FFbAz//9fNbYHzH915wSCnIgFmP336gUFaWoAsy2uSaxmYyNEIsxwEiLEcZBHHpfMMss/vg9nIgIWBgeG/t38gg5yaAsOjWw8Yfv38zaCiqwpncwtwMWxYsYocd6JYtnTtbjB9bk4GwzYkNUwgIirSmmHVvEVgR6QUpDAsmTyNwcBEn8EnwIPh8O69DJSA3ZF6DNlmYgxhnuYMGZaqDJdf/MIIAZqCCR8kGHyY/jKofHkFtu2kpCKKPBO6hptXHsLZr16/ocjylrnNDFu372J4mxrB4Lr8EtgxZ3ZfxnTAmw8ccAF1HXkGNm4eMFtMVIQiB8AcAaMtQ2wx0gYjEyPj/5U7NuA1JNwjgAGm5vbTywxXLt5nCPTyo9hxIHPBaWDX1i0MbBy8eBXvPQhJxZ++fmfg/s8E5yODv19+wtnMPOxwtqCUEMObW89JL4jaU13+s3LxgdnX/wkxPHv6jUFBWZyBVMDNiojiJ19egj0wd/IcsP0s+Eo/ZL6EmAzDs6e3GCTFFcDpBBtYMGsVg5GhGoOeqQFOx7CfvsDAzikI57PgUrhjcjLDnuO3GISgIQACTH+/Y+QUbODS6Qtg+tz5W3AxkMNg4Of394QdQA2AbCkuwIJD/P+9x68Zbtx7zmAlKsYgyMvOAHIzqGjGBc6dOcrA9Pc3hs+xOQo5CpiwKTo0u4hBSVaU4f6TVwzLt59gSG5ZzkAKgEUVLkBUFOw5fgtcfj98+YXh7K1nBC01MrFmOH7sJJgNqkfQAczXyJaDHYvLwF8/foBpFUUpEEW40YADgKIDOcjRAQsuiUnrTjOE2mkxGBoicgEbOyvcl4QsRQbIetATJgs2A3bsPwWmb7z4yLB04jq4+D9mTqJSNjFq8DoABH5hCfXt65YxbF9HfnTAQHVzw39iiuL/MDU4+JQAapo1CkbBEAcAo2XvonV/ZnYAAAAASUVORK5CYII="
+        }
+      ],
+      "view": "top-down"
+    }
+  },
+  "prop_chair": {
+    "endpoint": "/create-1-direction-object",
+    "note": "세트 소품: 대기 의자",
+    "body": {
+      "description": "pixel art, black outline, high top-down view facing straight south like the reference, front-facing, symmetrical, axis-aligned, not rotated, same style and palette as reference, game asset, single object, single blue plastic waiting room chair seen from the front",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACz0lEQVR4nGNgGAWjYIABIxMjI0FFbAz//9fNbYHzH915wSCnIgFmP336gUFaWoAsy2uSaxmYyNEIsxwEiLEcZBHHpfMMss/vg9nIgIWBgeG/t38gg5yaAsOjWw8Yfv38zaCiqwpncwtwMWxYsYocd6JYtnTtbjB9bk4GwzYkNUwgIirSmmHVvEVgR6QUpDAsmTyNwcBEn8EnwIPh8O69DJSA3ZF6DNlmYgxhnuYMGZaqDJdf/MIIAZqCCR8kGHyY/jKofHkFtu2kpCKKPBO6hptXHsLZr16/ocjylrnNDFu372J4mxrB4Lr8EtgxZ3ZfxnTAmw8ccAF1HXkGNm4eMFtMVIQiB8AcAaMtQ2wx0gYjEyPj/5U7NuA1JNwjgAGm5vbTywxXLt5nCPTyo9hxIHPBaWDX1i0MbBy8eBXvPQhJxZ++fmfg/s8E5yODv19+wtnMPOxwtqCUEMObW89JL4jaU13+s3LxgdnX/wkxPHv6jUFBWZyBVMDNiojiJ19egj0wd/IcsP0s+Eo/ZL6EmAzDs6e3GCTFFcDpBBtYMGsVg5GhGoOeqQFOx7CfvsDAzikI57PgUrhjcjLDnuO3GISgIQACTH+/Y+QUbODS6Qtg+tz5W3AxkMNg4Of394QdQA2AbCkuwIJD/P+9x68Zbtx7zmAlKsYgyMvOAHIzqGjGBc6dOcrA9Pc3hs+xOQo5CpiwKTo0u4hBSVaU4f6TVwzLt59gSG5ZzkAKgEUVLkBUFOw5fgtcfj98+YXh7K1nBC01MrFmOH7sJJgNqkfQAczXyJaDHYvLwF8/foBpFUUpEEW40YADgKIDOcjRAQsuiUnrTjOE2mkxGBoicgEbOyvcl4QsRQbIetATJgs2A3bsPwWmb7z4yLB04jq4+D9mTqJSNjFq8DoABH5hCfXt65YxbF9HfnTAQHVzw39iiuL/MDU4+JQAapo1CkbBEAcAo2XvonV/ZnYAAAAASUVORK5CYII="
+        }
+      ],
+      "view": "top-down"
+    }
+  },
+  "prop_plant": {
+    "endpoint": "/create-1-direction-object",
+    "note": "세트 소품: 화분",
+    "body": {
+      "description": "pixel art, black outline, high top-down view facing straight south like the reference, front-facing, symmetrical, axis-aligned, not rotated, same style and palette as reference, game asset, single object, potted green leafy plant in a round terracotta pot",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACz0lEQVR4nGNgGAWjYIABIxMjI0FFbAz//9fNbYHzH915wSCnIgFmP336gUFaWoAsy2uSaxmYyNEIsxwEiLEcZBHHpfMMss/vg9nIgIWBgeG/t38gg5yaAsOjWw8Yfv38zaCiqwpncwtwMWxYsYocd6JYtnTtbjB9bk4GwzYkNUwgIirSmmHVvEVgR6QUpDAsmTyNwcBEn8EnwIPh8O69DJSA3ZF6DNlmYgxhnuYMGZaqDJdf/MIIAZqCCR8kGHyY/jKofHkFtu2kpCKKPBO6hptXHsLZr16/ocjylrnNDFu372J4mxrB4Lr8EtgxZ3ZfxnTAmw8ccAF1HXkGNm4eMFtMVIQiB8AcAaMtQ2wx0gYjEyPj/5U7NuA1JNwjgAGm5vbTywxXLt5nCPTyo9hxIHPBaWDX1i0MbBy8eBXvPQhJxZ++fmfg/s8E5yODv19+wtnMPOxwtqCUEMObW89JL4jaU13+s3LxgdnX/wkxPHv6jUFBWZyBVMDNiojiJ19egj0wd/IcsP0s+Eo/ZL6EmAzDs6e3GCTFFcDpBBtYMGsVg5GhGoOeqQFOx7CfvsDAzikI57PgUrhjcjLDnuO3GISgIQACTH+/Y+QUbODS6Qtg+tz5W3AxkMNg4Of394QdQA2AbCkuwIJD/P+9x68Zbtx7zmAlKsYgyMvOAHIzqGjGBc6dOcrA9Pc3hs+xOQo5CpiwKTo0u4hBSVaU4f6TVwzLt59gSG5ZzkAKgEUVLkBUFOw5fgtcfj98+YXh7K1nBC01MrFmOH7sJJgNqkfQAczXyJaDHYvLwF8/foBpFUUpEEW40YADgKIDOcjRAQsuiUnrTjOE2mkxGBoicgEbOyvcl4QsRQbIetATJgs2A3bsPwWmb7z4yLB04jq4+D9mTqJSNjFq8DoABH5hCfXt65YxbF9HfnTAQHVzw39iiuL/MDU4+JQAapo1CkbBEAcAo2XvonV/ZnYAAAAASUVORK5CYII="
+        }
+      ],
+      "view": "top-down"
+    }
+  },
+  "prop_board": {
+    "endpoint": "/create-1-direction-object",
+    "note": "세트 소품: 게시판",
+    "body": {
+      "description": "pixel art, black outline, high top-down view facing straight south like the reference, front-facing, symmetrical, axis-aligned, not rotated, same style and palette as reference, game asset, single object, small cork notice board on two wooden legs with pinned paper notes",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACz0lEQVR4nGNgGAWjYIABIxMjI0FFbAz//9fNbYHzH915wSCnIgFmP336gUFaWoAsy2uSaxmYyNEIsxwEiLEcZBHHpfMMss/vg9nIgIWBgeG/t38gg5yaAsOjWw8Yfv38zaCiqwpncwtwMWxYsYocd6JYtnTtbjB9bk4GwzYkNUwgIirSmmHVvEVgR6QUpDAsmTyNwcBEn8EnwIPh8O69DJSA3ZF6DNlmYgxhnuYMGZaqDJdf/MIIAZqCCR8kGHyY/jKofHkFtu2kpCKKPBO6hptXHsLZr16/ocjylrnNDFu372J4mxrB4Lr8EtgxZ3ZfxnTAmw8ccAF1HXkGNm4eMFtMVIQiB8AcAaMtQ2wx0gYjEyPj/5U7NuA1JNwjgAGm5vbTywxXLt5nCPTyo9hxIHPBaWDX1i0MbBy8eBXvPQhJxZ++fmfg/s8E5yODv19+wtnMPOxwtqCUEMObW89JL4jaU13+s3LxgdnX/wkxPHv6jUFBWZyBVMDNiojiJ19egj0wd/IcsP0s+Eo/ZL6EmAzDs6e3GCTFFcDpBBtYMGsVg5GhGoOeqQFOx7CfvsDAzikI57PgUrhjcjLDnuO3GISgIQACTH+/Y+QUbODS6Qtg+tz5W3AxkMNg4Of394QdQA2AbCkuwIJD/P+9x68Zbtx7zmAlKsYgyMvOAHIzqGjGBc6dOcrA9Pc3hs+xOQo5CpiwKTo0u4hBSVaU4f6TVwzLt59gSG5ZzkAKgEUVLkBUFOw5fgtcfj98+YXh7K1nBC01MrFmOH7sJJgNqkfQAczXyJaDHYvLwF8/foBpFUUpEEW40YADgKIDOcjRAQsuiUnrTjOE2mkxGBoicgEbOyvcl4QsRQbIetATJgs2A3bsPwWmb7z4yLB04jq4+D9mTqJSNjFq8DoABH5hCfXt65YxbF9HfnTAQHVzw39iiuL/MDU4+JQAapo1CkbBEAcAo2XvonV/ZnYAAAAASUVORK5CYII="
+        }
+      ],
+      "view": "top-down"
+    }
+  },
+  "prop_aircon": {
+    "endpoint": "/create-1-direction-object",
+    "note": "세트 소품: 에어컨",
+    "body": {
+      "description": "pixel art, black outline, high top-down view facing straight south like the reference, front-facing, symmetrical, axis-aligned, not rotated, same style and palette as reference, game asset, single object, white floor standing air conditioner unit with front vent grille",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACz0lEQVR4nGNgGAWjYIABIxMjI0FFbAz//9fNbYHzH915wSCnIgFmP336gUFaWoAsy2uSaxmYyNEIsxwEiLEcZBHHpfMMss/vg9nIgIWBgeG/t38gg5yaAsOjWw8Yfv38zaCiqwpncwtwMWxYsYocd6JYtnTtbjB9bk4GwzYkNUwgIirSmmHVvEVgR6QUpDAsmTyNwcBEn8EnwIPh8O69DJSA3ZF6DNlmYgxhnuYMGZaqDJdf/MIIAZqCCR8kGHyY/jKofHkFtu2kpCKKPBO6hptXHsLZr16/ocjylrnNDFu372J4mxrB4Lr8EtgxZ3ZfxnTAmw8ccAF1HXkGNm4eMFtMVIQiB8AcAaMtQ2wx0gYjEyPj/5U7NuA1JNwjgAGm5vbTywxXLt5nCPTyo9hxIHPBaWDX1i0MbBy8eBXvPQhJxZ++fmfg/s8E5yODv19+wtnMPOxwtqCUEMObW89JL4jaU13+s3LxgdnX/wkxPHv6jUFBWZyBVMDNiojiJ19egj0wd/IcsP0s+Eo/ZL6EmAzDs6e3GCTFFcDpBBtYMGsVg5GhGoOeqQFOx7CfvsDAzikI57PgUrhjcjLDnuO3GISgIQACTH+/Y+QUbODS6Qtg+tz5W3AxkMNg4Of394QdQA2AbCkuwIJD/P+9x68Zbtx7zmAlKsYgyMvOAHIzqGjGBc6dOcrA9Pc3hs+xOQo5CpiwKTo0u4hBSVaU4f6TVwzLt59gSG5ZzkAKgEUVLkBUFOw5fgtcfj98+YXh7K1nBC01MrFmOH7sJJgNqkfQAczXyJaDHYvLwF8/foBpFUUpEEW40YADgKIDOcjRAQsuiUnrTjOE2mkxGBoicgEbOyvcl4QsRQbIetATJgs2A3bsPwWmb7z4yLB04jq4+D9mTqJSNjFq8DoABH5hCfXt65YxbF9HfnTAQHVzw39iiuL/MDU4+JQAapo1CkbBEAcAo2XvonV/ZnYAAAAASUVORK5CYII="
+        }
+      ],
+      "view": "top-down"
+    }
+  },
+  "prop_conveyor": {
+    "endpoint": "/create-1-direction-object",
+    "note": "세트 소품: 컨베이어 2x1",
+    "body": {
+      "description": "pixel art, black outline, high top-down view facing straight south like the reference, front-facing, symmetrical, axis-aligned, not rotated, same style and palette as reference, game asset, single object, short horizontal roller conveyor belt with grey metal frame, legs and a row of rollers, twice as wide as tall",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAGOUlEQVR4nO2ae1BUVRzHv7tedoEVQxRFsF1QoMnEB5pMNuWM5VDWJJZDlg0yIc7YVH80TjM6SVqUMzWWjY41Go1ToekfPkqFVFQsX0ioPEJABZFVBFPkvYtwm3PXe73sHi733n0g4/3MLPfc33lwfr/7u7/zO2cX0NDQ0NDQ0NDQ0Hgk0ZE/eh138RQsBge6HpYF48kRDWDZX3L3ospa4lJntTahu6OTK5ujw3rJIyKC4UtiIuLw5ktJ5EHpPGoAZ2ov1QsKEyXJvTeV/yRtlYssM+tzyT4MvIhYWWflCZ5W3myJxIdJ8ehqb0a4xYyuEdFYkrZS0gh6UZl192N3hBQqzsp7HKMRT02biXPnypGYEI2SomK8t2wF1ma8T/UMZw9gkxYmo6ujyzHZ2EjUVtYI5UslVVw5Oi5GkIeZR6C2yuHipuBA2OwMcnZtg6+gKbVx3TtY8NwfSFudzd0X7lyKe833sELOK3CjpgZvp6aguOw8dv70MzZlZ+FYXj5+3bAJP+7ZIZQz169DQ+Mt/LB+AzK+WNOrLDZAS7sdQYEGeItFzz+J1Ag/jLVPQJ3hXzTMS8H4qLk4dWIPV2+y7setm92ovtkqPwaMDHZEaU/gTeUJ2cfLkfrWJE55wslvvsLy16fj2NaNCGm6zcmquvWIi5+kLgjW19TJmogxYDgGivVNjrhyKOdPpM8YjUSjHWhtELTqudaN9F1ZyMzKlBUEBx121uFlJPhO1Ie61H98/hIyJJSnGsDgHwS5kPd/IDHo7IIRChsr8VtBOfch8WBVWSdeSJonuQJIeoA4HlSUXoXJzx8PE2Rt359zEIdy93H3USszgLmLkXW5C4sWLseIiEhOTlY3OcugLAymoVS5aag8r6ElQ+7gnOBETbEIMqL0K/Pmwy/ATzACLSHSi29uNdGf8hMTLS4ye1srRoWO5MptrS0+V16Wh+zdLXs3yJI0kodXyPnJEnl0zHjo2ptwuuIqzGFjBPmMWYlcHrAjd4/LZqj0QjUmTo6SbQiyWaFtqNTAu7/46d/fDKGHZXWCAcjE3YUM6jzO7gO/C8oTQ8yf+xoeBngDMLzg4P59XGprjgnrd0Wwdz5w+fra/7h0mScv/5BLe6K42CAmVo8hQ419Tq671YY2XY+LnPQj0Po2t3W4tBWPwfd17s+IO/HK97cUiuvNsdJtydPnDSClgBhSb2q1UeXU9gH+sISH4M7125zxaErLORFi8WjhciKk9FyMXZv+Is6WVGNmwmQcyf8Hs2dNw/LvdiHtgyVcg+vWdkSOHw1v01eOYgww4nJjLe7WdSI8IpDz3O+//raXrozK/8ke3/IRThQUUyvDRo3lrtetlQgZ9hiKzlVC3+14R+02x5abYDD6oWdIQJ//JH5qLGwdNpRdvKpymo4xiuoqYbHEUesZNYMawOJeZ5Ps9s/MTKDmElJs3bxTeIqE1KXJCmf5YAwpGMWj3t98KIWk0+5QfPY8vAGjog97ZMO7XKGlTfr8gHd7pdg67vTbhrxWNHeXGpO2dWfgZW4338UYL5wZEGXJ2Dwk1qiBwSBGqdI0z9KrdX85iCO+XIoKT1Bfn1dnT+GuxI15V+bL4g8vn/S0oz2PuN5tD7hyrRHjHg/FxSs3esmHB0lneO7w2br+I7qYUyfPyGrHKF37yfJHlD9wtBjVdQ1Y9MYcbM85jQWzJiAtczs8hdh7pIKbuzDuDkC+hfEGJEniESdSUokTDd54fa0sjJLBaMmPX+AwjA58MFlvkbJsMXc1U/ZetS0+SoQY/2DOCIdPVSKvoALJLyfg5JkLMJsdByOeIH76s9QnzSdC9ORb/TG9Hiqwd/ZOgKKjwrFiy2FS9OgPDZQkQuRezXcUDAYp3CZHZASy31CDXmkH4v5KAxnZCPFBiFzlpLrOOK/rvBHIx1l5JeMzSicSZPLHp9v+wpr0OSitsMrK1uQEo/7wxBhuGyD3aAFCQkcJ9xfr7yJx+jjuEEQKd9dxb+YBencHIB5xH5cAqHTNHggYpR3ILzDkngeQ7wlypJ3DZ8RPXe0ZA2QfL1faxWdLowSsJ14B3Zfb/nYR+nr9dwdanqBT+UNJZ4vqZNYNFNQ59bCP2jcBGhoaGhoaGhoaGuD5H8DDZKUeuP+GAAAAAElFTkSuQmCC"
+        }
+      ],
+      "view": "top-down"
+    }
   }
 }

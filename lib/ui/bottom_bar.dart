@@ -103,9 +103,12 @@ class ActionBar extends StatelessWidget {
       final problem = g.ghostProblem;
       okEnabled = problem == null;
       infoColor = okEnabled ? C.good : C.bad;
+            final (near, sets) = g.previewSets(t, g.ghostX, g.ghostY);
       info =
           '${t.name} ${t.w}×${t.h}칸 · ${t.cost}원 — '
-          '${okEnabled ? '놓을 수 있어요' : problem}';
+          '${okEnabled ? '놓을 수 있어요' : problem}'
+          '${near.isEmpty ? '' : '\n맞닿음 ${near.length}곳'}'
+          '${sets.isEmpty ? '' : ' · 세트 발동: ${sets.join(', ')}'}';
       okLabel = '확정';
       onOk = () => g.confirmPlace();
       onCancel = () => g.cancelPlacing();
