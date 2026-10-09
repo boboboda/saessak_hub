@@ -28,12 +28,27 @@ class Scenery {
 
   // ---- 장식 종류별로 놓을 수 있는 바닥 ----
   // grass: 풀밭, walk: 인도(보도블록·길), yard: 도크 마당, road: 차도
-  static const Map<String, Set<String>> allowed = {
+  static final Map<String, Set<String>> allowed = {
     'tree': {'grass'}, 'tree2': {'grass'}, 'bush': {'grass'}, 'flower': {'grass'},
     'house1': {'grass'}, 'house2': {'grass'}, 'house3': {'grass'},
+    for (final k in streetW.keys) k: {'grass'},
     'lamp': {'grass', 'walk'}, 'light': {'grass', 'walk'}, 'sign': {'grass', 'walk'}, 'bench': {'grass', 'walk'},
     'cone': {'yard'}, 'pallet': {'yard'},
   };
+
+  /// 길가 건물 그림 가로 칸 수 (그림 px / 32 + 여유)
+  static const Map<String, double> streetW = {
+    'house1': 3.4, 'house2': 3.0, 'house3': 3.3,
+    'shop1': 3.4, 'shop2': 3.4, 'shop3': 3.7, 'bake1': 3.5, 'bake2': 3.4, 'bake3': 3.5,
+    'home0': 2.8, 'home1': 3.0, 'home3': 2.8,
+    'apt0': 2.9, 'apt1': 2.4, 'apt2': 3.1, 'apt3': 2.8,
+  };
+  // 낮은 가게 → 높은 아파트 → 중간 주택 순으로 섞어 스카이라인이 들쭉날쭉하게
+  static const List<List<String>> streetRhythm = [
+    ['house1', 'shop1', 'shop2', 'shop3', 'house3', 'bake1', 'bake2', 'bake3'],
+    ['apt0', 'apt1', 'apt2', 'apt3'],
+    ['house2', 'home0', 'home1', 'home3'],
+  ];
 
   /// 오른쪽 인도에서 행인이 걷는 가운데 통로 (가로)
   static final Rect walkLane = Rect.fromLTRB(Cfg.road.right + 1.0, 0, Cfg.road.right + 2.3, Cfg.rows.toDouble());
@@ -90,14 +105,15 @@ class Scenery {
 
     // 건물은 창고를 최대로 확장해도 안 겹치는 바깥(위쪽 블록)에만 둔다.
     // 확장 가능한 자리는 아래의 나무·덤불·꽃으로만 채움 (확장하면 덮여서 사라짐)
-    const houses = ['house1', 'house2', 'house3'];
-    const wTiles = {'house1': 3.4, 'house2': 3.0, 'house3': 3.3};
     // 위쪽 큰길을 따라 한 줄로 (길에 앞면이 닿게). 건물 사이 간격은 들쭉날쭉, 틈에는 작은 나무
     var hx = 2.6;
     var i = 0;
+    final used = <String>{};
     while (true) {
-      final k = houses[i++ % 3];
-      final w = wTiles[k]!;
+      final group = streetRhythm[i++ % streetRhythm.length].where((k) => !used.contains(k)).toList();
+      final k = group[rnd.nextInt(group.length)];
+      used.add(k);
+      final w = streetW[k]!;
       if (hx + w > Cfg.road.left - 0.8) break;
       house(k, hx + w / 2, 6.0);
       hx += w + 0.4 + rnd.nextDouble() * 1.4;

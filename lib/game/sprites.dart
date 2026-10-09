@@ -15,6 +15,7 @@ class Sprites {
   static final List<ui.Image?> custWalk = List.filled(custLooks, null);
   static ui.Image? box;
   static ui.Image? floor;
+  static ui.Image? wallBack, wallItems, floorVar; // 절차 생성 (tools/hubgen): 뒷벽 4종 · 벽걸이 4종 · 바닥 변형 4종
   static ui.Image? counter, pack, shelf, van, truck, moto;
   static final ui.Paint _np = ui.Paint()..filterQuality = ui.FilterQuality.none;
   static ui.Image? vanFull, truckFull, motoFull; // 상자 가득 찬 모습 (없으면 null)
@@ -97,6 +98,9 @@ class Sprites {
     'house1',
     'house2',
     'house3',
+    // 길가 건물 후보 (높이 다양화: 가게 86~102 · 주택 96~104 · 아파트 114~119 px)
+    'shop1', 'shop2', 'shop3', 'home0', 'home1', 'home3', 'bake1', 'bake2', 'bake3',
+    'apt0', 'apt1', 'apt2', 'apt3',
     'pallet',
     'flower',
   ];
@@ -154,6 +158,9 @@ class Sprites {
       if (im != null) roadCars.add(im);
     }
     grass = await _img('assets/sprites/tiles/grass.png');
+    wallBack = await _img('assets/sprites/tiles/wall_back.png');
+    wallItems = await _img('assets/sprites/tiles/wall_items.png');
+    floorVar = await _img('assets/sprites/tiles/floor_var.png');
     asphalt = await _img('assets/sprites/tiles/asphalt.png');
     sidewalk = await _img('assets/sprites/tiles/sidewalk.png');
     yard = await _img('assets/sprites/tiles/yard.png');

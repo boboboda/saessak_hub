@@ -140,6 +140,7 @@ class Cfg {
     Offset(-1.2, -0.8),
     Offset(1.2, -0.8),
   ];
+  static const double backWallH = 64; // 창고 뒷벽 높이(px, 2칸)
   static const double faceIdle = 0.6; // 이만큼(초) 멈춰 있어야 정면을 봄
   static const double overnightRest = 0.5; // 하루가 지나면 최대 체력의 이만큼 회복
   static const double slipBase = 0.30; // 포장 실수 기본 확률

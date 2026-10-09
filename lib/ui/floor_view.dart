@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/sprites.dart';
 import 'draw_utils.dart';
 
 /// 창고 바닥: 구역마다 재질이 다름 (① 접수 밝은 타일, ② 포장 콘크리트 + 노란 안전선, ③ 보관 공장 바닥),
@@ -59,6 +60,22 @@ extension FloorView on HubGame {
       }
     }
 
+    // 1-2) 바닥 변형: 드문드문 얼룩·금·덧댄 판·배수구 (칸마다 고정, 통로 위는 뺌)
+    final fv = Sprites.floorVar;
+    if (fv != null) {
+      final paint = Paint()..filterQuality = FilterQuality.none;
+      for (var j = ay0; j < ay1; j++) {
+        for (var i = ax0; i < ax1; i++) {
+          final h = _h(i + 11, j + 5);
+          if (h % 19 != 0 || isAisle(i, j)) continue;
+          // 0 얼룩 · 1 금 · 3 배수구 (덧댄 판(2)은 빈 자리 표시처럼 보여서 안 씀, 배수구는 보관 구역만)
+          var k = const [0, 1, 0, 3][(h >> 5) % 4];
+          if (k == 3 && zoneOfX(i) != 2) k = 1;
+          c.drawImageRect(fv, Rect.fromLTWH(k * 32.0, 0, 32, 32), Rect.fromLTWH(i * t, j * t, t, t), paint);
+        }
+      }
+    }
+
     // 2) 포장 구역 양쪽 경계의 노란 안전선
     final safe = Paint()..color = const Color(0xFFF2C230);
     for (final zx in [Cfg.zoneX1, Cfg.zoneX2]) {
@@ -66,6 +83,34 @@ extension FloorView on HubGame {
         Rect.fromLTRB(zx * t - 3, a.top * t, zx * t + 3, a.bottom * t),
         safe,
       );
+    }
+
+    // 2-2) 바닥 마킹: 시설 자리 모서리 테이프(ㄱ자), 도크 앞 비움 구역(빗금)
+    final tape = Paint()..color = const Color(0xCCF2C230);
+    for (final b in buildings) {
+      if (b.type.id == 'dock') continue;
+      final r = Rect.fromLTWH(b.tx * t, b.ty * t, b.type.w * t, b.type.h * t).inflate(3);
+      const l = 8.0, w = 2.0;
+      for (final p in [r.topLeft, r.topRight, r.bottomLeft, r.bottomRight]) {
+        final sx = p.dx == r.left ? 1.0 : -1.0, sy = p.dy == r.top ? 1.0 : -1.0;
+        c.drawRect(Rect.fromPoints(p, p + Offset(l * sx, w * sy)), tape);
+        c.drawRect(Rect.fromPoints(p, p + Offset(w * sx, l * sy)), tape);
+      }
+    }
+    for (final d in buildings.where((b) => b.type.id == 'dock')) {
+      final z = Rect.fromLTWH((d.tx - 1) * t, d.ty * t + 4, t - 4, d.type.h * t - 8);
+      if (!z.overlaps(Rect.fromLTRB(a.left * t, a.top * t, a.right * t, a.bottom * t))) continue;
+      c.drawRect(z, Paint()..color = const Color(0x22F2C230));
+      c.save();
+      c.clipRect(z);
+      final hp = Paint()
+        ..color = const Color(0x88F2C230)
+        ..strokeWidth = 3;
+      for (var y = z.top - z.width; y < z.bottom; y += 9) {
+        c.drawLine(Offset(z.left, y + z.width), Offset(z.right, y), hp);
+      }
+      c.restore();
+      strokeBox(c, z, 0xAAF2C230, 1.5);
     }
 
     // 3) 바닥에 칠한 구역 글씨 (건물 밑에 깔림)

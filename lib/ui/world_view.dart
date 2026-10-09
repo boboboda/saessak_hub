@@ -136,6 +136,7 @@ extension WorldView on HubGame {
     for (final e in _q) {
       e.$2();
     }
+    _drawLights(c);
     for (final f in _tags) {
       f();
     }
@@ -155,6 +156,7 @@ extension WorldView on HubGame {
     }
 
     c.restore();
+    _drawVignette(c);
     _stackClock = clock;
     // 오래된 표정 기록 정리 (사라진 손님·직원)
     if (_faces.length > 64) {
@@ -164,6 +166,44 @@ extension WorldView on HubGame {
             (k is Staff && !staff.contains(k)),
       );
     }
+  }
+
+  /// 창고 천장 조명: 4칸마다 따뜻한 빛 웅덩이 (사람·시설 위에 살짝)
+  void _drawLights(Canvas c) {
+    const t = Cfg.tile;
+    final a = area;
+    final glow = Paint()..blendMode = BlendMode.softLight;
+    for (var y = a.top + 2; y < a.bottom - 0.5; y += 4) {
+      for (var x = a.left + 2; x < a.right - 0.5; x += 4) {
+        final p = Offset(x * t, y * t);
+        const r = Cfg.tile * 2.6;
+        glow.shader = RadialGradient(
+          colors: const [Color(0x66FFE9B0), Color(0x00FFE9B0)],
+        ).createShader(Rect.fromCircle(center: p, radius: r));
+        c.drawCircle(p, r, glow);
+      }
+    }
+  }
+
+  /// 화면 가장자리를 살짝 어둡게 (화면 좌표, 위·아래 메뉴에 가리지 않는 부분 기준)
+  void _drawVignette(Canvas c) {
+    final top = insetTop, bot = size.y - insetBottom;
+    const w = 70.0;
+    void edge(Rect r, Alignment from) {
+      c.drawRect(
+        r,
+        Paint()
+          ..shader = LinearGradient(
+            begin: from,
+            end: -from,
+            colors: const [Color(0x48000000), Color(0x00000000)],
+          ).createShader(r),
+      );
+    }
+    edge(Rect.fromLTWH(0, 0, w, size.y), Alignment.centerLeft);
+    edge(Rect.fromLTWH(size.x - w, 0, w, size.y), Alignment.centerRight);
+    edge(Rect.fromLTWH(0, top - 10, size.x, w), Alignment.topCenter);
+    edge(Rect.fromLTWH(0, bot - w + 10, size.x, w), Alignment.bottomCenter);
   }
 
   // ---------------- 도로 + 도크 마당 (창고 오른쪽 벽 바깥) ----------------

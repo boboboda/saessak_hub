@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/sprites.dart';
 import 'draw_utils.dart';
 
 /// 코드로 그리는 건물 구조·소품·그림자. 외곽선은 모두 [ink] 1px, 색은 [Pal]에서 고름 (에셋 톤에 맞춤).
@@ -65,35 +66,47 @@ extension StructureView on HubGame {
     );
   }
 
-  /// 창고 북쪽 외벽(안쪽 면): 판넬·기둥·창문 + 가운데 간판. 발끝 = 창고 위 끝
+  /// 창고 북쪽 외벽(안쪽 면): 2칸 높이. 골판·걸레받이 타일(창문·환기창·배관 섞임) + 기둥 + 벽걸이(시계·공지판·포스터·소화전) + 가운데 간판.
+  /// 발끝 = 창고 위 끝. 옆벽·남쪽 벽은 그대로 낮게 (안이 가려지지 않게)
   void drawFacade(Canvas c, Rect ar) {
-    const fh = 30.0; // 벽 높이(px)
-    final f = Rect.fromLTRB(ar.left - 6, ar.top - fh, ar.right + 6, ar.top + 2);
-    box(c, f.left, f.top, f.width, f.height, Pal.wallFace);
-    for (var y = f.top + 9; y < f.bottom - 2; y += 9) {
-      box(c, f.left, y, f.width, 1, Pal.wallLine); // 판넬 줄
-    }
     const t = Cfg.tile;
-    // 기둥(4칸마다) 사이에 창문(2칸마다)
+    const fh = Cfg.backWallH; // 벽 높이(px)
+    final f = Rect.fromLTRB(ar.left - 6, ar.top - fh, ar.right + 6, ar.top + 2);
+    final wb = Sprites.wallBack;
+    final sw = min(150.0, ar.width - 40);
+    final sign = Rect.fromCenter(center: Offset(ar.center.dx, f.top + 14), width: sw, height: 18);
+    if (wb == null) {
+      box(c, f.left, f.top, f.width, f.height, Pal.wallFace);
+    } else {
+      c.save();
+      c.clipRect(f);
+      final paint = Paint()..filterQuality = FilterQuality.none;
+      var i = 0;
+      for (var x = f.left; x < f.right; x += t, i++) {
+        // 칸마다 고정된 무늬: 간판 뒤는 민벽, 나머지는 창문 2칸마다 · 가끔 환기창·배관
+        final h = ((i * 2654435761) >> 7) & 0xff;
+        var k = i.isOdd ? 1 : (h % 7 == 0 ? 2 : (h % 11 == 0 ? 3 : 0));
+        if (Rect.fromLTWH(x, f.top, t, fh).overlaps(sign.inflate(6))) k = 0;
+        c.drawImageRect(wb, Rect.fromLTWH(k * 32.0, 0, 32, 64), Rect.fromLTWH(x, f.top, t, fh), paint);
+      }
+      c.restore();
+    }
+    // 기둥(4칸마다)
     for (var x = ar.left; x <= ar.right + 0.5; x += t * 4) {
       _rectInk(c, Rect.fromLTWH(x - 5, f.top, 10, f.height), Pal.wallDark);
       box(c, x - 4, f.top + 1, 2, f.height - 2, 0x33FFFFFF);
     }
-    for (var x = ar.left + t; x < ar.right - t * 0.5; x += t * 2) {
-      if (((x - ar.left) / (t * 4)).round() * t * 4 == x - ar.left)
-        continue; // 기둥 자리
-      final w = Rect.fromLTWH(x - 11, f.top + 7, 22, 13);
-      _rectInk(c, w, Pal.frame);
-      box(c, w.left + 2, w.top + 2, w.width - 4, w.height - 4, Pal.glass);
-      // 유리 반사
-      c.drawLine(
-        Offset(w.left + 4, w.bottom - 3),
-        Offset(w.left + 9, w.top + 3),
-        Paint()
-          ..color = const Color(Pal.glassHi)
-          ..strokeWidth = 2,
-      );
-      box(c, w.left + 2, w.center.dy, w.width - 4, 1, Pal.frame); // 창살
+    // 벽걸이: 기둥 사이 칸마다 하나씩 (시계는 간판 왼쪽, 나머지는 고정 순서)
+    final wi = Sprites.wallItems;
+    if (wi != null) {
+      final paint = Paint()..filterQuality = FilterQuality.none;
+      var n = 0;
+      for (var x = ar.left + t * 2; x < ar.right - t; x += t * 4, n++) {
+        final r = Rect.fromLTWH(x - 8, ar.top - 42, 16, 24);
+        if (r.overlaps(sign.inflate(4))) continue;
+        final k = x < ar.center.dx && n == 0 ? 0 : const [1, 2, 3, 0][n % 4];
+        c.drawImageRect(wi, Rect.fromLTWH(k * 16.0, 0, 16, 24), r, paint);
+      }
     }
     // 벽 윗면(캡)
     _rectInk(
@@ -103,13 +116,8 @@ extension StructureView on HubGame {
     );
     box(c, f.left - 1, f.top - 5, f.width + 2, 2, Pal.wallCapHi);
     box(c, f.left, f.bottom - 1, f.width, 1, ink);
-    // 간판: 새싹 택배 허브 (외벽 가운데)
-    final sw = min(150.0, ar.width - 40);
-    final s = Rect.fromCenter(
-      center: Offset(ar.center.dx, f.top + 13),
-      width: sw,
-      height: 18,
-    );
+    // 간판: 새싹 택배 허브 (외벽 위쪽 가운데)
+    final s = sign;
     _rectInk(c, s, Pal.green);
     box(c, s.left + 1, s.top + 1, s.width - 2, 2, 0x55FFFFFF);
     _leaf(c, Offset(s.left + 10, s.center.dy));
