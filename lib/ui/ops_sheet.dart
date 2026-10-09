@@ -25,7 +25,9 @@ class OpsSheet extends StatelessWidget {
         children: [
           _intake(),
           const SizedBox(height: 10),
-          _goals(),
+                    _goals(),
+          const SizedBox(height: 10),
+          _grade(),
           const SizedBox(height: 10),
           _fever(),
           const SizedBox(height: 16),
@@ -189,7 +191,50 @@ class OpsSheet extends StatelessWidget {
     );
   }
 
-    /// 오늘 만족도 + 올해 목표 3개
+      /// 회사 등급: 지금 등급, 다음 등급 조건, 열리는 것, 연말 시상식 기록
+  Widget _grade() {
+    final k = g.companyGrade;
+    final next = k + 1 < Cfg.corpName.length ? k + 1 : -1;
+    return CardBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.apartment, color: C.good, size: 20),
+              const SizedBox(width: 6),
+              Text('회사 등급: ${Cfg.corpName[k]}', style: Tx.h2),
+              const Spacer(),
+              Text(g.bestRank == 0 ? '시상식 기록 없음' : '시상식 최고 ${g.bestRank}위', style: Tx.sub),
+            ],
+          ),
+          if (g.endless)
+            const Text('무한 모드: 경쟁사가 더 빨리 커져요', style: TextStyle(color: C.accent, fontSize: 12)),
+          if (next >= 0) ...[
+            const SizedBox(height: 6),
+            Text('다음: ${Cfg.corpName[next]} → ${Cfg.gradeUnlockText[next]}', style: Tx.sub),
+            for (final n in g.gradeNeeds(next))
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  children: [
+                    Icon(n.$2 >= n.$3 ? Icons.check_circle : Icons.radio_button_unchecked,
+                        size: 16, color: n.$2 >= n.$3 ? C.good : C.sub),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text(n.$1, style: Tx.body)),
+                    Text(n.$3 == 1 ? (n.$2 >= 1 ? '달성' : '아직') : '${n.$2.clamp(0, n.$3)}/${n.$3}', style: Tx.sub),
+                  ],
+                ),
+              ),
+          ],
+          const SizedBox(height: 6),
+          Text('연말(28일차) 택배 대상: 올해 점수 ${g.fmt(g.yearScore)} · 경쟁사 ${Cfg.rivalName.length}곳', style: Tx.sub),
+        ],
+      ),
+    );
+  }
+
+  /// 오늘 만족도 + 올해 목표 3개
   Widget _goals() {
     final gs = g.goals;
     final st = g.todayStars;

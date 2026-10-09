@@ -50,7 +50,11 @@ extension SaveSystem on HubGame {
             'claimed': claimed.toList(),
       'rate': rt.toJson(),
                   'tickets': tickets,
-      'rp': rp,
+            'rp': rp,
+      'grade': companyGrade,
+      'bestRank': bestRank,
+      'wins': awardWins,
+      'endless': endless,
       'res': researched.toList(),
       'resNow': resNow,
       'resLeft': resLeft,
@@ -253,7 +257,11 @@ extension SaveSystem on HubGame {
         debugPrint('평가 기록 불러오기 실패: $e');
       }
                   tickets = (j['tickets'] as num?)?.toInt() ?? 0;
-      rp = (j['rp'] as num?)?.toInt() ?? 0;
+            rp = (j['rp'] as num?)?.toInt() ?? 0;
+      companyGrade = ((j['grade'] as num?)?.toInt() ?? 0).clamp(0, Cfg.corpName.length - 1);
+      bestRank = (j['bestRank'] as num?)?.toInt() ?? 0;
+      awardWins = (j['wins'] as num?)?.toInt() ?? 0;
+      endless = (j['endless'] as bool?) ?? false;
       researched
         ..clear()
         ..addAll(((j['res'] as List?) ?? const []).map((e) => (e as num).toInt()));

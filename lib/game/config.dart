@@ -394,6 +394,30 @@ class Cfg {
   static const List<String> statName = ['손속도', '걸음', '친절', '체력', '꼼꼼'];
   static const int trainBase = 1000, classSeats = 2;
 
+    // ---- 연말 '택배 대상' 시상식: 올해 점수 = 올해 접수 + 평균 별 × 60 + 명성 × 0.5 ----
+  static const List<String> rivalName = ['번개택배', '한빛로지스', '다람쥐배송', '큰곰물류', '하늘특송'];
+  static const List<int> rivalBase = [350, 550, 800, 1100, 1500]; // 1년차 점수
+  static const double rivalGrowth = 1.45; // 해마다 ×1.45
+  static const double endlessBoost = 1.3; // 무한 모드(전국 네트워크 뒤) 경쟁사 강화
+  static const double awardStarW = 60, awardFameW = 0.5;
+  static const int awardFirstFame = 300, awardTop3Fame = 100;
+
+  // ---- 회사 등급 (창고 확장과 따로, 내려가지 않음) ----
+  static const List<String> corpName = ['동네 영업소', '지점', '거점 허브', '광역 물류센터', '전국 네트워크'];
+  static const List<String> gradeUnlockText = [
+    '기본 시설',
+    '연구실 · 대기 의자 · 화분',
+    '교육실 · 컨베이어 · 상위 직업(전직)',
+    '야간 출고 연구',
+    '엔딩 + 무한 모드(경쟁사 강화)',
+  ];
+  // 지점 조건 '하루 처리 40건'은 명성 100 근처 접수량(하루 약 13건)으로 어려워 20건으로 낮춤
+  static const int grade1Day = 20;
+  static const Map<String, int> gradeUnlock = {
+    'lab': 1, 'chair': 1, 'plant': 1, 'classroom': 2, 'conveyor': 2,
+  };
+  static const int promoGrade = 2, nightShipGrade = 3;
+
   // ---- 계절 (1년 28일 = 7일씩) ----
   static const List<String> seasonName = ['봄', '여름', '가을', '겨울'];
 

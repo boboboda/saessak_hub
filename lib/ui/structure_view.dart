@@ -113,7 +113,7 @@ extension StructureView on HubGame {
     _rectInk(c, s, Pal.green);
     box(c, s.left + 1, s.top + 1, s.width - 2, 2, 0x55FFFFFF);
     _leaf(c, Offset(s.left + 10, s.center.dy));
-    labelIn(c, '새싹 택배 허브', s.translate(6, 0), size: 11);
+    labelIn(c, '새싹 택배 ${Cfg.corpName[companyGrade]}', s.translate(6, 0), size: 11); // 회사 등급이 간판에
     // 벽 아래 바닥 그늘 (창고 안쪽)
     c.drawRect(
       Rect.fromLTWH(ar.left, ar.top + 2, ar.width, 8),

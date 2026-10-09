@@ -37,7 +37,8 @@ class _TypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final locked = t.id == 'conveyor' && !g.conveyorOpen;
+            final gradeLock = !g.gradeAllows(t.id as String);
+    final locked = gradeLock || (t.id == 'conveyor' && !g.conveyorOpen);
     final can = g.money >= t.cost && !locked;
     final zone = t.zone >= 0 ? Cfg.zoneName[t.zone as int] : '창고 어디든';
     final swatch = Color(t.color as int);
@@ -97,7 +98,7 @@ class _TypeCard extends StatelessWidget {
               ),
               const SizedBox(height: 6),
                             AppButton(
-                locked ? '연구 필요' : '건설',
+                                gradeLock ? Cfg.corpName[Cfg.gradeUnlock[t.id] ?? 0] : (locked ? '연구 필요' : '건설'),
                 small: true,
                 onTap: can ? () => g.startPlacing(t) : null,
               ),

@@ -67,8 +67,10 @@ extension RatingSystem on HubGame {
       grade = gradeOf(avg, n == 0 ? 0 : rt.lost / n);
       fameD = Cfg.gradeFame[grade];
       fame = max(0, fame + fameD);
-      rt.grades[grade]++;
+            rt.grades[grade]++;
       if (grade <= 2) rt.yGood++;
+      rt.yDays++;
+      rt.yStarSum += avg;
     }
     // 포장 실수 없는 날 연속 (포장을 한 날만 셈)
     if (rt.mistakes == 0 && rt.packed > 0) {
@@ -77,6 +79,8 @@ extension RatingSystem on HubGame {
     } else if (rt.mistakes > 0) {
       rt.cleanStreak = 0;
     }
+        rt.yServed += rt.served;
+    rt.bestEver = max(rt.bestEver, rt.served);
     pendingReport = (endedDay, grade, rt.served, rt.lost, rt.mistakes,
         avg ?? 0, fameD);
     rt.served = 0;
@@ -95,9 +99,13 @@ extension RatingSystem on HubGame {
     if (dayOfYear == 1 && day > 1) {
       final got = rt.yearDone.length;
       yt = '${year - 1}년차 목표 $got/3 달성${got == 3 ? ' · 명성 +${Cfg.yearAllFame} · 전직서 +${Cfg.yearAllTicket}' : ''}';
+            this.runAward(year - 1); // 연말 시상식 (올해 기록으로 순위)
       rt.yearDone.clear();
       rt.yGood = 0;
       rt.bestDay = 0;
+      rt.yServed = 0;
+      rt.yStarSum = 0;
+      rt.yDays = 0;
     }
         report = DayReport(p.$1, p.$2, p.$3, p.$4, p.$5, p.$6, p.$7, earned, wages,
         paidAll, yt, List.of(evtNotes));
@@ -161,13 +169,16 @@ class RateState {
   final Set<int> yearDone = {}; // 올해 달성한 목표
   int yearsAll = 0; // 목표 셋 다 달성한 해 수
   int promotions = 0; // 전직 횟수
-  final Set<int> foundSets = {}; // 발견한 세트
+    final Set<int> foundSets = {}; // 발견한 세트
+  int yServed = 0, yDays = 0, bestEver = 0; // 올해 접수·평가한 날 수, 지금까지 하루 최고 접수
+  double yStarSum = 0; // 올해 하루 평균 별의 합
 
   Map<String, dynamic> toJson() => {
     'sv': served, 'ls': lost, 'mi': mistakes, 'pk': packed, 'st': stars,
     'gr': grades, 'fs': fiveStars, 'cs': cleanStreak, 'bc': bestClean,
     'bd': bestDay, 'yg': yGood, 'yd': yearDone.toList(), 'ya': yearsAll,
-    'pr': promotions, 'set': foundSets.toList(),
+        'pr': promotions, 'set': foundSets.toList(),
+    'ys': yServed, 'yd2': yDays, 'be': bestEver, 'yst': yStarSum,
   };
 
   void load(Map<String, dynamic> j) {
@@ -190,7 +201,11 @@ class RateState {
       ..clear()
       ..addAll(((j['yd'] as List?) ?? const []).map((e) => (e as num).toInt()));
     yearsAll = i('ya');
-    promotions = i('pr');
+        promotions = i('pr');
+    yServed = i('ys');
+    yDays = i('yd2');
+    bestEver = max(i('be'), bestDay); // 예전 저장엔 없어서 올해 하루 최고로 시작
+    yStarSum = ((j['yst'] as num?) ?? 0).toDouble();
     foundSets
       ..clear()
       ..addAll(((j['set'] as List?) ?? const []).map((e) => (e as num).toInt()));

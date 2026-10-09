@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/models.dart';
+import '../systems/award_system.dart';
 import '../systems/build_system.dart';
 import '../systems/dock_system.dart';
 import '../systems/event_system.dart';
@@ -26,6 +27,7 @@ import '../ui/world_view.dart';
 import 'config.dart';
 import 'sprites.dart';
 
+export '../systems/award_system.dart';
 export '../systems/build_system.dart';
 export '../systems/dock_system.dart';
 export '../systems/event_system.dart';
@@ -97,7 +99,14 @@ class HubGame extends FlameGame {
   int rp = 0; // 연구 포인트
   final Set<int> researched = {};
   int? resNow; // 진행 중 연구
-  double resLeft = 0; // 남은 시간(게임 초)
+    double resLeft = 0; // 남은 시간(게임 초)
+  // 회사 등급·시상식
+  int companyGrade = 0;
+  int bestRank = 0; // 연말 시상식 최고 순위 (0 = 아직 없음)
+  int awardWins = 0; // 대상(1위) 횟수
+  bool endless = false; // 전국 네트워크 뒤 무한 모드
+  AwardResult? award; // 시상식 카드
+  int? gradeUp; // 승급 카드 (오른 등급)
   double fever = 0; // 수익 부스트(광고) 남은 시간(초)
 
   // 배송 기한: 택배마다 접수 시각을 단계마다 넘겨준다 (먼저 들어온 것부터 나감)
@@ -387,7 +396,8 @@ class HubGame extends FlameGame {
     if (_tickAcc >= 0.2) {
       _tickAcc = 0;
             this.refreshAlerts();
-      this.checkGoals();
+            this.checkGoals();
+      this.checkGrade();
       ui();
     }
   }

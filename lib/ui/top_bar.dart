@@ -30,7 +30,7 @@ class TopBar extends StatelessWidget {
                   children: [
                     const Text('새싹 택배 허브', style: Tx.title),
                     Text(
-                      '${Cfg.areaName[g.areaLevel]} · ${g.year}년차 ${Cfg.seasonName[(g.dayOfYear - 1) ~/ 7]} ${(g.dayOfYear - 1) % 7 + 1}일',
+                      '${Cfg.corpName[g.companyGrade]} · ${Cfg.areaName[g.areaLevel]} · ${g.year}년차 ${Cfg.seasonName[(g.dayOfYear - 1) ~/ 7]} ${(g.dayOfYear - 1) % 7 + 1}일',
                       style: Tx.sub,
                     ),
                   ],
@@ -87,6 +87,16 @@ class TopBar extends StatelessWidget {
                                         case 11:
                       g.rp += 1000;
                       break;
+                                        case 12:
+                      g.runAward(g.year); // 지금 기록으로 시상식 보기
+                      break;
+                    case 13:
+                      if (g.companyGrade < Cfg.corpName.length - 1) {
+                        g.companyGrade++;
+                        g.gradeUp = g.companyGrade;
+                        if (g.companyGrade == Cfg.corpName.length - 1) g.endless = true;
+                      }
+                      break;
                     case 10:
                       // 사건 차례로 일으키기 (확인용)
                       g.openEvent(g.debugEvt++ % Cfg.hubEvtName.length);
@@ -135,6 +145,14 @@ class TopBar extends StatelessWidget {
                                     PopupMenuItem(
                     value: 11,
                     child: Text('RP +1000', style: Tx.body),
+                  ),
+                                    PopupMenuItem(
+                    value: 12,
+                    child: Text('연말 시상식 보기', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 13,
+                    child: Text('회사 등급 +1', style: Tx.body),
                   ),
                   PopupMenuItem(
                     value: 4,

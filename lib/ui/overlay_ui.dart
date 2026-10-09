@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/hub_game.dart';
 import 'alert_bar.dart';
+import 'award_card.dart';
 import 'bottom_bar.dart';
 import 'build_sheet.dart';
 import 'building_sheet.dart';
@@ -90,7 +91,15 @@ class OverlayUi extends StatelessWidget {
             child: Center(child: _Toast(g.toast)),
           ),
         // 선택형 사건 (정산 카드보다 아래, 둘이 겹치면 정산 먼저)
-        if (g.evtNow != null && g.report == null) ...[
+                // 연말 시상식 · 승급 (정산 카드를 닫은 뒤)
+        if (g.report == null && g.award != null) ...[
+          Positioned.fill(child: Container(color: Colors.black45)),
+          Positioned.fill(child: Center(child: SingleChildScrollView(child: AwardCard(g)))),
+        ] else if (g.report == null && g.gradeUp != null) ...[
+          Positioned.fill(child: Container(color: Colors.black45)),
+          Positioned.fill(child: Center(child: GradeUpCard(g))),
+        ],
+        if (g.evtNow != null && g.report == null && g.award == null && g.gradeUp == null) ...[
           Positioned.fill(child: Container(color: Colors.black45)),
           Positioned.fill(
             child: Center(child: SingleChildScrollView(child: EventCard(g))),

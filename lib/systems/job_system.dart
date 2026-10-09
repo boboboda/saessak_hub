@@ -137,7 +137,11 @@ extension JobSystem on HubGame {
 
   /// 전직: 직업 Lv5 + 전직서 1장
   void promote(Staff s) {
-    if (!s.canPromote) return;
+        if (!s.canPromote) return;
+    if (companyGrade < Cfg.promoGrade) {
+      showToast('전직은 회사 등급 ${Cfg.corpName[Cfg.promoGrade]}부터 열려요');
+      return;
+    }
     if (tickets <= 0) {
       showToast('전직서가 없어요 (올해 목표·업적 보상으로 받아요)');
       return;

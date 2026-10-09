@@ -20,7 +20,8 @@ extension ResearchSystem on HubGame {
   String? resProblem(int i) {
     if (resDone(i)) return '완료';
     if (resNow != null) return '다른 연구 중';
-    if (!resOpen(i)) return '앞 연구 먼저';
+        if (!resOpen(i)) return '앞 연구 먼저';
+    if (i == 5 && companyGrade < Cfg.nightShipGrade) return '${Cfg.corpName[Cfg.nightShipGrade]} 필요';
     final d = Cfg.research[i];
     if (rp < d.rp) return 'RP 부족';
     if (money < d.cost) return '돈 부족';

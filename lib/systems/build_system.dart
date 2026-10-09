@@ -100,6 +100,10 @@ extension BuildSystem on HubGame {
   }
 
     void startPlacing(BuildingType t) {
+        if (!this.gradeAllows(t.id)) {
+      showToast('${t.name}은(는) 회사 등급 ${this.gradeNeedText(t.id)}');
+      return;
+    }
     if (t.id == 'conveyor' && !this.conveyorOpen) {
       showToast('컨베이어는 연구(물류: 컨베이어 해금)가 필요해요');
       return;

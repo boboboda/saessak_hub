@@ -196,9 +196,12 @@ class _StaffCard extends StatelessWidget {
               AppButton(s.training != null ? '훈련 중' : '훈련',
                   small: true, color: C.card, onTap: s.training != null ? null : () => _pickTrain(context)),
               const SizedBox(width: 8),
-              if (s.canPromote)
-                AppButton('전직 (전직서 ${g.tickets}장)',
-                    small: true, color: C.gold, onTap: g.tickets > 0 ? () => g.promote(s) : null),
+                            if (s.canPromote)
+                AppButton(
+                    g.companyGrade < Cfg.promoGrade ? '전직: ${Cfg.corpName[Cfg.promoGrade]} 필요' : '전직 (전직서 ${g.tickets}장)',
+                    small: true,
+                    color: C.gold,
+                    onTap: g.tickets > 0 && g.companyGrade >= Cfg.promoGrade ? () => g.promote(s) : null),
             ],
           ),
         ],
