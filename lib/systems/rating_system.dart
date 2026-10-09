@@ -13,9 +13,11 @@ class DayReport {
   final int fameD; // 등급으로 바뀐 명성
   final int earned, wages;
   final bool paidAll;
-  final String? yearText; // 해가 바뀌었으면 올해 목표 결과
+    final String? yearText; // 해가 바뀌었으면 올해 목표 결과
+  final List<String> notes; // 오늘 끝난 사건 결과
   const DayReport(this.day, this.grade, this.served, this.lost, this.mistakes,
-      this.stars, this.fameD, this.earned, this.wages, this.paidAll, this.yearText);
+            this.stars, this.fameD, this.earned, this.wages, this.paidAll, this.yearText,
+      [this.notes = const []]);
 }
 
 /// 하루 평가(별점·등급) + 올해 목표 + 업적 진행 기록
@@ -97,8 +99,9 @@ extension RatingSystem on HubGame {
       rt.yGood = 0;
       rt.bestDay = 0;
     }
-    report = DayReport(p.$1, p.$2, p.$3, p.$4, p.$5, p.$6, p.$7, earned, wages,
-        paidAll, yt);
+        report = DayReport(p.$1, p.$2, p.$3, p.$4, p.$5, p.$6, p.$7, earned, wages,
+        paidAll, yt, List.of(evtNotes));
+    evtNotes.clear();
     ui();
   }
 

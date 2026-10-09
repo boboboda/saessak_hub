@@ -145,7 +145,7 @@ extension StaffSystem on HubGame {
   Iterable<Building> openPosts() =>
       buildings.where((b) => b.seats > 0 && b.crew.length < b.seats);
 
-  int get dailyWages => staff.fold<int>(0, (a, s) => a + s.wage);
+  int get dailyWages => (staff.fold<int>(0, (a, s) => a + s.wage) * this.evtWage).round(); // 특근이면 ×1.3
 
   /// 효과가 있는 휴게실 개수 (최대 Cfg.loungeMax)
   int get loungeBonus => min(Cfg.loungeMax, ofType('lounge').length);
@@ -285,7 +285,7 @@ extension StaffSystem on HubGame {
   /// 체력 계산: 일한 직원은 줄고, 쉰 직원은 찬다. (매 프레임, 일 처리 뒤에 호출)
   void updateStaffEnergy(double dt) {
     final n = loungeBonus;
-    final drain = Cfg.drainPerSec * (1.0 - Cfg.loungeDrain * n) * this.jobDrain; // 현장 반장
+    final drain = Cfg.drainPerSec * (1.0 - Cfg.loungeDrain * n) * this.jobDrain * this.evtDrain; // 현장 반장·폭염
     for (final s in staff) {
       // 회복 속도: 대기·휴식 자리 > 휴게실(×3) > 자리에서 서서 쉬기(아주 느림)
       double gain;

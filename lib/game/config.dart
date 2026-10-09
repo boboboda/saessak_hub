@@ -345,6 +345,32 @@ class Cfg {
   static const int plantMax = 3;
   static const double airconRadius = 3, airconDrain = 0.10; // 에어컨: 반경 3칸, 소모 −10%
 
+    // ---- 선택형 사건 (허브 안, 하루 1~2번, 같은 사건은 일주일에 한 번 이하) ----
+  static const List<String> hubEvtName = ['TV 취재 요청', '명절 특수', '직원 다툼', '대량 주문 제안', '폭염', '신입 지원자'];
+  static const List<String> hubEvtDesc = [
+    '방송국에서 허브를 취재하고 싶대요. 손님이 몰리겠지만 잘 해내면 유명해져요.',
+    '명절을 앞두고 택배가 쏟아질 조짐이에요. 특근을 할까요?',
+    '두 직원이 말다툼을 했어요. 분위기가 험악해요.',
+    '쇼핑몰에서 대량 주문을 맡기고 싶대요. 기한 안에 다 보내야 해요.',
+    '오늘은 찜통더위예요. 직원들이 금방 지칠 것 같아요.',
+    '경력 많은 지원자가 찾아왔어요. 월급은 두 배를 원해요.',
+  ];
+  static const List<int> evtPerDay = [1, 2]; // 하루 사건 수 (최소, 최대)
+  static const List<double> evtWindow = [40, 260]; // 하루(300초) 중 사건이 뜨는 구간(초)
+  static const int evtCooldownDays = 7;
+  static const double evtTvBase = 0.25, evtTvIntake = 1.5;
+  static const int evtTvFame = 50, evtTvFail = 10;
+  static const int evtRushDays = 3, evtRushFame = 10;
+  static const double evtRushIntake = 1.5, evtRushWage = 1.3;
+  static const int evtFightCost = 500, evtFightDays = 3;
+  static const double evtFightSlow = 0.85;
+  // 대량 주문: 제안서의 '급송 40건'은 시작 접수량으로 불가능해서, 지금 접수량 × 5분 × 0.8 건(최소 8)을 내일 끝까지 배송
+  static const double evtBulkIntake = 1.3;
+  static const int evtBulkPay = 250, evtBulkFail = 30;
+  static const int evtHeatCost = 2000;
+  static const double evtHeatDrain = 1.3;
+  static const double evtRookieWage = 2.0;
+
   // ---- 계절 (1년 28일 = 7일씩) ----
   static const List<String> seasonName = ['봄', '여름', '가을', '겨울'];
 

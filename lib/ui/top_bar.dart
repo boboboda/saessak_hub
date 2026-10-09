@@ -81,8 +81,12 @@ class TopBar extends StatelessWidget {
                       }
                       g.tickets++;
                       break;
-                    case 9:
+                                        case 9:
                       g.debugProps();
+                      break;
+                    case 10:
+                      // 사건 차례로 일으키기 (확인용)
+                      g.openEvent(g.debugEvt++ % Cfg.hubEvtName.length);
                       break;
                   }
                   g.ui();
@@ -121,6 +125,10 @@ class TopBar extends StatelessWidget {
                     value: 9,
                     child: Text('세트 소품 6종 놓기', style: Tx.body),
                   ),
+                                    PopupMenuItem(
+                    value: 10,
+                    child: Text('사건 일으키기 (차례로)', style: Tx.body),
+                  ),
                   PopupMenuItem(
                     value: 4,
                     child: Text('저장 지우기 (다시 켜면 새로 시작)', style: Tx.body),
@@ -136,6 +144,7 @@ class TopBar extends StatelessWidget {
             child: Wrap(
               spacing: 6,
               children: [
+                                for (final l in g.evtLabels) Pill(Icons.campaign, l, color: C.accent),
                 Pill(Icons.inbox, '접수 ${g.done}'),
                 Pill(Icons.inventory_2, '보관 ${g.totalStored}'),
                 Pill(Icons.local_shipping, '배송 ${g.delivered}'),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../systems/build_system.dart';
 import '../systems/dock_system.dart';
+import '../systems/event_system.dart';
 import '../systems/fleet_system.dart';
 import '../systems/flow_system.dart';
 import '../systems/input_system.dart';
@@ -26,6 +27,7 @@ import 'sprites.dart';
 
 export '../systems/build_system.dart';
 export '../systems/dock_system.dart';
+export '../systems/event_system.dart';
 export '../systems/flow_system.dart';
 export '../systems/input_system.dart';
 export '../systems/job_system.dart';
@@ -81,7 +83,14 @@ class HubGame extends FlameGame {
   int tickets = 0; // 전직서 (직업 Lv5 직원을 상위 직업으로 전직할 때 1장)
   (int, int, int, int, int, double, int)? pendingReport; // 월급 정산 전 하루 평가
     DayReport? report; // 하루 정산 카드 (null 이면 안 보임)
-  double setTimer = 0; // 세트 다시 계산까지
+    double setTimer = 0; // 세트 다시 계산까지
+  // 선택형 사건
+  final List<double> evtTimes = []; // 오늘 사건이 뜰 시각(하루 초)
+  final Map<int, int> evtLast = {}; // 사건별 마지막으로 뜬 날
+  HubEvent? evtNow; // 고르는 중인 사건 (게임 멈춤)
+  final List<ActiveEvt> evts = []; // 진행 중인 사건
+    final List<String> evtNotes = []; // 오늘 끝난 사건 결과 (정산 카드에 표시)
+  int debugEvt = 0; // (디버그) 다음에 일으킬 사건
   double fever = 0; // 수익 부스트(광고) 남은 시간(초)
 
   // 배송 기한: 택배마다 접수 시각을 단계마다 넘겨준다 (먼저 들어온 것부터 나감)
@@ -123,7 +132,7 @@ class HubGame extends FlameGame {
   }
 
   /// 지금 접수량 (분당 택배 수) = 명성 구간 × 성수기 배수
-  double get intakeNow => Cfg.intakeBase(fame) * (holiday?.$4 ?? 1.0);
+    double get intakeNow => Cfg.intakeBase(fame) * (holiday?.$4 ?? 1.0) * this.evtIntake; // 사건(TV 취재·특근·대량 주문)
   double dayTimer = 0;
   double candTimer = 0;
   int lastPayroll = 0;
@@ -298,8 +307,9 @@ class HubGame extends FlameGame {
     await super.onLoad();
     await Sprites.load();
     if (!await this.loadGame()) {
-      this.addStarters();
+            this.addStarters();
     }
+    this.planEvents();
     this.genCandidates();
   }
 
@@ -319,15 +329,19 @@ class HubGame extends FlameGame {
     super.update(dt);
     clock += dt;
     if (toastTime > 0) toastTime -= dt;
-    final d = dt * speedMul;
+        final d = evtNow != null ? 0.0 : dt * speedMul; // 사건을 고르는 동안 멈춤
 
     // 달력: 하루가 끝나면 월급 정산
     dayTimer += d;
         if (dayTimer >= Cfg.dayLength) {
       dayTimer = 0;
+            evtNotes
+        ..clear()
+        ..addAll(this.resolveEvents(day));
       this.endOfDay(day);
       day++;
       this.payroll();
+      this.planEvents();
       final h = holiday;
       if (h != null && dayOfYear == h.$2) {
         showToast('${h.$1} 시작! 오늘부터 ${h.$3}일간 접수량 ×${h.$4}');
@@ -343,7 +357,8 @@ class HubGame extends FlameGame {
     }
 
     gt += d;
-    this.updateFever(d);
+        this.updateFever(d);
+    this.updateEvents(d);
     if (sootheCd > 0) sootheCd = max(0.0, sootheCd - d);
 
     this.updateFlow(d);

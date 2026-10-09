@@ -70,14 +70,16 @@ class Staff {
       energyPct >= 0.3 ? 1.0 : 0.5 + 0.5 * (energyPct / 0.3);
 
   /// 일하는 속도 배수 (손속도 1 → 0.8, 3 → 1.2, 5 → 1.6) × 피로
-  double get workRate =>
-      (0.6 + 0.2 * speed) * fatigueMul * (1 + 0.06 * (level - 1));
+    double get workRate =>
+      (0.6 + 0.2 * speed) * fatigueMul * (1 + 0.06 * (level - 1)) * eventMul;
+  double eventMul = 1; // 사건(직원 다툼)으로 떨어진 능률
 
   /// 걷는 속도 배수 (걸음 1 → 0.85, 3 → 1.15, 5 → 1.45) × 피로
   double get walkMul =>
       (0.7 + 0.15 * walk) *
       fatigueMul *
-            (1 + 0.06 * (level - 1)); // 직업 걸음 보너스는 JobSystem.jobWalk
+                        (1 + 0.06 * (level - 1)) *
+      eventMul; // 직업 걸음 보너스는 JobSystem.jobWalk
 
   String get initial => name.isEmpty ? '?' : name.substring(0, 1);
 }

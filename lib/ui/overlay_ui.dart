@@ -6,6 +6,7 @@ import 'bottom_bar.dart';
 import 'build_sheet.dart';
 import 'building_sheet.dart';
 import 'ops_sheet.dart';
+import 'event_card.dart';
 import 'report_card.dart';
 import 'staff_sheet.dart';
 import 'theme.dart';
@@ -84,6 +85,11 @@ class OverlayUi extends StatelessWidget {
           ),
                 if (sheet != null)
           Positioned(left: 0, right: 0, bottom: 0, child: sheet),
+                // 선택형 사건 (정산 카드보다 아래, 둘이 겹치면 정산 먼저)
+        if (g.evtNow != null && g.report == null) ...[
+          Positioned.fill(child: Container(color: Colors.black45)),
+          Positioned.fill(child: Center(child: SingleChildScrollView(child: EventCard(g)))),
+        ],
         // 하루 정산 카드 (맨 위)
         if (g.report != null) ...[
           Positioned.fill(child: Container(color: Colors.black45)),

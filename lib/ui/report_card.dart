@@ -83,6 +83,16 @@ class ReportCard extends StatelessWidget {
             const SizedBox(height: 6),
             const Text('월급을 다 못 줬어요 (파산은 없어요)', style: TextStyle(color: C.bad, fontSize: 12)),
           ],
+                    for (final n in r.notes) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.campaign, size: 16, color: C.accent),
+                const SizedBox(width: 6),
+                Expanded(child: Text(n, style: Tx.body)),
+              ],
+            ),
+          ],
           if (r.yearText != null) ...[
             const SizedBox(height: 10),
             Container(

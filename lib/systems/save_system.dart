@@ -49,7 +49,9 @@ extension SaveSystem on HubGame {
       ],
             'claimed': claimed.toList(),
       'rate': rt.toJson(),
-      'tickets': tickets,
+            'tickets': tickets,
+      'evts': [for (final e in evts) e.toJson()],
+      'evtLast': {for (final e in evtLast.entries) '${e.key}': e.value},
       'routes': [
         for (final r in routes)
           {'on': r.on, 'v': r.vehicle, 'w': r.wait, 'p': r.prio}
@@ -244,7 +246,24 @@ extension SaveSystem on HubGame {
       } catch (e) {
         debugPrint('평가 기록 불러오기 실패: $e');
       }
-      tickets = (j['tickets'] as num?)?.toInt() ?? 0;
+            tickets = (j['tickets'] as num?)?.toInt() ?? 0;
+      // 진행 중 사건 (예전 저장엔 없음)
+      try {
+        evts
+          ..clear()
+          ..addAll(((j['evts'] as List?) ?? const [])
+              .map((e) => ActiveEvt.fromJson(e as Map<String, dynamic>)));
+        evtLast.clear();
+        final el = j['evtLast'] as Map?;
+        if (el != null) {
+          for (final e in el.entries) {
+            evtLast[int.parse(e.key as String)] = (e.value as num).toInt();
+          }
+        }
+      } catch (e) {
+        evts.clear();
+        debugPrint('사건 기록 불러오기 실패: $e');
+      }
       aisles
         ..clear()
         ..addAll(((j['aisles'] as List?) ?? const []).map((e) => e as int));
