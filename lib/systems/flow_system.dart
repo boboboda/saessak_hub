@@ -91,9 +91,14 @@ extension FlowSystem on HubGame {
     if (counters.isNotEmpty) {
       spawnTimer -= dt;
       if (spawnTimer <= 0) {
-        spawnTimer = (5 + rnd.nextDouble() * 4) *
-            (fever > 0 ? Cfg.feverSpawn : 1.0);
-        if (customers.length < 4 + counters.length * 3) spawnCustomer();
+        // 도착 간격은 접수량(명성 구간 × 성수기)으로만 정해진다. 창구를 늘려도 손님이 더 오지 않음
+        final j = Cfg.intakeJitter;
+        spawnTimer = 60 / intakeNow * (1 - j + rnd.nextDouble() * 2 * j);
+        if (customers.length < 4 + counters.length * 3) {
+          spawnCustomer();
+        } else {
+          lost++; // 줄이 너무 길어 그냥 돌아감
+        }
       }
     }
 

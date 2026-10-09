@@ -4,7 +4,7 @@ import '../game/config.dart';
 import '../game/hub_game.dart';
 import 'theme.dart';
 
-/// 운영 시트: 피버 타임 / 배송 지역 / 목표
+/// 운영 시트: 접수량·달력 / 수익 부스트 / 배송 지역 / 목표
 class OpsSheet extends StatelessWidget {
   final HubGame g;
   const OpsSheet(this.g, {super.key});
@@ -22,6 +22,8 @@ class OpsSheet extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
         children: [
+          _intake(),
+          const SizedBox(height: 10),
           _fever(),
           const SizedBox(height: 16),
           CardBox(
@@ -67,6 +69,42 @@ class OpsSheet extends StatelessWidget {
     );
   }
 
+  /// 접수량: 명성 구간 × 성수기. 다음 구간과 다음 성수기 안내
+  Widget _intake() {
+    final tier = Cfg.intakeTier(g.fame);
+    final next = tier + 1 < Cfg.intakeFame.length ? tier + 1 : -1;
+    final h = g.holiday;
+    final (nh, nd) = g.nextHoliday;
+    final total = g.onTimeCount + g.lateCount;
+    final rate = total == 0 ? 100 : (g.onTimeCount * 100 / total).round();
+    return CardBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            const Icon(Icons.inbox, color: C.accent, size: 22),
+            const SizedBox(width: 8),
+            Expanded(
+                child: Text('접수량 분당 ${g.intakeNow.toStringAsFixed(1)}건', style: Tx.h2)),
+            Text('${g.year}년차 ${g.dayOfYear}/${Cfg.yearDays}일', style: Tx.sub),
+          ]),
+          const SizedBox(height: 4),
+          Text(
+              next < 0
+                  ? '명성 구간 최고 단계'
+                  : '명성 ${g.fame}/${Cfg.intakeFame[next]} → 분당 ${Cfg.intakePerMin[next]}건',
+              style: Tx.sub),
+          Text(
+              h != null
+                  ? '오늘은 ${h.$1}! 접수 ×${h.$4}'
+                  : '다음 성수기: ${nh.$1} ($nd일 후, 접수 ×${nh.$4})',
+              style: TextStyle(color: h != null ? C.gold : C.sub, fontSize: 12)),
+          Text('정시 배송 $rate% · 연속 ${g.streak}건 (최고 ${g.bestStreak})', style: Tx.sub),
+        ],
+      ),
+    );
+  }
+
   Widget _fever() {
     final on = g.fever > 0;
     final cd = g.adCd.ceil();
@@ -80,9 +118,8 @@ class OpsSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(on ? '피버 타임 ${g.fever.ceil()}초 남음' : '피버 타임', style: Tx.h2),
-                Text(
-                    '손님이 2배로 몰리고 수익 ×${Cfg.feverPay} · 가끔 저절로 시작돼요',
+                Text(on ? '수익 부스트 ${g.fever.ceil()}초 남음' : '수익 부스트', style: Tx.h2),
+                Text('${Cfg.feverLen.round()}초 동안 배송 수익 ×${Cfg.feverPay} (손님 수는 그대로)',
                     style: Tx.sub),
               ],
             ),

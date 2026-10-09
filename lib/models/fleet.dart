@@ -14,6 +14,7 @@ class FleetUnit {
   double t = 0; // 현재 구간 경과(차량 속도 반영)
   double dur = 0; // 현재 구간 길이
   int cargo = 0; // 싣고 있는 택배
+  final List<double> load = []; // 싣고 있는 택배의 접수 시각 (배송 기한 계산용)
   bool full = false; // 가득 싣고 출발했는지 (수익 보너스)
   int house = 0; // 이번에 배달 가는 집 번호 (지도 표시용)
 

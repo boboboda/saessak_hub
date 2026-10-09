@@ -117,6 +117,12 @@ extension FleetSystem on HubGame {
 
   void _startCourier(FleetUnit u, int n) {
     u.cargo = n;
+    final cb = centerBorn[u.region];
+    final k = min(n, cb.length);
+    u.load
+      ..clear()
+      ..addAll(cb.take(k));
+    cb.removeRange(0, k);
     u.full = n >= u.cap;
     u.state = 1;
     u.t = 0;
@@ -148,6 +154,7 @@ extension FleetSystem on HubGame {
       } else if (k == 3 && u.cargo > 1) {
         final lost = max(1, (u.cargo * 0.15).round());
         u.cargo -= lost;
+        if (u.load.length > u.cargo) u.load.removeRange(u.cargo, u.load.length);
         extra = ' 택배 $lost건 분실';
       }
       u.evtText = '${Cfg.evtName[k]}… 대응 실패';
@@ -201,6 +208,8 @@ extension FleetSystem on HubGame {
   void _arrive(FleetUnit u) {
     if (u.isTrunk) {
       centerStock[u.region] += u.cargo;
+      centerBorn[u.region].addAll(u.load);
+      u.load.clear();
       note('${Cfg.regionName[u.region]} 센터에 ${u.cargo}건 도착', 0xFF56CCF2);
       mapFx.add(MapFx(u.region, true, 0, '+${u.cargo}건', 0xFF56CCF2));
       u.cargo = 0;
@@ -209,18 +218,46 @@ extension FleetSystem on HubGame {
       u.dur = Cfg.regionTrip[u.region] * 0.8;
     } else {
       final n = u.cargo;
-      final pay = (n *
-              Cfg.parcelPay *
-              Cfg.vehicles[u.type].payMul *
-              Cfg.regionPay[u.region] *
-              (fever > 0 ? Cfg.feverPay : 1.0) *
-              (u.full ? Cfg.fullBonus : 1.0))
-          .round();
+      final unit = Cfg.parcelPay *
+          Cfg.vehicles[u.type].payMul *
+          Cfg.regionPay[u.region] *
+          (fever > 0 ? Cfg.feverPay : 1.0) *
+          (u.full ? Cfg.fullBonus : 1.0);
+      // 택배마다 기한 확인: 정시면 정상 + 연속 보너스, 늦으면 수익 감소·명성 하락
+      final limit = Cfg.deadline(u.region);
+      var payD = 0.0, ok = 0, late = 0, fameD = 0;
+      for (var i = 0; i < n; i++) {
+        final born = i < u.load.length ? u.load[i] : gt; // 불러온 저장 등 시각을 모르면 정시로
+        if (gt - born <= limit) {
+          ok++;
+          streak++;
+          if (streak > bestStreak) bestStreak = streak;
+          payD += unit * (1 + Cfg.streakStep * min(streak, Cfg.streakCap));
+          fameD += Cfg.onTimeFame;
+          if (streak % Cfg.streakEvery == 0) {
+            fameD += Cfg.streakFame;
+            note('연속 정시 배송 $streak건! 명성 +${Cfg.streakFame}', 0xFF3FB27F);
+          }
+        } else {
+          late++;
+          streak = 0;
+          payD += unit * Cfg.latePay;
+          fameD -= Cfg.lateFame;
+        }
+      }
+      u.load.clear();
+      final pay = payD.round();
       money += pay;
       dayEarn += pay;
       delivered += n;
-      fame += n;
-      note('${u.driver} 배달 완료 ${n}건 +${fmt(pay)}원', 0xFFFFD166);
+      onTimeCount += ok;
+      lateCount += late;
+      fame = max(0, fame + fameD);
+      note(
+          late == 0
+              ? '${u.driver} 정시 배달 ${n}건 +${fmt(pay)}원'
+              : '${u.driver} 배달 ${n}건 (지각 $late) +${fmt(pay)}원',
+          late == 0 ? 0xFFFFD166 : 0xFFE5484D);
       mapFx.add(MapFx(u.region, false, u.house, '+${fmt(pay)}', 0xFFFFD166));
       u.cargo = 0;
       u.state = 2;

@@ -6,30 +6,24 @@ import '../game/hub_game.dart';
 import '../models/models.dart';
 
 extension OpsSystem on HubGame {
-  // ---- 피버 타임 ----
+  // ---- 수익 부스트 (광고). 접수량은 명성·성수기로만 정해지므로 손님 수는 그대로 ----
   void updateFever(double d) {
     if (adCd > 0) adCd = max(0.0, adCd - d);
     if (fever > 0) {
       fever -= d;
       if (fever <= 0) {
         fever = 0;
-        showToast('피버 타임 끝!');
+        showToast('수익 부스트 끝!');
       }
-      return;
     }
-    // 가게가 돌아가기 시작한 뒤에만 시계가 간다
-    if (ofType('counter').isEmpty) return;
-    feverCd -= d;
-    if (feverCd <= 0) startFever();
   }
 
   void startFever() {
     fever = Cfg.feverLen;
-    feverCd = Cfg.feverMin + rnd.nextDouble() * (Cfg.feverMax - Cfg.feverMin);
-    showToast('피버 타임! 손님이 몰리고 수익이 ×${Cfg.feverPay}');
+    showToast('수익 부스트! ${Cfg.feverLen.round()}초 동안 수익 ×${Cfg.feverPay}');
   }
 
-  /// 광고를 보고 피버를 바로 켠다
+  /// 광고를 보고 수익 부스트를 켠다
   Future<void> adFever() async {
     if (adCd > 0 || fever > 0) return;
     final ok = await AdService.showRewarded();

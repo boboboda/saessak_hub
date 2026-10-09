@@ -89,6 +89,9 @@ extension DockSystem on HubGame {
             if (u != null) {
               if (v.loaded > 0) {
                 u.cargo = v.loaded;
+                u.load
+                  ..clear()
+                  ..addAll(v.borns);
                 u.full = v.loaded >= v.cap;
                 this.startTrunkTrip(u);
                 showToast('${Cfg.regionName[v.region]}행 ${u.driver} 출발! 택배 ${v.loaded}건');

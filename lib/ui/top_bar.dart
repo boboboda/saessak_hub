@@ -69,6 +69,9 @@ class TopBar extends StatelessWidget {
                     case 5:
                       g.fame += 500;
                       break;
+                    case 6:
+                      g.debugStarterLayout();
+                      break;
                   }
                   g.ui();
                 },
@@ -78,17 +81,18 @@ class TopBar extends StatelessWidget {
                   PopupMenuItem(value: 2, child: Text('하루 넘기기 (월급)', style: Tx.body)),
                   PopupMenuItem(value: 3, child: Text('손님 +3', style: Tx.body)),
                   PopupMenuItem(value: 5, child: Text('명성 +500', style: Tx.body)),
+                  PopupMenuItem(value: 6, child: Text('시작 구성 자동 배치', style: Tx.body)),
                   PopupMenuItem(value: 4, child: Text('저장 지우기 (다시 켜면 새로 시작)', style: Tx.body)),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 4),
-          Align(
-            alignment: Alignment.centerLeft,
+          // 상태 알약은 한 줄 가로 스크롤 (줄이 늘어 아래 경고와 겹치지 않게)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             child: Wrap(
               spacing: 6,
-              runSpacing: 4,
               children: [
                 Pill(Icons.inbox, '접수 ${g.done}'),
                 Pill(Icons.inventory_2, '보관 ${g.totalStored}'),
@@ -96,8 +100,12 @@ class TopBar extends StatelessWidget {
                 Pill(Icons.sentiment_dissatisfied, '놓침 ${g.lost}',
                     color: g.lost > 0 ? C.bad : C.sub),
                 Pill(Icons.groups, '직원 ${g.staff.length}'),
+                if (g.holiday != null)
+                  Pill(Icons.celebration, '${g.holiday!.$1} ×${g.holiday!.$4}', color: C.gold),
+                if (g.streak >= 5)
+                  Pill(Icons.bolt, '연속 정시 ${g.streak}', color: C.good),
                 if (g.fever > 0)
-                  Pill(Icons.local_fire_department, '피버 ${g.fever.ceil()}초',
+                  Pill(Icons.local_fire_department, '부스트 ${g.fever.ceil()}초',
                       color: C.bad),
               ],
             ),

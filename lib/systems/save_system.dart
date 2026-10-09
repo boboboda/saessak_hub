@@ -7,7 +7,8 @@ import '../game/config.dart';
 import '../game/hub_game.dart';
 import '../models/models.dart';
 
-const String _saveKey = 'hub_save_v1';
+// v2: 접수량·배송 기한 경제로 바뀌며 예전 저장(v1)은 쓰지 않음 (새로 시작)
+const String _saveKey = 'hub_save_v2';
 
 extension SaveSystem on HubGame {
   Map<String, dynamic> _toJson() {
@@ -25,6 +26,10 @@ extension SaveSystem on HubGame {
       'nextStaffId': nextStaffId,
       'regions': regionOpen,
       'fame': fame,
+      'streak': streak,
+      'bestStreak': bestStreak,
+      'onTime': onTimeCount,
+      'late': lateCount,
       'cstock': centerStock,
       'nextUnitId': nextUnitId,
       'fleet': [
@@ -167,6 +172,10 @@ extension SaveSystem on HubGame {
         }
       }
       fame = (j['fame'] as int?) ?? 0;
+      streak = (j['streak'] as int?) ?? 0;
+      bestStreak = (j['bestStreak'] as int?) ?? 0;
+      onTimeCount = (j['onTime'] as int?) ?? 0;
+      lateCount = (j['late'] as int?) ?? 0;
       final cs = j['cstock'] as List?;
       if (cs != null) {
         for (var i = 0; i < centerStock.length && i < cs.length; i++) {

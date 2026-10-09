@@ -72,6 +72,7 @@ extension WorkerSystem on HubGame {
       if (shelf != null) {
         shelf.stored++;
         shelf.regions[p.region]++;
+        hubBorn[p.region].insert(0, p.born); // 가장 먼저 나갈 택배로 되돌림
       }
     }
     final v = c.veh;
@@ -252,12 +253,15 @@ extension WorkerSystem on HubGame {
         sh.regions[p.region]--;
         sh.pickRes[p.region] = max(0, sh.pickRes[p.region] - 1);
         sh.stored = max(0, sh.stored - 1);
+        final hb = hubBorn[p.region];
+        p.born = hb.isEmpty ? gt : hb.removeAt(0); // 오래 기다린 택배부터 싣는다
         c.carrying = true;
       } else {
         // 차량에 싣기
         final v = c.dst!.vehicle;
         if (v != null && v == c.veh && v.state == 1) {
           v.loaded++;
+          v.borns.add(p.born);
           v.incoming = max(0, v.incoming - 1);
           v.idle = 0;
         } else {
@@ -288,6 +292,7 @@ extension WorkerSystem on HubGame {
       } else {
         d.stored++;
         d.regions[p.region]++;
+        hubBorn[p.region].add(p.born);
         d.incoming = max(0, d.incoming - 1);
         if (p.kind == 1) {
           if (gt - p.born <= Cfg.urgentLimit) {

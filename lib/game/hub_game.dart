@@ -65,8 +65,15 @@ class HubGame extends FlameGame {
   int nextUnitId = 1;
   bool showMap = false; // 전체화면 노선 지도
   final Set<int> claimed = {}; // 보상을 받은 목표
-  double fever = 0; // 피버 남은 시간(초)
-  double feverCd = Cfg.feverFirst; // 다음 피버까지
+  double fever = 0; // 수익 부스트(광고) 남은 시간(초)
+
+  // 배송 기한: 택배마다 접수 시각을 단계마다 넘겨준다 (먼저 들어온 것부터 나감)
+  final List<List<double>> hubBorn = List.generate(5, (_) => []); // 허브 선반
+  final List<List<double>> centerBorn = List.generate(5, (_) => []); // 지역센터
+  int streak = 0; // 연속 정시 배송
+  int bestStreak = 0;
+  int onTimeCount = 0;
+  int lateCount = 0;
   double adCd = 0; // 광고 피버 재사용 대기
   bool noSave = false; // 저장 지우기 후 덮어쓰기 방지
   int speedIdx = 0;
@@ -74,6 +81,32 @@ class HubGame extends FlameGame {
 
   // 달력·월급
   int day = 1;
+
+  /// 연중 며칠째 (1~yearDays), 몇 년차
+  int get dayOfYear => (day - 1) % Cfg.yearDays + 1;
+  int get year => (day - 1) ~/ Cfg.yearDays + 1;
+
+  /// 오늘이 성수기면 그 정보, 아니면 null
+  (String, int, int, double)? get holiday {
+    final d = dayOfYear;
+    for (final h in Cfg.holidays) {
+      if (d >= h.$2 && d < h.$2 + h.$3) return h;
+    }
+    return null;
+  }
+
+  /// 다음 성수기와 남은 날 수
+  ((String, int, int, double), int) get nextHoliday {
+    final d = dayOfYear;
+    for (final h in Cfg.holidays) {
+      if (h.$2 > d) return (h, h.$2 - d);
+    }
+    final h = Cfg.holidays.first;
+    return (h, Cfg.yearDays - d + h.$2);
+  }
+
+  /// 지금 접수량 (분당 택배 수) = 명성 구간 × 성수기 배수
+  double get intakeNow => Cfg.intakeBase(fame) * (holiday?.$4 ?? 1.0);
   double dayTimer = 0;
   double candTimer = 0;
   int lastPayroll = 0;
@@ -208,6 +241,12 @@ class HubGame extends FlameGame {
       dayTimer = 0;
       day++;
       this.payroll();
+      final h = holiday;
+      if (h != null && dayOfYear == h.$2) {
+        showToast('${h.$1} 시작! 오늘부터 ${h.$3}일간 접수량 ×${h.$4}');
+      } else if (dayOfYear == 1) {
+        showToast('$year년차가 시작됐어요');
+      }
     }
     // 고용 후보 자동 갱신
     candTimer += d;

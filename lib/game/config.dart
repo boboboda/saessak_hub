@@ -58,7 +58,7 @@ class Cfg {
   static const double fullBonus = 1.2; // 차량을 가득 채워 보내면 수익 배수
   static const double vehicleMove = 1.5; // 차량이 들어오고 나가는 시간(초)
   static const double vehicleWait = 5; // 더 실을 게 없을 때 기다리는 시간(초)
-  static const int hubTruckMin = 8; // 한 지역 택배가 이만큼 쌓이면 허브 도크에 대형 트럭이 옴
+  static const int hubTruckMin = 3; // 한 지역 택배가 이만큼 쌓이면 허브 도크에 대형 트럭이 옴
   // 차량 종류 (허브 도크는 [0] 대형 트럭만 사용, 나머지는 지역→동네 배송용으로 예정)
   static const List<VehicleType> vehicles = [
     VehicleType('대형 트럭', 40, 30, 3.0, 1.5, 1.0, 0.85),
@@ -147,14 +147,52 @@ class Cfg {
   static const List<double> regionTrip = [15, 30, 50, 80, 120]; // 노선 지도에서 달리는 시간(초)
   static const List<double> waitOptions = [5, 15, 30];
 
-  // ---- 피버 타임 (손님이 몰리고 수익이 오름) ----
-  static const double feverFirst = 180; // 첫 피버까지(게임 초)
-  static const double feverMin = 300;
-  static const double feverMax = 420;
+  // ---- 접수량: 오직 ① 명성 구간 ② 달력 성수기 배수로만 늘어난다 ----
+  // 시뮬레이션(tools/sim/econ_sim.py) 기준: 시작 구성(창구1·포장1·운반1·트럭1)은 분당 2건까지 여유,
+  // 직원·선반·트럭을 늘린 구성은 분당 8건 안팎까지. 그 위로는 지각·놓침이 생겨 투자가 필요하다.
+  static const List<int> intakeFame = [0, 25, 60, 120, 200, 320, 480, 700, 1000, 1400, 2000, 2800];
+  static const List<double> intakePerMin = [1.0, 1.4, 1.8, 2.4, 3.0, 3.8, 4.6, 5.6, 6.8, 8.2, 10, 12];
+  static const double intakeJitter = 0.4; // 손님 도착 간격 ±40%
+
+  /// 명성 구간 번호 (0부터)
+  static int intakeTier(int fame) {
+    var t = 0;
+    for (var i = 0; i < intakeFame.length; i++) {
+      if (fame >= intakeFame[i]) t = i;
+    }
+    return t;
+  }
+
+  static double intakeBase(int fame) => intakePerMin[intakeTier(fame)];
+
+  // ---- 게임 달력: 1년 = 28일. 성수기(피버)에는 그날 하루 접수량 배수 ----
+  static const int yearDays = 28;
+  // (이름, 시작일(연중 1~28), 일수, 접수 배수)
+  static const List<(String, int, int, double)> holidays = [
+    ('설 연휴', 5, 2, 1.8),
+    ('가정의 달', 10, 1, 1.4),
+    ('추석', 16, 2, 2.0),
+    ('블랙프라이데이', 22, 1, 2.5),
+    ('연말 성수기', 26, 3, 1.6),
+  ];
+
+  // ---- 배송 기한: 접수부터 배달 완료까지. 지역이 멀수록(운행 시간이 길수록) 길다 ----
+  static const double deadlineBase = 240; // 게임 초
+  static const double deadlinePerTrip = 2.5; // 노선 왕복 시간 1초당 추가
+  static double deadline(int region) =>
+      deadlineBase + deadlinePerTrip * (regionTrip[region] + deliverTime[region]);
+  static const int onTimeFame = 1; // 정시 1건당 명성
+  static const int lateFame = 1; // 지각 1건당 명성 감소
+  static const double latePay = 0.5; // 지각이면 수익 배수
+  static const double streakStep = 0.004; // 연속 정시 1건당 수익 +0.4%
+  static const int streakCap = 50; // 수익 보너스는 50연속(+20%)까지
+  static const int streakEvery = 25; // 25연속마다 명성 보너스
+  static const int streakFame = 5;
+
+  // ---- 수익 부스트 (광고): 접수량은 늘리지 않고 수익만 오름 ----
   static const double feverLen = 60;
-  static const double feverSpawn = 0.5; // 손님 도착 간격 배수
   static const double feverPay = 1.5; // 수익 배수
-  static const double adCooldown = 300; // 광고로 피버를 켜는 재사용 대기(초)
+  static const double adCooldown = 300; // 광고 재사용 대기(초)
 
   // ---- 목표 ----
   static const List<Mission> missions = [

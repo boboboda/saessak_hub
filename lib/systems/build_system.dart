@@ -135,6 +135,32 @@ extension BuildSystem on HubGame {
         : '${t.name} 설치 완료!');
   }
 
+  /// (디버그) 시작 구성 자동 배치: 접수 창구·포장대·선반·도크 1개씩, 남는 직원은 운반
+  void debugStarterLayout() {
+    final a = area;
+    final y = (a.top + 3).toInt();
+    final plan = <(String, int, int)>[
+      ('counter', Cfg.zoneX1.toInt() - 3, y),
+      ('pack', Cfg.zoneX1.toInt() + 1, y),
+      ('shelf', Cfg.zoneX2.toInt() + 1, y),
+      ('dock', Cfg.wallX.toInt(), y),
+    ];
+    for (final (id, x, yy) in plan) {
+      final t = Cfg.types.firstWhere((t) => t.id == id);
+      final r = Rect.fromLTWH(x.toDouble(), yy.toDouble(), t.w.toDouble(), t.h.toDouble());
+      if (buildings.any((b) => b.rect.overlaps(r))) continue;
+      final nb = Building(t, x, yy);
+      if (id == 'counter' && !ofType('counter').any((b) => b.mine)) nb.mine = true;
+      buildings.add(nb);
+      this.autoAssign(nb);
+    }
+    for (final s in staff) {
+      if (s.idle) this.setCarrier(s);
+    }
+    showToast('시작 구성 배치 완료');
+    ui();
+  }
+
   Building? buildingAt(int tx, int ty) {
     final p = Offset(tx + 0.5, ty + 0.5);
     for (var i = buildings.length - 1; i >= 0; i--) {
@@ -152,6 +178,7 @@ extension BuildSystem on HubGame {
     final dv = b.vehicle; // 도크를 철거하면 싣던 택배는 지역센터로 보내고 트럭은 풀어줌
     if (dv != null) {
       centerStock[dv.region] += dv.loaded;
+      centerBorn[dv.region].addAll(dv.borns);
       dv.unit?.state = 0;
     }
     buildings.remove(b);
