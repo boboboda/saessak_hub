@@ -54,13 +54,16 @@ class Cfg {
   // 건물 바로 아래 한 줄은 '앞줄'(손님 줄·직원 서는 자리). 다른 건물이 막을 수 없다.
 
   // ---- 흐름 수치 ----
-  static const double serveTime = 5; // 접수 시간(초, 직원 1명 기준 ×1.0)
+  // 접수 시간(초, 직원 1명 기준 ×1.0). 직원 1명 창구는 분당 6건쯤 받아서 시작엔 병목이 아니지만,
+  // 손님이 창구 앞에 서 있는 시간이 길어 줄이 보이고 명성이 오르면(분당 4건~) 창구 직원을 늘려야 한다.
+  // 사연 말풍선을 탭하면 그 손님은 2배 빨리 접수됨
+  static const double serveTime = 12;
   static const double packTime = 5; // 포장 시간(초)
   static const double customerSpeed = 2.2; // 칸/초
   static const double carrierSpeed = 1.3; // 칸/초 (걸음 능력치로 배수)
-  static const double patience = 45; // 손님 인내심(초)
+  static const double patience = 60; // 손님 인내심(초)
   static const int shelfCap = 20; // 선반 1개 용량
-  static const int outboxCap = 4; // 접수 창구 대기 택배 한도 (레벨마다 +2, 최대 8)
+  static const int outboxCap = 6; // 접수 창구 대기 택배 한도 (레벨마다 +2, 최대 8 = 적재대 2x4)
   // 접수 창구 오른쪽 칸 적재대: 상자를 가로 stackCols 개씩 아래 층부터 쌓는다 (최대 stackLayers 층)
   static const int stackCols = 2;
   static const int stackLayers = 4;
@@ -171,11 +174,13 @@ class Cfg {
   static const List<double> waitOptions = [5, 15, 30];
 
   // ---- 접수량: 오직 ① 명성 구간 ② 달력 성수기 배수로만 늘어난다 ----
-  // 시뮬레이션(tools/sim/econ_sim.py) 기준: 시작 구성(창구1·포장1·운반1·트럭1)은 분당 2건까지 여유,
-  // 직원·선반·트럭을 늘린 구성은 분당 8건 안팎까지. 그 위로는 지각·놓침이 생겨 투자가 필요하다.
+  // 시뮬레이션(tools/sim/econ_sim.py, 접수 12초·인내심 60초·1~2명씩 도착) 기준: 시작 구성(창구1·포장1·운반1·트럭1)은
+  // 분당 1.5건을 거의 놓침 없이 처리하고(선반은 쌓이지 않음), 통로를 깔면 분당 1.8건까지. 분당 2.2건(명성 60)부터는 통로·운반 직원을 늘려야
+  // 놓침이 없어진다. 직원·선반·트럭을 늘린 구성은 분당 8건 안팎까지.
   static const List<int> intakeFame = [0, 25, 60, 120, 200, 320, 480, 700, 1000, 1400, 2000, 2800];
-  static const List<double> intakePerMin = [1.0, 1.4, 1.8, 2.4, 3.0, 3.8, 4.6, 5.6, 6.8, 8.2, 10, 12];
+  static const List<double> intakePerMin = [1.5, 1.8, 2.2, 2.7, 3.2, 3.8, 4.6, 5.6, 6.8, 8.2, 10, 12];
   static const double intakeJitter = 0.4; // 손님 도착 간격 ±40%
+  static const int groupMax = 2; // 손님이 한 번에 함께 오는 최대 인원 (줄이 보이게, 평균 접수량은 같음)
 
   /// 명성 구간 번호 (0부터)
   static int intakeTier(int fame) {

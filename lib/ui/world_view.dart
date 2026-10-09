@@ -854,20 +854,22 @@ extension WorldView on HubGame {
     final col = Color(cu.pre ? 0xFFE6F4EA : Cfg.storyColor[s.$2]);
     // 꼬리 (머리 쪽)
     c.drawPath(
-        Path()
-          ..moveTo(r.left + 2, r.bottom - 5)
-          ..lineTo(r.left - 4, r.bottom + 2)
-          ..lineTo(r.left + 7, r.bottom - 1)
-          ..close(),
-        Paint()..color = col);
+      Path()
+        ..moveTo(r.left + 2, r.bottom - 5)
+        ..lineTo(r.left - 4, r.bottom + 2)
+        ..lineTo(r.left + 7, r.bottom - 1)
+        ..close(),
+      Paint()..color = col,
+    );
     final rr = RRect.fromRectAndRadius(r, const Radius.circular(5));
     c.drawRRect(rr, Paint()..color = col);
     c.drawRRect(
-        rr,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1
-          ..color = const Color(0xFF2A2438));
+      rr,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = const Color(0xFF2A2438),
+    );
     labelIn(c, text, r, size: 10, color: const Color(0xFF2A2438));
     if (!cu.pre) cu.bubble = r;
   }
@@ -1156,7 +1158,9 @@ extension WorldView on HubGame {
         label(
           c,
           Cfg.kindName[cu.kind],
-          p.dx - 9 - textWidth(Cfg.kindName[cu.kind], 10), // 머리 왼쪽 (오른쪽은 사연 말풍선)
+          p.dx -
+              9 -
+              textWidth(Cfg.kindName[cu.kind], 10), // 머리 왼쪽 (오른쪽은 사연 말풍선)
           p.dy - t * 0.62,
           size: 10,
           color: const Color(0xFFFF8A80),
@@ -1165,7 +1169,8 @@ extension WorldView on HubGame {
       if (cu.state != 2 && cu.ready) {
         // 내 자리 맨 앞 손님: 눌러 달라는 말풍선 (살짝 깜빡임)
         final pulse = 0.5 + 0.5 * sin(clock * 8);
-        final bubble = Rect.fromLTWH(p.dx - 17, p.dy - t * 0.98, 34, 15);
+        // 머리 왼쪽 (오른쪽은 사연 말풍선)
+        final bubble = Rect.fromLTWH(p.dx - 44, p.dy - t * 0.95, 34, 15);
         box(
           c,
           bubble.left,
@@ -1205,9 +1210,25 @@ extension WorldView on HubGame {
     hubFx.removeWhere((f) => clock - f.$4 > 1.4);
     for (final f in hubFx) {
       final k = (clock - f.$4) / 1.4;
-      final r = Rect.fromCenter(center: f.$1.translate(0, -8 - k * 22), width: 70, height: 16);
-      labelIn(c, f.$2, r.translate(1, 1), size: 11, color: Color.fromRGBO(0, 0, 0, 1 - k));
-      labelIn(c, f.$2, r, size: 11, color: Color(f.$3).withValues(alpha: 1 - k));
+      final r = Rect.fromCenter(
+        center: f.$1.translate(0, -8 - k * 22),
+        width: 70,
+        height: 16,
+      );
+      labelIn(
+        c,
+        f.$2,
+        r.translate(1, 1),
+        size: 11,
+        color: Color.fromRGBO(0, 0, 0, 1 - k),
+      );
+      labelIn(
+        c,
+        f.$2,
+        r,
+        size: 11,
+        color: Color(f.$3).withValues(alpha: 1 - k),
+      );
     }
 
     // 운반 직원 (쉬러 간 직원은 위에서 따로 그림)

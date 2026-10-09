@@ -1,7 +1,7 @@
 """택배 허브 처리 능력 시뮬레이션 (게임 수치 정하기용, 0.5초 단위 이산 시뮬레이션)
 
 단계: 손님 도착 → 접수 창구 → (운반) → 포장대 → (운반) → 선반 → (운반) → 도크 대형 트럭 → 지역센터 → 배달 차량
-지금 게임 코드의 기본값을 옮겨 왔다 (config.dart): 접수·포장 5초, 실수 확률, 트럭 40건, 오토바이 6건, 노선 15초 등.
+지금 게임 코드의 기본값을 옮겨 왔다 (config.dart): 접수 8초·포장 5초, 실수 확률, 트럭 40건, 오토바이 6건, 노선 15초 등.
 """
 import random
 import sys
@@ -14,17 +14,18 @@ def run(rate_pm, setup, secs=900, seed=1, deadline=240.0, truck_min=4, wait=15, 
     lam = rate_pm / 60.0
     st = dict(setup)
     # 직원 능력(평균): 손속도 3 → workRate 1.2, 걸음 3 → 걸음 1.3*1.15 칸/초
-    serve = 5 / 1.2 / st.get('counter_mul', 1.0)
+    serve = st.get('serve', 12) / 1.2 / st.get('counter_mul', 1.0)  # Cfg.serveTime
     pack = 5 / 1.2 / st.get('pack_mul', 1.0)
     slip = 0.15
-    walk = 1.3 * 1.15
+    # 통로(직접 설치) 위에서는 1.5배, 밖에서는 0.7배 → 구성마다 평균 걸음 배수 walk_mul
+    walk = 1.3 * 1.15 * st.get('walk_mul', 1.0)
     # 운반 한 번 (빈손으로 가기 + 들고 가기) 걸리는 시간 (창고 크기에 따라 칸 수)
     leg = {'c2p': 9 / walk, 'p2s': 9 / walk, 's2d': 10 / walk}
     trip, back = st.get('trip', 15.0), st.get('trip', 15.0) * 0.8
     deliver = st.get('deliver', 8.0)
     truck_cap = st.get('truck_cap', 40)
     moto_cap = st.get('moto_cap', 6)
-    outcap = 4 * st['counters']
+    outcap = st.get('outcap', 6) * st['counters']  # Cfg.outboxCap
     shelf_cap = 20 * st['shelves']
 
     t = 0.0
@@ -49,11 +50,14 @@ def run(rate_pm, setup, secs=900, seed=1, deadline=240.0, truck_min=4, wait=15, 
         # 손님 도착
         spawn -= DT
         while spawn <= 0:
-            spawn += rnd.expovariate(lam)
-            if len(queue) < 4 + 3 * st['counters']:
-                queue.append(t)
-            else:
-                lost += 1
+            # 손님은 1~group 명씩 함께 온다 (평균 접수량은 같고 간격만 그만큼 길어짐)
+            g = rnd.randint(1, st.get('group', 2))
+            spawn += rnd.expovariate(lam / ((1 + st.get('group', 2)) / 2))
+            for _ in range(g):
+                if len(queue) < 4 + 3 * st['counters']:
+                    queue.append(t)
+                else:
+                    lost += 1
         # 접수
         for i in range(len(counters)):
             if counters[i] is None and queue and len(outbox) < outcap:
@@ -64,8 +68,8 @@ def run(rate_pm, setup, secs=900, seed=1, deadline=240.0, truck_min=4, wait=15, 
                 if counters[i][0] <= 0:
                     outbox.append(counters[i][1])
                     counters[i] = None
-        # 인내심 45초
-        while queue and t - queue[0] > 45:
+        # 인내심 (Cfg.patience)
+        while queue and t - queue[0] > st.get('patience', 60):
             queue.pop(0)
             lost += 1
         # 포장

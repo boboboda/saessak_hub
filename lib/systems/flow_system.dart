@@ -6,13 +6,17 @@ import '../game/util.dart';
 import '../models/models.dart';
 
 extension FlowSystem on HubGame {
-  void spawnCustomer() {
+  void spawnCustomer({int behind = 0}) {
     final open = <int>[
       for (var i = 0; i < regionOpen.length; i++)
-        if (regionOpen[i] && routes[i].on) i
+        if (regionOpen[i] && routes[i].on) i,
     ];
     if (open.isEmpty) return; // 켜진 노선이 없으면 손님도 오지 않음
-    final cu = Customer(exitPoint, open[rnd.nextInt(open.length)]);
+    // 함께 온 손님은 조금 뒤에서 따라 들어옴
+    final cu = Customer(
+      exitPoint.translate(-0.9 * behind, 0),
+      open[rnd.nextInt(open.length)],
+    );
     cu.look = rnd.nextInt(6);
     cu.story = _pickStory(cu.region);
     final r = rnd.nextDouble();
@@ -63,9 +67,11 @@ extension FlowSystem on HubGame {
   /// 자리에 있는 직원들의 합산 처리 속도 (지친 직원은 느림, 건물 레벨·특기 반영)
   double _rate(Building b) =>
       b.active.fold<double>(
-          0,
-          (a, s) =>
-              a + s.workRate * (b.type.id == 'counter' && s.spec == 1 ? 1.25 : 1.0)) *
+        0,
+        (a, s) =>
+            a +
+            s.workRate * (b.type.id == 'counter' && s.spec == 1 ? 1.25 : 1.0),
+      ) *
       b.speedMul;
 
   /// 손님이 맡긴 택배 만들기 (VIP 팁 포함)
@@ -114,11 +120,16 @@ extension FlowSystem on HubGame {
       if (spawnTimer <= 0) {
         // 도착 간격은 접수량(명성 구간 × 성수기)으로만 정해진다. 창구를 늘려도 손님이 더 오지 않음
         final j = Cfg.intakeJitter;
-        spawnTimer = 60 / intakeNow * (1 - j + rnd.nextDouble() * 2 * j);
-        if (customers.length < 4 + counters.length * 3) {
-          spawnCustomer();
-        } else {
-          lost++; // 줄이 너무 길어 그냥 돌아감
+        // 손님은 1~groupMax 명씩 함께 온다. 간격을 평균 인원만큼 늘려서 분당 접수량은 그대로
+        final g = 1 + rnd.nextInt(Cfg.groupMax);
+        final avg = (1 + Cfg.groupMax) / 2;
+        spawnTimer = 60 / intakeNow * avg * (1 - j + rnd.nextDouble() * 2 * j);
+        for (var k = 0; k < g; k++) {
+          if (customers.length < 4 + counters.length * 3) {
+            spawnCustomer(behind: k);
+          } else {
+            lost++; // 줄이 너무 길어 그냥 돌아감
+          }
         }
       }
     }
@@ -164,8 +175,7 @@ extension FlowSystem on HubGame {
       final target = frontOf(cnt) + Offset(0, idx * 0.8);
       c.pos = stepToward(c.pos, target, Cfg.customerSpeed, dt);
       final arrived = (c.pos - target).distance < 0.05;
-      final canServe =
-          arrived && idx == 0 && cnt.outbox.length < cnt.outCap;
+      final canServe = arrived && idx == 0 && cnt.outbox.length < cnt.outCap;
       c.ready = canServe && cnt.mine;
 
       if (canServe && cnt.mine && c.tapped) {
