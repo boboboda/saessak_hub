@@ -10,9 +10,40 @@ import '../models/models.dart';
 extension InteractSystem on HubGame {
   // ---------------- 1. 내 자리에서 손님 탭 접수 ----------------
 
+  /// 손님 말풍선을 탭: 미리 처리 + 사연 보너스. 접수량(손님 수)은 바뀌지 않는다.
+  bool tapStory(Offset world) {
+    for (final c in customers.reversed) {
+      final r = c.bubble;
+      if (c.state == 2 || c.pre || c.story < 0 || r == null) continue;
+      if (!r.inflate(6).contains(world)) continue;
+      c.pre = true;
+      final eff = Cfg.stories[c.story].$2;
+      String txt;
+      switch (eff) {
+        case 0:
+          money += Cfg.storyTip;
+          dayEarn += Cfg.storyTip;
+          txt = '팁 +${Cfg.storyTip}원';
+          break;
+        case 1:
+          c.patience = Cfg.patience * (c.vip ? Cfg.vipPatience : 1.0);
+          txt = '만족!';
+          break;
+        default:
+          fame += Cfg.storyFame;
+          txt = '명성 +${Cfg.storyFame}';
+      }
+      hubFx.add((r.topCenter, txt, Cfg.storyColor[eff], clock));
+      ui();
+      return true;
+    }
+    return false;
+  }
+
   /// 맵을 탭했을 때 '내 자리' 손님을 눌렀으면 접수 처리. 처리했으면 true.
   bool tapCustomer(Offset world) {
     if (mode != 0) return false;
+    if (tapStory(world)) return true;
     final tp = Offset(world.dx / Cfg.tile, world.dy / Cfg.tile);
     for (final c in customers) {
       final cnt = c.counter;

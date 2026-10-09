@@ -14,6 +14,7 @@ extension FlowSystem on HubGame {
     if (open.isEmpty) return; // 켜진 노선이 없으면 손님도 오지 않음
     final cu = Customer(exitPoint, open[rnd.nextInt(open.length)]);
     cu.look = rnd.nextInt(6);
+    cu.story = _pickStory(cu.region);
     final r = rnd.nextDouble();
     if (day >= 2) {
       cu.kind = r < 0.08 ? 1 : (r < 0.16 ? 2 : (r < 0.22 ? 3 : 0));
@@ -23,6 +24,26 @@ extension FlowSystem on HubGame {
       cu.patience *= Cfg.vipPatience;
     }
     customers.add(cu);
+  }
+
+  /// 사연 고르기: 이 지역·오늘 성수기에 맞는 사연은 더 자주 나옴
+  int _pickStory(int region) {
+    final h = holiday?.$1;
+    final idx = <int>[];
+    final w = <double>[];
+    for (var i = 0; i < Cfg.stories.length; i++) {
+      final s = Cfg.stories[i];
+      if (s.$3 >= 0 && s.$3 != region) continue;
+      if (s.$4 != null && s.$4 != h) continue;
+      idx.add(i);
+      w.add(s.$4 != null ? 5 : (s.$3 >= 0 ? 2 : 1));
+    }
+    var r = rnd.nextDouble() * w.fold<double>(0, (a, b) => a + b);
+    for (var i = 0; i < idx.length; i++) {
+      r -= w[i];
+      if (r <= 0) return idx[i];
+    }
+    return idx.last;
   }
 
   Building? _bestCounter(List<Building> counters, Map<Building, int> load) {
@@ -161,14 +182,14 @@ extension FlowSystem on HubGame {
         for (final s in cnt.active) {
           s.working = true;
         }
-        c.serveT += dt * _rate(cnt);
+        c.serveT += dt * _rate(cnt) * (c.pre ? Cfg.storyServeBoost : 1.0);
         if (c.serveT >= Cfg.serveTime) {
           cnt.outbox.add(_mkParcel(c));
           done++;
           c.state = 2;
         }
       } else {
-        c.patience -= dt * _calm(cnt);
+        c.patience -= dt * _calm(cnt) * (c.pre ? Cfg.storyDrain : 1.0);
         if (c.patience <= 0) {
           lost++;
           c.state = 2;

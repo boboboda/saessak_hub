@@ -40,6 +40,9 @@ TextPainter _painter(String text, double size, Color color, double maxWidth,
   return tp;
 }
 
+/// 글자 폭 (한 줄)
+double textWidth(String text, double size) => _painter(text, size, Colors.white, 0, false).width;
+
 void label(Canvas c, String text, double x, double y,
     {double size = 12, Color color = Colors.white}) {
   _painter(text, size, color, 0, false).paint(c, Offset(x, y));
