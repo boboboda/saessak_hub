@@ -40,7 +40,7 @@ class Cfg {
 
   // 건물 종류 (zone: 0 접수/1 포장/2 보관·출고/3 도크, -1 창고 어디든 / slots: 근무 직원 자리 수)
   static const List<BuildingType> types = [
-    BuildingType('counter', '접수 창구', 2, 2, 1500, 0xFFF0963A, '손님 접수 · 직원 2명까지', 0, 2),
+    BuildingType('counter', '접수 창구', 3, 2, 1500, 0xFFF0963A, '손님 접수 · 직원 2명까지 · 오른쪽 칸은 상자 적재대', 0, 2),
     BuildingType('pack', '포장대', 2, 2, 2000, 0xFF5BA88A, '택배 포장 · 직원 2명까지', 1, 2),
     BuildingType('shelf', '선반', 2, 3, 1500, 0xFF8B5E3C, '택배 20건 보관', 2, 0),
     BuildingType('vending', '자판기', 1, 1, 4000, 0xFF3B82D6, '인내심 감소 완화', -1, 0),
@@ -60,7 +60,12 @@ class Cfg {
   static const double carrierSpeed = 1.3; // 칸/초 (걸음 능력치로 배수)
   static const double patience = 45; // 손님 인내심(초)
   static const int shelfCap = 20; // 선반 1개 용량
-  static const int outboxCap = 4; // 접수 창구 대기 택배 한도
+  static const int outboxCap = 4; // 접수 창구 대기 택배 한도 (레벨마다 +2, 최대 8)
+  // 접수 창구 오른쪽 칸 적재대: 상자를 가로 stackCols 개씩 아래 층부터 쌓는다 (최대 stackLayers 층)
+  static const int stackCols = 2;
+  static const int stackLayers = 4;
+  static const double stackStep = 9; // 한 층 높이(px, 작은 상자 앞면)
+  static const double stackAnim = 6; // 상자가 올라가고 내려가는 연출 속도(개/초)
   static const int parcelPay = 100; // 배송 완료 택배 1건 기본 수익
   static const double fullBonus = 1.2; // 차량을 가득 채워 보내면 수익 배수
   static const double vehicleMove = 1.5; // 차량이 들어오고 나가는 시간(초)

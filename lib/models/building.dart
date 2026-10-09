@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../game/config.dart';
@@ -16,8 +18,17 @@ class BuildingType {
   final String desc;
   final int zone; // 0 접수, 1 포장, 2 보관·출고, 3 도크(벽 밖), -1 창고 어디든
   final int slots; // 근무 직원 자리 수 (0이면 직원 없음)
-  const BuildingType(this.id, this.name, this.w, this.h, this.cost, this.color,
-      this.desc, this.zone, this.slots);
+  const BuildingType(
+    this.id,
+    this.name,
+    this.w,
+    this.h,
+    this.cost,
+    this.color,
+    this.desc,
+    this.zone,
+    this.slots,
+  );
 }
 
 /// 설치된 건물 (타일 좌표)
@@ -28,7 +39,9 @@ class Building {
   Building(this.type, this.tx, this.ty);
 
   // ---- 런타임 상태 ----
-  final List<Parcel> outbox = []; // 접수 창구: 포장 대기 택배
+  final List<Parcel> outbox = []; // 접수 창구: 포장 대기 택배 (적재대에 쌓인 순서, 뒤가 맨 위)
+  double stackVis = 0; // 접수 창구: 화면에 보이는 상자 수 (연출용, outbox 길이를 따라감)
+  int stackGhost = 0; // 접수 창구: 방금 집어 간 상자 색(지역) — 위로 사라지는 연출용
   Parcel? slot; // 포장대: 올려진 택배
   double progress = 0; // 포장대: 포장 진행(초)
   bool reservedIn = false; // 포장대: 운반 예약됨
@@ -50,14 +63,16 @@ class Building {
   int get upgradeCost => (type.cost * (level == 1 ? 1.5 : 3)).round();
 
   /// 접수·포장 속도 배수
-  double get speedMul =>
-      (type.id == 'counter' || type.id == 'pack') ? 1 + 0.25 * (level - 1) : 1.0;
+  double get speedMul => (type.id == 'counter' || type.id == 'pack')
+      ? 1 + 0.25 * (level - 1)
+      : 1.0;
 
   /// 선반 용량
   int get cap => Cfg.shelfCap + 10 * (level - 1);
 
   /// 접수 창구 대기 택배 한도
-  int get outCap => Cfg.outboxCap + 2 * (level - 1);
+  int get outCap =>
+      min(Cfg.outboxCap + 2 * (level - 1), Cfg.stackCols * Cfg.stackLayers);
 
   /// 도크 싣는 속도 배수
   double get loadMul => type.id == 'dock' ? 1 + 0.5 * (level - 1) : 1.0;
@@ -66,5 +81,9 @@ class Building {
   List<Staff> get active => crew.where((s) => !s.away).toList();
 
   Rect get rect => Rect.fromLTWH(
-      tx.toDouble(), ty.toDouble(), type.w.toDouble(), type.h.toDouble());
+    tx.toDouble(),
+    ty.toDouble(),
+    type.w.toDouble(),
+    type.h.toDouble(),
+  );
 }

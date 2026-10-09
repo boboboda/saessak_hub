@@ -13,13 +13,19 @@ import 'draw_utils.dart';
 
 /// 게임 맵(캔버스). 메뉴·패널은 위젯이 따로 그림.
 extension WorldView on HubGame {
-  Rect _px(Rect r) => Rect.fromLTWH(r.left * Cfg.tile, r.top * Cfg.tile,
-      r.width * Cfg.tile, r.height * Cfg.tile);
+  Rect _px(Rect r) => Rect.fromLTWH(
+    r.left * Cfg.tile,
+    r.top * Cfg.tile,
+    r.width * Cfg.tile,
+    r.height * Cfg.tile,
+  );
 
   int x0Of(HubGame g) => max(0, (g.cam.dx / Cfg.tile).floor());
-  int x1Of(HubGame g) => min(Cfg.cols, ((g.cam.dx + g.size.x) / Cfg.tile).ceil());
+  int x1Of(HubGame g) =>
+      min(Cfg.cols, ((g.cam.dx + g.size.x) / Cfg.tile).ceil());
   int y0Of(HubGame g) => max(0, (g.cam.dy / Cfg.tile).floor());
-  int y1Of(HubGame g) => min(Cfg.rows, ((g.cam.dy + g.size.y) / Cfg.tile).ceil());
+  int y1Of(HubGame g) =>
+      min(Cfg.rows, ((g.cam.dy + g.size.y) / Cfg.tile).ceil());
 
   // ---------------- 인도(길) ----------------
   /// 창고 입구(왼쪽 벽 가운데)에서 왼쪽 세로길까지 이어지는 길. 창고가 커지면 같이 이동.
@@ -32,8 +38,16 @@ extension WorldView on HubGame {
   void _drawPaths(Canvas c) {
     const t = Cfg.tile;
     for (final r in [...Scenery.paths, entrancePath]) {
-      for (var y = max(r.top.toInt(), y0Of(this)); y < min(r.bottom.toInt(), y1Of(this)); y++) {
-        for (var x = max(r.left.toInt(), x0Of(this)); x < min(r.right.ceil(), x1Of(this)); x++) {
+      for (
+        var y = max(r.top.toInt(), y0Of(this));
+        y < min(r.bottom.toInt(), y1Of(this));
+        y++
+      ) {
+        for (
+          var x = max(r.left.toInt(), x0Of(this));
+          x < min(r.right.ceil(), x1Of(this));
+          x++
+        ) {
           if (!Sprites.drawTile(c, Sprites.sidewalk, x * t, y * t, t)) {
             box(c, x * t, y * t, t, t, 0xFFB9B5A8);
           }
@@ -46,7 +60,12 @@ extension WorldView on HubGame {
   void _drawDecor(Canvas c) {
     const t = Cfg.tile;
     final a = _px(area.inflate(0.6)); // 지금 창고(+여백)와 겹치는 장식은 숨김
-    final view = Rect.fromLTWH(cam.dx - 160, cam.dy - 160, size.x + 320, size.y + 320);
+    final view = Rect.fromLTWH(
+      cam.dx - 160,
+      cam.dy - 160,
+      size.x + 320,
+      size.y + 320,
+    );
     for (final d in Scenery.items) {
       final img = Sprites.decor[d.key];
       if (img == null) continue;
@@ -73,7 +92,14 @@ extension WorldView on HubGame {
       for (var x = x0Of(this); x < x1Of(this); x++) {
         final v = (x * 7 + y * 13) % 4;
         if (!Sprites.drawTile(c, Sprites.grass, x * t, y * t, t, 4, v)) {
-          box(c, x * t, y * t, t, t, (x + y) % 2 == 0 ? 0xFF69A857 : 0xFF6FAE5B);
+          box(
+            c,
+            x * t,
+            y * t,
+            t,
+            t,
+            (x + y) % 2 == 0 ? 0xFF69A857 : 0xFF6FAE5B,
+          );
         }
       }
     }
@@ -95,11 +121,14 @@ extension WorldView on HubGame {
     }
 
     c.restore();
+    _stackClock = clock;
     // 오래된 표정 기록 정리 (사라진 손님·직원)
     if (_faces.length > 64) {
-      _faces.removeWhere((k, _) =>
-          (k is Customer && !customers.contains(k)) ||
-          (k is Staff && !staff.contains(k)));
+      _faces.removeWhere(
+        (k, _) =>
+            (k is Customer && !customers.contains(k)) ||
+            (k is Staff && !staff.contains(k)),
+      );
     }
   }
 
@@ -125,8 +154,14 @@ extension WorldView on HubGame {
     // 횡단보도 (위·아래)
     for (final cy in [Cfg.yard.top - 1, Cfg.yard.bottom]) {
       for (var i = 0; i < 6; i++) {
-        box(c, rd.left + 3 + i * (rd.width - 6) / 6, cy * t + 4,
-            (rd.width - 6) / 6 - 3, t - 8, 0xDDFFFFFF);
+        box(
+          c,
+          rd.left + 3 + i * (rd.width - 6) / 6,
+          cy * t + 4,
+          (rd.width - 6) / 6 - 3,
+          t - 8,
+          0xDDFFFFFF,
+        );
       }
     }
     label(c, '→ 운송', rd.left + 4, area.top * t, size: 11);
@@ -136,8 +171,14 @@ extension WorldView on HubGame {
     for (var ty = y.top.toInt(); ty < y.bottom.toInt(); ty++) {
       for (var tx = y.left.toInt(); tx < y.right.toInt(); tx++) {
         if (!Sprites.drawTile(c, Sprites.yard, tx * t, ty * t, t)) {
-          box(c, tx * t, ty * t, t, t,
-              (tx + ty) % 2 == 0 ? 0xFF55556A : 0xFF4D4D62);
+          box(
+            c,
+            tx * t,
+            ty * t,
+            t,
+            t,
+            (tx + ty) % 2 == 0 ? 0xFF55556A : 0xFF4D4D62,
+          );
         }
       }
     }
@@ -147,8 +188,16 @@ extension WorldView on HubGame {
       final lp = Paint()
         ..color = const Color(0x88FFFFFF)
         ..strokeWidth = 2;
-      c.drawLine(Offset(r.right, r.top + 2), Offset(_px(y).right - 2, r.top + 2), lp);
-      c.drawLine(Offset(r.right, r.bottom - 2), Offset(_px(y).right - 2, r.bottom - 2), lp);
+      c.drawLine(
+        Offset(r.right, r.top + 2),
+        Offset(_px(y).right - 2, r.top + 2),
+        lp,
+      );
+      c.drawLine(
+        Offset(r.right, r.bottom - 2),
+        Offset(_px(y).right - 2, r.bottom - 2),
+        lp,
+      );
     }
     // 도크를 고르면 마당이 강조됨
     if (mode == 2 && placing != null && placing!.zone == 3) {
@@ -157,7 +206,10 @@ extension WorldView on HubGame {
     }
     strokeBox(c, _px(y), 0xFF2A2438, 3);
     final dt = Rect.fromLTWH(y.left * t + 6, y.top * t + 6, 74, 18);
-    c.drawRRect(RRect.fromRectAndRadius(dt, const Radius.circular(4)), Paint()..color = const Color(0xF2FFD166));
+    c.drawRRect(
+      RRect.fromRectAndRadius(dt, const Radius.circular(4)),
+      Paint()..color = const Color(0xF2FFD166),
+    );
     labelIn(c, '④ 출고 도크', dt, size: 11, color: const Color(0xFF2A2438));
   }
 
@@ -173,8 +225,13 @@ extension WorldView on HubGame {
       final r = _px(n);
       box(c, r.left, r.top, r.width, r.height, 0x663B82D6);
       strokeBox(c, r, 0xFF3B82D6, 3);
-      label(c, '확장 후 ${n.width.toInt()}×${n.height.toInt()}칸', r.left + 6,
-          r.top + 6, size: 12);
+      label(
+        c,
+        '확장 후 ${n.width.toInt()}×${n.height.toInt()}칸',
+        r.left + 6,
+        r.top + 6,
+        size: 12,
+      );
     }
 
     final a = area;
@@ -189,19 +246,40 @@ extension WorldView on HubGame {
     final p = Paint()
       ..filterQuality = FilterQuality.none
       ..isAntiAlias = false;
-    for (var j = max(a.top.toInt(), y0Of(this)); j <= min(a.bottom.toInt(), y1Of(this)); j++) {
-      for (var i = max(a.left.toInt(), x0Of(this)); i <= min(a.right.toInt(), x1Of(this)); i++) {
+    for (
+      var j = max(a.top.toInt(), y0Of(this));
+      j <= min(a.bottom.toInt(), y1Of(this));
+      j++
+    ) {
+      for (
+        var i = max(a.left.toInt(), x0Of(this));
+        i <= min(a.right.toInt(), x1Of(this));
+        i++
+      ) {
         final dst = Rect.fromLTWH((i - 0.5) * t, (j - 0.5) * t, t, t);
         if (fl == null) {
-          box(c, dst.left, dst.top, t, t, aisleAt(i, j) ? 0xFFE8C94A : 0xFFDCCDAE);
+          box(
+            c,
+            dst.left,
+            dst.top,
+            t,
+            t,
+            aisleAt(i, j) ? 0xFFE8C94A : 0xFFDCCDAE,
+          );
           continue;
         }
-        final m = (aisleAt(i - 1, j - 1) ? 8 : 0) |
+        final m =
+            (aisleAt(i - 1, j - 1) ? 8 : 0) |
             (aisleAt(i, j - 1) ? 4 : 0) |
             (aisleAt(i - 1, j) ? 2 : 0) |
             (aisleAt(i, j) ? 1 : 0);
         final w = fl.width / 16;
-        c.drawImageRect(fl, Rect.fromLTWH(w * m, 0, w, fl.height.toDouble()), dst, p);
+        c.drawImageRect(
+          fl,
+          Rect.fromLTWH(w * m, 0, w, fl.height.toDouble()),
+          dst,
+          p,
+        );
       }
     }
     c.restore();
@@ -218,15 +296,16 @@ extension WorldView on HubGame {
     for (var x = a.left + 1.5; x < a.right - 0.5; x += 2) {
       final cx = x * t, cy = ai.center.dy * t;
       c.drawPath(
-          Path()
-            ..moveTo(cx - 6, cy - 9)
-            ..lineTo(cx + 6, cy)
-            ..lineTo(cx - 6, cy + 9)
-            ..lineTo(cx - 6, cy + 4)
-            ..lineTo(cx, cy)
-            ..lineTo(cx - 6, cy - 4)
-            ..close(),
-          arrow);
+        Path()
+          ..moveTo(cx - 6, cy - 9)
+          ..lineTo(cx + 6, cy)
+          ..lineTo(cx - 6, cy + 9)
+          ..lineTo(cx - 6, cy + 4)
+          ..lineTo(cx, cy)
+          ..lineTo(cx - 6, cy - 4)
+          ..close(),
+        arrow,
+      );
     }
     // 구역 경계: 바닥에 칠한 흰 점선 (통로는 끊김)
     final line = Paint()
@@ -243,9 +322,16 @@ extension WorldView on HubGame {
     for (var z = 0; z < 3; z++) {
       final r = _px(this.zoneRect(z));
       // 창고 윗벽 바깥에 걸린 간판 (안쪽 건물·수량표와 겹치지 않게)
-      final tag = Rect.fromLTWH(r.left + 4, r.top - 26, names[z].length * 11.0 + 10, 18);
-      c.drawRRect(RRect.fromRectAndRadius(tag, const Radius.circular(4)),
-          Paint()..color = Color(Cfg.zoneHot[z]).withValues(alpha: 0.95));
+      final tag = Rect.fromLTWH(
+        r.left + 4,
+        r.top - 26,
+        names[z].length * 11.0 + 10,
+        18,
+      );
+      c.drawRRect(
+        RRect.fromRectAndRadius(tag, const Radius.circular(4)),
+        Paint()..color = Color(Cfg.zoneHot[z]).withValues(alpha: 0.95),
+      );
       labelIn(c, names[z], tag, size: 11, color: const Color(0xFF2A2438));
     }
 
@@ -280,7 +366,12 @@ extension WorldView on HubGame {
       final r = _px(b.rect).deflate(1);
       final sp = Sprites.forBuilding(b.type.id);
       if (sp != null) {
-        Sprites.drawFitBottom(c, sp, r, left: b.type.id == 'dock');
+        Sprites.drawFitBottom(
+          c,
+          sp,
+          _px(_deskRect(b)).deflate(1),
+          left: b.type.id == 'dock',
+        );
       } else {
         box(c, r.left, r.top, r.width, r.height, b.type.color);
         strokeBox(c, r, 0xFF2A2438, 2);
@@ -289,21 +380,34 @@ extension WorldView on HubGame {
 
       if (b.level > 1) {
         box(c, r.left + 2, r.top + 2, 28, 13, 0xFFFFD166);
-        labelIn(c, 'Lv${b.level}', Rect.fromLTWH(r.left + 2, r.top + 2, 28, 13),
-            size: 10, color: const Color(0xFF2A2438));
+        labelIn(
+          c,
+          'Lv${b.level}',
+          Rect.fromLTWH(r.left + 2, r.top + 2, 28, 13),
+          size: 10,
+          color: const Color(0xFF2A2438),
+        );
       }
 
       // 직원이 필요한 건물: 배치가 없으면 빨강, 전원 휴식 중이면 주황
       if (b.mine) {
         box(c, r.left + 2, r.bottom - 16, 40, 14, 0xFF3FB27F);
-        labelIn(c, '내 자리', Rect.fromLTWH(r.left + 2, r.bottom - 16, 40, 14),
-            size: 10);
+        labelIn(
+          c,
+          '내 자리',
+          Rect.fromLTWH(r.left + 2, r.bottom - 16, 40, 14),
+          size: 10,
+        );
       }
       // 배치된 직원이 없으면 건물 위쪽 바깥에 표시. (자리 비움은 직원 머리 위에 표시)
       if (b.type.slots > 0 && b.crew.isEmpty && !b.mine) {
         box(c, r.center.dx - 22, r.top - 17, 44, 15, 0xFFE5484D);
-        labelIn(c, '직원 필요',
-            Rect.fromLTWH(r.center.dx - 22, r.top - 17, 44, 15), size: 10);
+        labelIn(
+          c,
+          '직원 필요',
+          Rect.fromLTWH(r.center.dx - 22, r.top - 17, 44, 15),
+          size: 10,
+        );
       }
 
       // 포장 실수 표시
@@ -314,14 +418,7 @@ extension WorldView on HubGame {
 
       switch (b.type.id) {
         case 'counter':
-          // 대기 중인 택배는 창구 왼쪽 옆 바닥에 작은 상자 줄로 (직원·손님과 겹치지 않게)
-          for (var i = 0; i < b.outbox.length; i++) {
-            final br = Rect.fromLTWH(r.left + 1 + (i % 4) * 11, r.top + 1 + (i ~/ 4) * 11, 11, 11);
-            if (!Sprites.drawBox(c, br, Cfg.regionColor[b.outbox[i].region])) {
-              box(c, br.left, br.top, 9, 9, Cfg.regionColor[b.outbox[i].region]);
-            }
-            if (b.outbox[i].kind > 0) strokeBox(c, br, 0xFFFF3B30, 1.5);
-          }
+          _drawStack(c, b);
           break;
         case 'pack':
           break; // 상자·진행 막대는 직원 뒤에 다시 그림 (_drawPackContent)
@@ -332,27 +429,49 @@ extension WorldView on HubGame {
           if (sh != null && Sprites.boxS != null) {
             final d = Sprites.fitBottom(sh, r);
             final k = d.width / sh.width;
-            const tierBase = [48.0, 31.0, 14.0]; // 각 판 위 상자 바닥 (그림 기준 픽셀, hub_shelf)
+            const tierBase = [
+              48.0,
+              31.0,
+              14.0,
+            ]; // 각 판 위 상자 바닥 (그림 기준 픽셀, hub_shelf)
             const perTier = 4;
-            final slots = (b.stored / b.cap * perTier * 3).ceil().clamp(0, perTier * 3);
+            final slots = (b.stored / b.cap * perTier * 3).ceil().clamp(
+              0,
+              perTier * 3,
+            );
             for (var i = 0; i < slots; i++) {
               final tier = i ~/ perTier, col = i % perTier;
-              Sprites.drawSmallBox(c, d.left + (7 + col * 12) * k, d.top + tierBase[tier] * k - 12);
+              Sprites.drawSmallBox(
+                c,
+                d.left + (7 + col * 12) * k,
+                d.top + tierBase[tier] * k - 12,
+              );
             }
           }
           final full = b.stored >= b.cap;
           final tag = Rect.fromLTWH(r.left + 6, r.top + 2, r.width - 12, 14);
-          c.drawRRect(RRect.fromRectAndRadius(tag, const Radius.circular(4)),
-              Paint()..color = const Color(0xCC2A2438));
-          box(c, tag.left + 2, tag.bottom - 4, (tag.width - 4) * (b.stored / b.cap).clamp(0.0, 1.0), 2,
-              full ? 0xFFE5484D : 0xFF7BD389);
+          c.drawRRect(
+            RRect.fromRectAndRadius(tag, const Radius.circular(4)),
+            Paint()..color = const Color(0xCC2A2438),
+          );
+          box(
+            c,
+            tag.left + 2,
+            tag.bottom - 4,
+            (tag.width - 4) * (b.stored / b.cap).clamp(0.0, 1.0),
+            2,
+            full ? 0xFFE5484D : 0xFF7BD389,
+          );
           labelIn(c, '${b.stored}/${b.cap}', tag.translate(0, -1), size: 10);
           break;
         case 'lounge':
           // 그림이 없을 때만 벤치를 그림 (그림에는 소파가 있음)
           if (sp == null) {
             for (final o in Cfg.loungeSeats) {
-              _bench(c, Offset((b.tx + o.dx) * Cfg.tile, (b.ty + o.dy) * Cfg.tile));
+              _bench(
+                c,
+                Offset((b.tx + o.dx) * Cfg.tile, (b.ty + o.dy) * Cfg.tile),
+              );
             }
             label(c, '휴게실', r.center.dx - 18, r.bottom - 15, size: 11);
           }
@@ -362,7 +481,14 @@ extension WorldView on HubGame {
           if (sp == null) {
             box(c, r.left, r.top + 8, 8, r.height - 16, 0xFFB0B0C0);
             for (var i = 1; i < 3; i++) {
-              box(c, r.left + 14, r.top + i * r.height / 3 - 1, r.width - 22, 2, 0x55FFFFFF);
+              box(
+                c,
+                r.left + 14,
+                r.top + i * r.height / 3 - 1,
+                r.width - 22,
+                2,
+                0x55FFFFFF,
+              );
             }
           }
           final v = b.vehicle;
@@ -384,32 +510,54 @@ extension WorldView on HubGame {
                 final k = drawn.width / vimg.width;
                 final fw = fimg.width * k, fh = fimg.height * k;
                 final dst = Rect.fromLTWH(
-                    drawn.right - fw, drawn.bottom - fh, fw, fh);
+                  drawn.right - fw,
+                  drawn.bottom - fh,
+                  fw,
+                  fh,
+                );
                 c.drawImageRect(
-                    fimg,
-                    Rect.fromLTWH(
-                        0, 0, fimg.width.toDouble(), fimg.height.toDouble()),
-                    dst,
-                    Paint()..filterQuality = FilterQuality.none);
+                  fimg,
+                  Rect.fromLTWH(
+                    0,
+                    0,
+                    fimg.width.toDouble(),
+                    fimg.height.toDouble(),
+                  ),
+                  dst,
+                  Paint()..filterQuality = FilterQuality.none,
+                );
               } else {
                 Sprites.drawContain(c, vimg, vr);
                 // 싣은 만큼 짐칸에 상자가 쌓임
-                Sprites.drawCargo(
-                    c, v.type.name, vimg, drawn, v.loaded, v.cap);
+                Sprites.drawCargo(c, v.type.name, vimg, drawn, v.loaded, v.cap);
               }
               // 구역 색 띠 + 적재 현황 (차량 위쪽)
-              box(c, drawn.left + 2, drawn.top - 7, 22, 4,
-                  Cfg.regionColor[v.region]);
-              labelIn(c, '${v.loaded}/${v.cap}',
-                  Rect.fromLTWH(drawn.left + 26, drawn.top - 13, 44, 14),
-                  size: 11, color: const Color(0xFFFFFFFF));
+              box(
+                c,
+                drawn.left + 2,
+                drawn.top - 7,
+                22,
+                4,
+                Cfg.regionColor[v.region],
+              );
+              labelIn(
+                c,
+                '${v.loaded}/${v.cap}',
+                Rect.fromLTWH(drawn.left + 26, drawn.top - 13, 44, 14),
+                size: 11,
+                color: const Color(0xFFFFFFFF),
+              );
             } else {
               box(c, vx, vy, vw, vh, Cfg.regionColor[v.region]);
               box(c, vx + vw - vw * 0.25, vy, vw * 0.25, vh, 0xFF3D4466); // 운전석
               strokeBox(c, Rect.fromLTWH(vx, vy, vw, vh), 0xFF2A2438, 2);
-              labelIn(c, '${v.loaded}/${v.cap}',
-                  Rect.fromLTWH(vx, vy, vw * 0.75, vh),
-                  size: 11, color: const Color(0xFF2A2438));
+              labelIn(
+                c,
+                '${v.loaded}/${v.cap}',
+                Rect.fromLTWH(vx, vy, vw * 0.75, vh),
+                size: 11,
+                color: const Color(0xFF2A2438),
+              );
             }
           }
           break;
@@ -418,8 +566,18 @@ extension WorldView on HubGame {
     }
   }
 
-  void _person(Canvas c, Offset p, String initial, int fill, int stroke,
-      {bool tired = false, double energy = 1.0, Object? key, bool work = false, double workHz = 7}) {
+  void _person(
+    Canvas c,
+    Offset p,
+    String initial,
+    int fill,
+    int stroke, {
+    bool tired = false,
+    double energy = 1.0,
+    Object? key,
+    bool work = false,
+    double workHz = 7,
+  }) {
     const t = Cfg.tile;
     if (Sprites.staffWalk != null) {
       final f = _faces.putIfAbsent(key ?? initial, () => _Face(p));
@@ -431,49 +589,91 @@ extension WorldView on HubGame {
       }
       if (!moved && clock > f.until + 0.3) f.dir = 0; // 멈춰 있으면 정면(남쪽)을 봄
       f.last = p;
-      Sprites.drawStaff(c, p.dx, p.dy + t * 0.35, f.dir, clock < f.until, clock,
-          look: key is Staff ? key.id : 0, work: work, workHz: workHz);
+      Sprites.drawStaff(
+        c,
+        p.dx,
+        p.dy + t * 0.35,
+        f.dir,
+        clock < f.until,
+        clock,
+        look: key is Staff ? key.id : 0,
+        work: work,
+        workHz: workHz,
+      );
       if (tired) {
-        label(c, 'Zz', p.dx + t * 0.18, p.dy - t * 0.7,
-            size: 11, color: const Color(0xFF8EC5FF));
+        label(
+          c,
+          'Zz',
+          p.dx + t * 0.18,
+          p.dy - t * 0.7,
+          size: 11,
+          color: const Color(0xFF8EC5FF),
+        );
       }
       if (energy < 0.98) {
         box(c, p.dx - 12, p.dy + t * 0.42, 24, 3, 0xFF2A2438);
-        box(c, p.dx - 12, p.dy + t * 0.42, 24 * energy.clamp(0.0, 1.0), 3,
-            energy >= 0.6
-                ? 0xFF7BD389
-                : (energy >= 0.3 ? 0xFFF0963A : 0xFFE5484D));
+        box(
+          c,
+          p.dx - 12,
+          p.dy + t * 0.42,
+          24 * energy.clamp(0.0, 1.0),
+          3,
+          energy >= 0.6
+              ? 0xFF7BD389
+              : (energy >= 0.3 ? 0xFFF0963A : 0xFFE5484D),
+        );
       }
       return;
     }
     c.drawCircle(p, t * 0.3, Paint()..color = Color(fill));
     c.drawCircle(
-        p,
-        t * 0.3,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2
-          ..color = Color(stroke));
-    labelIn(c, initial, Rect.fromCircle(center: p, radius: t * 0.3),
-        size: 12, color: const Color(0xFF2A2438));
+      p,
+      t * 0.3,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = Color(stroke),
+    );
+    labelIn(
+      c,
+      initial,
+      Rect.fromCircle(center: p, radius: t * 0.3),
+      size: 12,
+      color: const Color(0xFF2A2438),
+    );
     if (tired) {
-      label(c, 'Zz', p.dx + t * 0.18, p.dy - t * 0.62,
-          size: 11, color: const Color(0xFF8EC5FF));
+      label(
+        c,
+        'Zz',
+        p.dx + t * 0.18,
+        p.dy - t * 0.62,
+        size: 11,
+        color: const Color(0xFF8EC5FF),
+      );
     }
     // 컨디션 막대 (가득 차 있을 땐 숨김)
     if (energy < 0.98) {
       box(c, p.dx - 12, p.dy + t * 0.34, 24, 3, 0xFF2A2438);
-      box(c, p.dx - 12, p.dy + t * 0.34, 24 * energy.clamp(0.0, 1.0), 3,
-          energy >= 0.6
-              ? 0xFF7BD389
-              : (energy >= 0.3 ? 0xFFF0963A : 0xFFE5484D));
+      box(
+        c,
+        p.dx - 12,
+        p.dy + t * 0.34,
+        24 * energy.clamp(0.0, 1.0),
+        3,
+        energy >= 0.6 ? 0xFF7BD389 : (energy >= 0.3 ? 0xFFF0963A : 0xFFE5484D),
+      );
     }
   }
 
   /// 길을 오가는 행인 (보기용). 시간만으로 위치가 정해지는 왕복 경로.
   static final List<List<Offset>> _walkRoutes = [
     // 윗길(가로) → 왼쪽 길(세로) → 아랫길(가로)
-    [Offset(Cfg.road.left - 1, 6.6), Offset(1, 6.6), Offset(1, 29.4), Offset(Cfg.road.left - 1, 29.4)],
+    [
+      Offset(Cfg.road.left - 1, 6.6),
+      Offset(1, 6.6),
+      Offset(1, 29.4),
+      Offset(Cfg.road.left - 1, 29.4),
+    ],
     // 오른쪽 인도(세로)
     [Offset(Cfg.road.right + 0.5, 1.5), Offset(Cfg.road.right + 0.5, 34.5)],
   ];
@@ -518,7 +718,9 @@ extension WorldView on HubGame {
           var v = b - a;
           if (back) v = -v;
           if (w[3] < 0) v = -v;
-          dir = v.dx.abs() > v.dy.abs() ? (v.dx < 0 ? 1 : 2) : (v.dy < 0 ? 3 : 0);
+          dir = v.dx.abs() > v.dy.abs()
+              ? (v.dx < 0 ? 1 : 2)
+              : (v.dy < 0 ? 3 : 0);
           break;
         }
         acc += seg[i];
@@ -543,19 +745,108 @@ extension WorldView on HubGame {
     final dst = Rect.fromLTWH(p.dx - w / 2, p.dy + 9 - h, w, h);
     if (front) {
       c.save();
-      c.clipRect(Rect.fromLTRB(dst.left, dst.top + h * 9 / 21, dst.right, dst.bottom)); // 좌판·다리만 사람 앞에
+      c.clipRect(
+        Rect.fromLTRB(dst.left, dst.top + h * 9 / 21, dst.right, dst.bottom),
+      ); // 좌판·다리만 사람 앞에
     }
     c.drawImageRect(
-        img,
-        Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-        dst,
-        Paint()..filterQuality = FilterQuality.none);
+      img,
+      Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+      dst,
+      Paint()..filterQuality = FilterQuality.none,
+    );
     if (front) c.restore();
+  }
+
+  /// 건물 그림이 들어가는 칸. 접수 창구는 왼쪽 2칸이 책상, 오른쪽 1칸은 적재대
+  Rect _deskRect(Building b) => b.type.id == 'counter'
+      ? Rect.fromLTWH(b.tx.toDouble(), b.ty.toDouble(), 2, b.type.h.toDouble())
+      : b.rect;
+
+  /// 접수 창구 오른쪽 칸: 팔레트 위에 상자를 격자로 쌓는다 (아래 층 왼쪽부터, 집어 가면 맨 위부터 줄어듦)
+  void _drawStack(Canvas c, Building b) {
+    const t = Cfg.tile;
+    final cell = Rect.fromLTWH(
+      (b.tx + b.type.w - 1) * t,
+      b.ty * t,
+      t,
+      b.type.h * t,
+    );
+    // 보이는 상자 수가 실제 수를 부드럽게 따라감
+    final n = b.outbox.length;
+    final dt = (clock - _stackClock).clamp(0.0, 0.1);
+    if (b.stackVis < n) {
+      b.stackVis = min(n.toDouble(), b.stackVis + dt * Cfg.stackAnim);
+    } else if (b.stackVis > n) {
+      b.stackVis = max(n.toDouble(), b.stackVis - dt * Cfg.stackAnim);
+    }
+    // 나무 팔레트 (바닥에 붙음): 윗판 + 앞면 받침 3개
+    final px0 = cell.left + 2, pw = t - 4, pBot = cell.bottom - 4;
+    box(c, px0, pBot - 11, pw, 7, 0xFFC8955E); // 윗판
+    for (var k = 1; k < 4; k++) {
+      box(c, px0, pBot - 11 + k * 2 - 1, pw, 1, 0xFF9A6A3C); // 판 사이 틈
+    }
+    box(c, px0, pBot - 4, pw, 4, 0xFF7A5230); // 앞면
+    for (final bxx in [px0, px0 + pw / 2 - 2, px0 + pw - 4]) {
+      box(c, bxx, pBot - 4, 4, 4, 0xFFB07B47); // 받침 기둥
+    }
+    strokeBox(c, Rect.fromLTWH(px0, pBot - 11, pw, 11), 0xFF4A3020, 1);
+    final bx = Sprites.boxS;
+    const side = 12.0;
+    final baseY = pBot - 5; // 1층 상자 바닥 (윗판 앞쪽)
+    final full = b.stackVis.floor();
+    final frac = b.stackVis - full;
+    final shown = frac > 0.01 ? full + 1 : full;
+    for (var i = 0; i < shown && i < Cfg.stackCols * Cfg.stackLayers; i++) {
+      final layer = i ~/ Cfg.stackCols, col = i % Cfg.stackCols;
+      final top = i == full; // 올라오는 중이거나 사라지는 중인 맨 위 상자
+      final lift = top ? (1 - frac) * 8 : 0.0;
+      final x = cell.left + 4 + col * side;
+      final y = baseY - side - layer * Cfg.stackStep - lift;
+      final region = i < n ? b.outbox[i].region : b.stackGhost;
+      final alpha = top ? frac : 1.0;
+      if (bx != null) {
+        c.drawImageRect(
+          bx,
+          Rect.fromLTWH(0, 0, bx.width.toDouble(), bx.height.toDouble()),
+          Rect.fromLTWH(x, y, side, side),
+          Paint()
+            ..filterQuality = FilterQuality.none
+            ..color = Color.fromRGBO(255, 255, 255, alpha),
+        );
+      } else {
+        box(c, x, y, side - 1, side - 1, 0xFFB8865A);
+      }
+      // 지역 색 스티커 (앞면 가운데)
+      c.drawRect(
+        Rect.fromLTWH(x + 4, y + 6, 4, 3),
+        Paint()
+          ..color = Color(Cfg.regionColor[region]).withValues(alpha: alpha),
+      );
+      if (i < n && b.outbox[i].kind > 0) {
+        c.drawRect(
+          Rect.fromLTWH(x + 9, y + 3, 2, 2),
+          Paint()..color = const Color(0xFFFF3B30),
+        );
+      }
+    }
+    // 가득 차면 적재대 위에 표시
+    if (n >= b.outCap) {
+      final layers = (n + Cfg.stackCols - 1) ~/ Cfg.stackCols;
+      final tag = Rect.fromLTWH(
+        cell.left + 2,
+        baseY - side - (layers - 1) * Cfg.stackStep - 14,
+        t - 4,
+        12,
+      );
+      box(c, tag.left, tag.top, tag.width, tag.height, 0xEEE5484D);
+      labelIn(c, '가득', tag, size: 9);
+    }
   }
 
   /// 창구·포장대에서 직원이 서는 자리 (건물 왼쪽 위 기준, 칸). 책상 그림 뒤쪽, 칸 안.
   List<Offset> _spots(Building b) {
-    final w = b.type.w.toDouble(), h = b.type.h.toDouble();
+    final w = _deskRect(b).width, h = b.type.h.toDouble();
     final sp = Sprites.forBuilding(b.type.id);
     // 책상 윗면 뒤쪽 = 그림 위 끝에서 조금 아래
     final topY = sp == null ? 0.1 : h - sp.height / Cfg.tile + 0.25;
@@ -569,13 +860,27 @@ extension WorldView on HubGame {
     final r0 = _px(b.rect).deflate(1);
     final sp = Sprites.forBuilding('pack');
     // 상자는 책상 윗면 가운데에 놓이도록 (그림이 있으면 그림 위 끝 기준)
-    final r = sp == null ? r0 : Rect.fromLTRB(r0.left, Sprites.fitBottom(sp, r0).top - 6, r0.right, r0.bottom);
+    final r = sp == null
+        ? r0
+        : Rect.fromLTRB(
+            r0.left,
+            Sprites.fitBottom(sp, r0).top - 6,
+            r0.right,
+            r0.bottom,
+          );
     final dyn = Sprites.packEmpty != null || Sprites.boxOpen != null;
     final prog = (b.progress / Cfg.packTime).clamp(0.0, 1.0);
     if (p.stage == 3) {
       final rr = Rect.fromLTWH(r.center.dx - 10, r.top + 1, 20, 20);
       if (!Sprites.drawBox(c, rr, Cfg.regionColor[p.region])) {
-        box(c, r.center.dx - 7, r.bottom - 20, 14, 14, Cfg.regionColor[p.region]);
+        box(
+          c,
+          r.center.dx - 7,
+          r.bottom - 20,
+          14,
+          14,
+          Cfg.regionColor[p.region],
+        );
       }
     } else {
       if (dyn && p.stage == 2 && Sprites.boxOpen != null) {
@@ -585,7 +890,12 @@ extension WorldView on HubGame {
         final live = b.active.isNotEmpty; // 직원이 자리에 없으면 작업이 멈춘 상태
         final jx = live ? sin(clock * 22) * 0.8 * k : 0.0;
         final jy = live ? (sin(clock * 14) * 0.5 + 0.5) * -1.2 : 0.0;
-        final br = Rect.fromLTWH(r.center.dx - w / 2 + jx, r.top + 21 - h + jy, w, h);
+        final br = Rect.fromLTWH(
+          r.center.dx - w / 2 + jx,
+          r.top + 21 - h + jy,
+          w,
+          h,
+        );
         Sprites.drawContain(c, Sprites.boxOpen!, br);
         // 테이프가 위로 붙어 나가는 선 (진행도만큼)
         if (prog > 0.35) {
@@ -596,8 +906,14 @@ extension WorldView on HubGame {
         for (var i = 0; i < (live ? 3 : 0); i++) {
           final ph = (clock * 3 + i * 0.37) % 1.0;
           final sx = br.center.dx + (i - 1) * 9 + sin(i * 5 + clock * 4) * 3;
-          box(c, sx, br.top + 4 - ph * 9, 2, 2,
-              ph < 0.8 ? 0xFFFFF3C4 : 0x00FFFFFF);
+          box(
+            c,
+            sx,
+            br.top + 4 - ph * 9,
+            2,
+            2,
+            ph < 0.8 ? 0xFFFFF3C4 : 0x00FFFFFF,
+          );
         }
       }
       box(c, r.left + 4, r.bottom - 10, r.width - 8, 6, 0xFF2A2438);
@@ -622,33 +938,66 @@ extension WorldView on HubGame {
       if (!s.away) continue;
       var p = Offset(s.pos.dx * t, s.pos.dy * t);
       if (s.carrier) {
-        _person(c, p, s.initial, 0xFF8EC5FF, 0xFFFFFFFF,
-            tired: true, energy: s.energyPct, key: s);
+        _person(
+          c,
+          p,
+          s.initial,
+          0xFF8EC5FF,
+          0xFFFFFFFF,
+          tired: true,
+          energy: s.energyPct,
+          key: s,
+        );
       } else if (s.post?.type.id == 'counter') {
-        _person(c, p, s.initial, 0xFFFFE0B2, 0xFF8B4A00,
-            tired: true, energy: s.energyPct, key: s);
+        _person(
+          c,
+          p,
+          s.initial,
+          0xFFFFE0B2,
+          0xFF8B4A00,
+          tired: true,
+          energy: s.energyPct,
+          key: s,
+        );
       } else {
-        _person(c, p, s.initial, 0xFFB9F6CA, 0xFF1B5E20,
-            tired: true, energy: s.energyPct, key: s);
+        _person(
+          c,
+          p,
+          s.initial,
+          0xFFB9F6CA,
+          0xFF1B5E20,
+          tired: true,
+          energy: s.energyPct,
+          key: s,
+        );
       }
     }
 
     // 접수 직원: 창구 뒤(위)에 서 있음. 자리에 있는 직원만 표시.
     for (final b in ofType('counter')) {
-      final working = customers
-          .any((cu) => cu.counter == b && cu.state != 2 && cu.serveT > 0);
+      final working = customers.any(
+        (cu) => cu.counter == b && cu.state != 2 && cu.serveT > 0,
+      );
       final spots = _spots(b);
       final act = b.active;
       for (var i = 0; i < act.length && i < spots.length; i++) {
         const bob = 0.0;
-        final p =
-        Offset((b.tx + spots[i].dx) * t, (b.ty + spots[i].dy) * t + bob);
-        _person(c, p, act[i].initial, 0xFFFFE0B2, 0xFF8B4A00,
-            tired: act[i].tired,
-            energy: act[i].energyPct,
-            key: act[i],
-            work: working,
-            workHz: 9); // 접수: 타이핑처럼 빠르고 작게
+        final p = Offset(
+          (b.tx + spots[i].dx) * t,
+          (b.ty + spots[i].dy) * t + bob,
+        );
+        _person(
+          c,
+          p,
+          act[i].initial,
+          0xFFFFE0B2,
+          0xFF8B4A00,
+          tired: act[i].tired,
+          energy: act[i].energyPct,
+          key: act[i],
+          work: working,
+          workHz: 9,
+        ); // 접수: 타이핑처럼 빠르고 작게
       }
     }
 
@@ -659,14 +1008,22 @@ extension WorldView on HubGame {
       final act = b.active;
       for (var i = 0; i < act.length && i < spots.length; i++) {
         const bob = 0.0;
-        final p =
-        Offset((b.tx + spots[i].dx) * t, (b.ty + spots[i].dy) * t + bob);
-        _person(c, p, act[i].initial, 0xFFB9F6CA, 0xFF1B5E20,
-            tired: act[i].tired,
-            energy: act[i].energyPct,
-            key: act[i],
-            work: working,
-            workHz: 7);
+        final p = Offset(
+          (b.tx + spots[i].dx) * t,
+          (b.ty + spots[i].dy) * t + bob,
+        );
+        _person(
+          c,
+          p,
+          act[i].initial,
+          0xFFB9F6CA,
+          0xFF1B5E20,
+          tired: act[i].tired,
+          energy: act[i].energyPct,
+          key: act[i],
+          work: working,
+          workHz: 7,
+        );
       }
     }
 
@@ -676,11 +1033,13 @@ extension WorldView on HubGame {
         if (b.active.isEmpty) continue;
         final sp = Sprites.forBuilding(id);
         if (sp == null) continue;
-        final r = _px(b.rect).deflate(1);
+        final r = _px(_deskRect(b)).deflate(1);
         final d = Sprites.fitBottom(sp, r);
         // 책상(윗면 뒤 끝 아래부터)을 다시 그려 직원 다리를 가림
         c.save();
-        c.clipRect(Rect.fromLTRB(d.left, d.top + d.height * 0.22, d.right, d.bottom));
+        c.clipRect(
+          Rect.fromLTRB(d.left, d.top + d.height * 0.22, d.right, d.bottom),
+        );
         Sprites.drawFitBottom(c, sp, r);
         c.restore();
       }
@@ -735,48 +1094,80 @@ extension WorldView on HubGame {
         if (!moved && clock > f.until + 0.3) f.dir = 3; // 서서 기다릴 땐 창구(위)를 봄
         f.last = p;
         Sprites.drawPerson(
-            c, p.dx, p.dy + t * 0.35, f.dir, clock < f.until, clock, cu.look);
+          c,
+          p.dx,
+          p.dy + t * 0.35,
+          f.dir,
+          clock < f.until,
+          clock,
+          cu.look,
+        );
       } else {
         c.drawCircle(p, t * 0.28, Paint()..color = const Color(0xFFE8B07A));
         c.drawCircle(
-            p,
-            t * 0.28,
-            Paint()
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 1.5
-              ..color = const Color(0xFF2A2438));
+          p,
+          t * 0.28,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5
+            ..color = const Color(0xFF2A2438),
+        );
         box(c, p.dx - 4, p.dy - t * 0.5, 8, 8, Cfg.regionColor[cu.region]);
       }
       if (cu.vip) {
         c.drawCircle(
-            p,
-            t * 0.34,
-            Paint()
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 2.5
-              ..color = const Color(0xFFFFD166));
+          p,
+          t * 0.34,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.5
+            ..color = const Color(0xFFFFD166),
+        );
       }
       if (cu.kind > 0 && cu.state != 2) {
-        label(c, Cfg.kindName[cu.kind], p.dx + 7, p.dy - t * 0.62,
-            size: 10, color: const Color(0xFFFF8A80));
+        label(
+          c,
+          Cfg.kindName[cu.kind],
+          p.dx + 7,
+          p.dy - t * 0.62,
+          size: 10,
+          color: const Color(0xFFFF8A80),
+        );
       }
       if (cu.state != 2 && cu.ready) {
         // 내 자리 맨 앞 손님: 눌러 달라는 말풍선 (살짝 깜빡임)
         final pulse = 0.5 + 0.5 * sin(clock * 8);
         final bubble = Rect.fromLTWH(p.dx - 17, p.dy - t * 0.98, 34, 15);
-        box(c, bubble.left, bubble.top, bubble.width, bubble.height,
-            pulse > 0.5 ? 0xFFFFD166 : 0xFFF0963A);
+        box(
+          c,
+          bubble.left,
+          bubble.top,
+          bubble.width,
+          bubble.height,
+          pulse > 0.5 ? 0xFFFFD166 : 0xFFF0963A,
+        );
         labelIn(c, '탭!', bubble, size: 11, color: const Color(0xFF2A2438));
-      } else if (cu.state != 2 &&
-          cu.patience / Cfg.patience < Cfg.alertAngry) {
-        label(c, '!', p.dx - 3, p.dy - t * 0.98,
-            size: 14, color: const Color(0xFFE5484D));
+      } else if (cu.state != 2 && cu.patience / Cfg.patience < Cfg.alertAngry) {
+        label(
+          c,
+          '!',
+          p.dx - 3,
+          p.dy - t * 0.98,
+          size: 14,
+          color: const Color(0xFFE5484D),
+        );
       }
       if (cu.state != 2) {
         final ratio = (cu.patience / Cfg.patience).clamp(0.0, 1.0);
         box(c, p.dx - 12, p.dy + t * 0.34, 24, 3, 0xFF2A2438);
-        box(c, p.dx - 12, p.dy + t * 0.34, 24 * ratio, 3,
-            ratio > 0.4 ? 0xFF7BD389 : 0xFFE5484D);
+        box(
+          c,
+          p.dx - 12,
+          p.dy + t * 0.34,
+          24 * ratio,
+          3,
+          ratio > 0.4 ? 0xFF7BD389 : 0xFFE5484D,
+        );
       }
     }
 
@@ -790,20 +1181,40 @@ extension WorldView on HubGame {
         // 상자를 가슴 앞에 안고 있는 모습 (머리 위가 아님)
         final cx = p.dx + (dir == 1 ? -9 : (dir == 2 ? 9 : 0));
         final cy = p.dy + (dir == 0 ? 3 : 0);
-        final r = Rect.fromCenter(center: Offset(cx, cy), width: 17, height: 17);
+        final r = Rect.fromCenter(
+          center: Offset(cx, cy),
+          width: 17,
+          height: 17,
+        );
         if (!Sprites.drawBox(c, r, Cfg.regionColor[w.job!.region])) {
-          box(c, r.left, r.top, r.width, r.height, Cfg.regionColor[w.job!.region]);
+          box(
+            c,
+            r.left,
+            r.top,
+            r.width,
+            r.height,
+            Cfg.regionColor[w.job!.region],
+          );
           strokeBox(c, r, 0xFF2A2438, 1.5);
         }
       }
 
       if (carrying && dir == 3) carried(); // 뒤돌아 걸을 땐 몸에 가려지게 먼저
-      _person(c, p, w.staff.initial, 0xFF8EC5FF, 0xFFFFFFFF,
-          tired: w.staff.tired, energy: w.staff.energyPct, key: w.staff);
+      _person(
+        c,
+        p,
+        w.staff.initial,
+        0xFF8EC5FF,
+        0xFFFFFFFF,
+        tired: w.staff.tired,
+        energy: w.staff.energyPct,
+        key: w.staff,
+      );
       if (carrying && dir != 3) carried();
     }
   }
 }
+
 class _Face {
   Offset last;
   int dir = 0;
@@ -812,3 +1223,4 @@ class _Face {
 }
 
 final Map<Object, _Face> _faces = {};
+double _stackClock = 0; // 지난 프레임 시각 (적재대 연출용)

@@ -56,7 +56,10 @@ class HubGame extends FlameGame {
   int dayEarn = 0; // 오늘 번 돈 (하루 결산용)
   double saveTimer = 0;
   final List<bool> regionOpen = [true, false, false, false, false]; // 열린 배송 지역
-  final List<DeliveryRoute> routes = List.generate(5, (_) => DeliveryRoute()); // 지역별 노선 설정
+  final List<DeliveryRoute> routes = List.generate(
+    5,
+    (_) => DeliveryRoute(),
+  ); // 지역별 노선 설정
   final List<FleetUnit> fleet = []; // 내 차량들
   final List<int> centerStock = List.filled(5, 0); // 지역센터에 내려진 택배
   final List<MapNote> notes = []; // 노선 지도 소식
@@ -153,8 +156,14 @@ class HubGame extends FlameGame {
   int get totalStored => buildings.fold(0, (a, b) => a + b.stored);
 
   /// 건물 앞(아래쪽) 서는 자리 (타일 좌표)
-  Offset frontOf(Building b) =>
-      Offset(b.tx + b.type.w / 2, b.ty + b.type.h + 0.6);
+  Offset frontOf(Building b) => b.type.id == 'counter'
+      ? Offset(b.tx + 1.0, b.ty + b.type.h + 0.6) // 창구: 책상(왼쪽 2칸) 앞
+      : Offset(b.tx + b.type.w / 2, b.ty + b.type.h + 0.6);
+
+  /// 운반 직원이 택배를 집거나 내려놓는 자리. 접수 창구는 오른쪽 칸 적재대 앞
+  Offset pickOf(Building b) => b.type.id == 'counter'
+      ? Offset(b.tx + b.type.w - 0.5, b.ty + b.type.h + 0.6)
+      : frontOf(b);
 
   /// 창고 가운데 통로 (입구 → 도크, 건물 금지)
   Rect get aisle {
@@ -175,9 +184,10 @@ class HubGame extends FlameGame {
   @override
   Color backgroundColor() => const Color(0xFF2A2438);
 
-  String fmt(int n) => n
-      .toString()
-      .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',');
+  String fmt(int n) => n.toString().replaceAllMapped(
+    RegExp(r'\B(?=(\d{3})+(?!\d))'),
+    (m) => ',',
+  );
 
   void showToast(String s) {
     toast = s;
@@ -212,8 +222,10 @@ class HubGame extends FlameGame {
   void centerCamOnArea() {
     final a = area;
     final visibleH = size.y - insetTop - insetBottom;
-    cam = Offset((a.right - 3) * Cfg.tile - size.x / 2,
-        a.center.dy * Cfg.tile - (insetTop + visibleH / 2));
+    cam = Offset(
+      (a.right - 3) * Cfg.tile - size.x / 2,
+      a.center.dy * Cfg.tile - (insetTop + visibleH / 2),
+    );
     clampCam();
   }
 

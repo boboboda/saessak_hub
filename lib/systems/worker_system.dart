@@ -89,7 +89,7 @@ extension WorkerSystem on HubGame {
       final v = d.vehicle;
       if (v == null || v.state != 1) continue;
       if (v.loaded + v.incoming >= v.cap) continue;
-      final dist = (frontOf(d) - c.pos).distance;
+      final dist = (pickOf(d) - c.pos).distance;
       if (dist >= bestD) continue;
       final shelf = _nearest(
           ofType('shelf').where((b) => b.regions[v.region] - b.pickRes[v.region] > 0),
@@ -126,7 +126,7 @@ extension WorkerSystem on HubGame {
     Building? best;
     var bd = 1e9;
     for (final b in list) {
-      final d = (frontOf(b) - from).distance;
+      final d = (pickOf(b) - from).distance;
       if (d < bd) {
         bd = d;
         best = b;
@@ -192,9 +192,9 @@ extension WorkerSystem on HubGame {
     for (final b in ofType('pack')) {
       final p = b.slot;
       if (p == null || p.stage != 3 || p.reserved) continue;
-      final d = (frontOf(b) - c.pos).distance - (p.kind == 1 ? 100 : 0);
+      final d = (pickOf(b) - c.pos).distance - (p.kind == 1 ? 100 : 0);
       if (d >= bestD) continue;
-      final dst = _findDst(p, frontOf(b));
+      final dst = _findDst(p, pickOf(b));
       if (dst == null) continue;
       bestSrc = b;
       bestP = p;
@@ -206,15 +206,16 @@ extension WorkerSystem on HubGame {
 
     if (bestSrc == null) {
       for (final b in ofType('counter')) {
+        // 적재대 맨 위 상자부터 (급송은 먼저)
         Parcel? p;
-        for (final q in b.outbox) {
+        for (final q in b.outbox.reversed) {
           if (q.reserved) continue;
           if (p == null || (q.kind == 1 && p.kind != 1)) p = q;
         }
         if (p == null) continue;
-        final d = (frontOf(b) - c.pos).distance - (p.kind == 1 ? 100 : 0);
+        final d = (pickOf(b) - c.pos).distance - (p.kind == 1 ? 100 : 0);
         if (d >= bestD) continue;
-        final dst = _findDst(p, frontOf(b));
+        final dst = _findDst(p, pickOf(b));
         if (dst == null) continue;
         bestSrc = b;
         bestP = p;
@@ -234,7 +235,7 @@ extension WorkerSystem on HubGame {
 
   void _move(Carrier c, double dt) {
     c.staff.working = true; // 걷는 동안 체력 소모
-    final target = c.carrying ? frontOf(c.dst!) : frontOf(c.src!);
+    final target = c.carrying ? pickOf(c.dst!) : pickOf(c.src!);
     var slow = (c.carrying && c.job!.kind == 3) ? Cfg.bulkySlow : 1.0;
     if (c.job!.stage == 4) slow *= c.dst!.loadMul; // 도크 업그레이드: 싣는 속도
     c.pos = stepToward(
@@ -276,6 +277,7 @@ extension WorkerSystem on HubGame {
       final s = c.src!;
       if (s.type.id == 'counter') {
         s.outbox.remove(p);
+        s.stackGhost = p.region;
       } else {
         s.slot = null;
         s.progress = 0;

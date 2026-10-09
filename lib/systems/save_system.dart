@@ -9,7 +9,8 @@ import '../models/models.dart';
 
 // v2: 접수량·배송 기한 경제로 바뀌며 예전 저장(v1)은 쓰지 않음 (새로 시작)
 // v3: 허브 개편(창구 2x2·통로·마당 크기)으로 예전 배치와 겹칠 수 있어 새로 시작
-const String _saveKey = 'hub_save_v3';
+// v4: 접수 창구가 3x2(오른쪽 칸 적재대)로 넓어져 예전 배치와 겹칠 수 있어 새로 시작
+const String _saveKey = 'hub_save_v4';
 
 extension SaveSystem on HubGame {
   Map<String, dynamic> _toJson() {
