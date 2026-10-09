@@ -10,6 +10,7 @@ import '../models/building.dart';
 import '../models/customer.dart';
 import '../models/staff.dart';
 import 'draw_utils.dart';
+import 'floor_view.dart';
 
 /// 게임 맵(캔버스). 메뉴·패널은 위젯이 따로 그림.
 extension WorldView on HubGame {
@@ -255,7 +256,7 @@ extension WorldView on HubGame {
 
   // ---------------- 창고 건물 ----------------
   // 동선: 입구(왼쪽 벽) → ① 접수 → ② 분류·포장 → ③ 보관 → ④ 출고 도크(오른쪽 벽 밖).
-  // 가운데 노란 통로가 그 길이고, 화살표가 진행 방향이다.
+  // 구역은 바닥 재질·색과 바닥 글씨로 구분하고, 직원 통로는 유저가 직접 깐다.
   void _drawWarehouse(Canvas c) {
     const t = Cfg.tile;
 
@@ -277,56 +278,10 @@ extension WorldView on HubGame {
     final a = area;
     final ai = this.door; // 양쪽 벽 문 (가운데 줄)
     final ar = _px(a);
-    // 바닥: 콘크리트 + 노란 통로 (이중 격자 Wang 타일, 창고 안만)
+    // 바닥: 구역별 재질 + 유저가 깐 통로 + 바닥 구역 글씨 (floor_view.dart)
     c.save();
     c.clipRect(ar);
-    final fl = Sprites.wangFloor;
-    // 유저가 깐 통로 (창고 안)
-    bool aisleAt(int x, int y) =>
-        x >= a.left &&
-        x < a.right &&
-        y >= a.top &&
-        y < a.bottom &&
-        isAisle(x, y);
-    final p = Paint()
-      ..filterQuality = FilterQuality.none
-      ..isAntiAlias = false;
-    for (
-      var j = max(a.top.toInt(), y0Of(this));
-      j <= min(a.bottom.toInt(), y1Of(this));
-      j++
-    ) {
-      for (
-        var i = max(a.left.toInt(), x0Of(this));
-        i <= min(a.right.toInt(), x1Of(this));
-        i++
-      ) {
-        final dst = Rect.fromLTWH((i - 0.5) * t, (j - 0.5) * t, t, t);
-        if (fl == null) {
-          box(
-            c,
-            dst.left,
-            dst.top,
-            t,
-            t,
-            aisleAt(i, j) ? 0xFFE8C94A : 0xFFDCCDAE,
-          );
-          continue;
-        }
-        final m =
-            (aisleAt(i - 1, j - 1) ? 8 : 0) |
-            (aisleAt(i, j - 1) ? 4 : 0) |
-            (aisleAt(i - 1, j) ? 2 : 0) |
-            (aisleAt(i, j) ? 1 : 0);
-        final w = fl.width / 16;
-        c.drawImageRect(
-          fl,
-          Rect.fromLTWH(w * m, 0, w, fl.height.toDouble()),
-          dst,
-          p,
-        );
-      }
-    }
+    this.drawFloor(c, x0Of(this), y0Of(this), x1Of(this), y1Of(this));
     c.restore();
 
     // 배치 중이면 들어갈 구역만 진하게
@@ -349,36 +304,6 @@ extension WorldView on HubGame {
       );
     }
     if (mode == 4) _drawAisleOverlay(c);
-    // 구역 경계: 바닥에 칠한 흰 점선 (통로 칸에서는 끊김)
-    final line = Paint()
-      ..color = const Color(0x99FFFFFF)
-      ..strokeWidth = 2;
-    for (final zx in [Cfg.zoneX1, Cfg.zoneX2]) {
-      for (var y = a.top + 0.2; y < a.bottom; y += 0.6) {
-        if (isAisle(zx.toInt() - 1, y.floor()) ||
-            isAisle(zx.toInt(), y.floor()))
-          continue;
-        c.drawLine(Offset(zx * t, y * t), Offset(zx * t, (y + 0.3) * t), line);
-      }
-    }
-    // 구역 간판 (번호 = 진행 순서)
-    const names = ['① 접수', '② 분류·포장', '③ 보관'];
-    for (var z = 0; z < 3; z++) {
-      final r = _px(this.zoneRect(z));
-      // 창고 윗벽 바깥에 걸린 간판 (안쪽 건물·수량표와 겹치지 않게)
-      final tag = Rect.fromLTWH(
-        r.left + 4,
-        r.top - 26,
-        names[z].length * 11.0 + 10,
-        18,
-      );
-      c.drawRRect(
-        RRect.fromRectAndRadius(tag, const Radius.circular(4)),
-        Paint()..color = Color(Cfg.zoneHot[z]).withValues(alpha: 0.95),
-      );
-      labelIn(c, names[z], tag, size: 11, color: const Color(0xFF2A2438));
-    }
-
     // 벽: 두께 8px, 입구(왼쪽 벽의 통로 자리)와 도크 문(오른쪽 벽)은 뚫림
     const wall = 0xFF7A5C3A, cap = 0xFF9C7A52;
     box(c, ar.left - 4, ar.top - 4, ar.width + 8, 8, wall); // 위
