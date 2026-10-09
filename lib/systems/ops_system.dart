@@ -51,7 +51,7 @@ extension OpsSystem on HubGame {
     }
     regionOpen[i] = true;
     grantStarterUnits(i);
-    showToast('${Cfg.regionName[i]} 배송 시작! (수익 ×${Cfg.regionPay[i]})');
+    showToast('${Cfg.regionName[i]} 배송 시작! 노선 지도에서 새 지역을 볼 수 있어요');
     ui();
   }
 

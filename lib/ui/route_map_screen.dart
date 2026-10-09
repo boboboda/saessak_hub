@@ -1,11 +1,11 @@
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/region_map.dart';
 import '../game/sprites.dart';
 import '../models/models.dart';
 import 'theme.dart';
@@ -513,7 +513,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
                           color: color, borderRadius: BorderRadius.circular(3))),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text('${Cfg.regionName[sel]} 노선 · 수익 ×${Cfg.regionPay[sel]}',
+                    child: Text('${Cfg.regionName[sel]} 노선 · 집 ${RegionMap.of(sel).houses.length}채',
                         style: Tx.h2),
                   ),
                   Switch(
@@ -527,7 +527,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
                 ],
               ),
               Text(
-                  '대형 트럭 ${g.trunkCount(sel)}대 · 배달 차량 ${g.courierCount(sel)}대 · 편도 ${Cfg.regionTrip[sel].round()}초',
+                  '대형 트럭 ${g.trunkCount(sel)}대 · 배달 차량 ${g.courierCount(sel)}대 · 편도 ${RegionMap.of(sel).tripSec.round()}초',
                   style: Tx.sub),
               const SizedBox(height: 6),
               _row('대기', [
@@ -783,67 +783,6 @@ class _Cam {
   bool reset = true; // 다음 프레임에 허브 쪽으로 이동
 }
 
-/// 지역 하나의 지도 설계. 도로 좌표는 칸 경계(중심선, 2칸 폭), 골목 좌표는 칸 번호(1칸 폭).
-class _Spec {
-  final int gw, gh;
-  final Offset hub; // 허브 건물 왼쪽 x, 바닥 y
-  final Offset center; // 센터 건물 왼쪽 x, 바닥 y (간선 끝이 센터 왼쪽에 닿음)
-  final List<Offset> trunk; // 허브 → 센터 간선
-  final List<List<Offset>> roads; // 간선과 엇갈리는 다른 차도 (교차로·갈림길)
-  final List<List<Offset>> lanes; // 동네 골목 (첫 골목의 첫 칸이 센터 출구)
-  const _Spec(this.gw, this.gh, this.hub, this.center, this.trunk, this.roads, this.lanes);
-}
-
-/// 지역마다 한 번 만들어 두는 지도 정보. 좌표는 칸 단위.
-class _Layout {
-  final _Spec sp;
-  final Uint8List cell; // 0 잔디, 1 도로(아스팔트), 2 동네 길(보도블록)
-  final Set<int> cross = {}; // 골목이 차도를 건너는 칸 (건널목)
-  final List<_House> houses = [];
-  final List<int> deliver = []; // 배달 번호(0~5) → houses 번호
-  final List<List<Offset>> courier = []; // 배달 번호별 센터 → 집 앞 길
-  final List<List<double>> courierStops = []; // 배달 길의 건널목 위치(길 따라 거리)
-  final List<double> trunkStops = []; // 간선의 교차로·건널목 위치(길 따라 거리)
-  final List<Offset> lights = []; // 신호등을 세울 교차로 중심
-  final List<_Dec> decor = [];
-  _Layout(this.sp) : cell = Uint8List(sp.gw * sp.gh);
-
-  int get gw => sp.gw;
-  int get gh => sp.gh;
-  double get hubX => sp.hub.dx;
-  double get hubFoot => sp.hub.dy;
-  double get cx0 => sp.center.dx;
-  double get cFoot => sp.center.dy;
-  List<Offset> get trunk => sp.trunk;
-
-  int at(int x, int y) => (x < 0 || y < 0 || x >= gw || y >= gh) ? 0 : cell[y * gw + x];
-  void set(int x, int y, int v) {
-    if (x >= 0 && y >= 0 && x < gw && y < gh) cell[y * gw + x] = v;
-  }
-
-  bool nearPath(double x, double y) {
-    final cx = x.floor(), cy = y.floor();
-    for (var dy = -1; dy <= 0; dy++) {
-      for (var dx = -1; dx <= 1; dx++) {
-        if (at(cx + dx, cy + dy) != 0) return true;
-      }
-    }
-    return false;
-  }
-}
-
-class _House {
-  final double x, y; // 발 밑(아래 가운데)
-  final String key;
-  _House(this.x, this.y, this.key);
-}
-
-class _Dec {
-  final String key;
-  final double x, y; // 발 밑(아래 가운데) 칸 좌표
-  _Dec(this.key, this.x, this.y);
-}
-
 class _MapPainter extends CustomPainter {
   final HubGame g;
   final int sel;
@@ -856,395 +795,15 @@ class _MapPainter extends CustomPainter {
   static const double bigScale = 1.25; // 허브·센터 건물 배율
   static const double stopTime = 1.2; // 교차로·건널목에서 잠깐 서는 시간(초)
 
-  /// 지역별 지도. 정사각형에 가까운 영역 안에서 굽은 길·교차로·블록으로 거리를 만든다.
-  /// 지역마다 틀이 다르다: 주택가 / 상가 격자 / 산동네 굽잇길 / 순환로 도심 / 물류 인터체인지
-  static const List<_Spec> specs = [
-    // 동네 (주택가): ㄱ자 간선 + 가로지르는 큰길, 골목 격자에 단독주택
-    _Spec(30, 26, Offset(1.4, 23), Offset(17, 10), [
-      Offset(5, 22), Offset(11, 22), Offset(11, 9), Offset(17, 9),
-    ], [
-      [Offset(0, 16), Offset(30, 16)],
-    ], [
-      [Offset(22, 9), Offset(23, 9)], [Offset(23, 3), Offset(23, 23)], [Offset(2, 3), Offset(28, 3)],
-      [Offset(23, 13), Offset(28, 13)], [Offset(14, 22), Offset(28, 22)], [Offset(2, 3), Offset(2, 13)],
-      [Offset(2, 13), Offset(8, 13)],
-    ]),
-    // 시내 (상가): 큰길 격자를 ㄹ자로 지나감, 교차로가 많음
-    _Spec(34, 30, Offset(1.4, 27), Offset(21, 15), [
-      Offset(5, 26), Offset(10, 26), Offset(10, 8), Offset(16, 8), Offset(16, 14), Offset(21, 14),
-    ], [
-      [Offset(10, 0), Offset(10, 30)], [Offset(0, 19), Offset(34, 19)], [Offset(10, 8), Offset(34, 8)],
-    ], [
-      [Offset(26, 14), Offset(27, 14)], [Offset(27, 2), Offset(27, 28)], [Offset(1, 5), Offset(33, 5)],
-      [Offset(12, 17), Offset(33, 17)], [Offset(12, 28), Offset(33, 28)], [Offset(1, 5), Offset(1, 13)],
-      [Offset(1, 13), Offset(8, 13)],
-    ]),
-    // 근교 (산동네): 계단처럼 오르내리는 굽잇길 + 농장 갈림길, 비탈에 층층이 집
-    _Spec(38, 32, Offset(1.4, 29), Offset(26, 9), [
-      Offset(5, 28), Offset(12, 28), Offset(12, 25), Offset(18, 25), Offset(18, 28), Offset(26, 28),
-      Offset(26, 23), Offset(33, 23), Offset(33, 17), Offset(28, 17), Offset(28, 12), Offset(22, 12),
-      Offset(22, 8), Offset(26, 8),
-    ], [
-      [Offset(18, 25), Offset(18, 16), Offset(8, 16)],
-    ], [
-      [Offset(31, 8), Offset(35, 8)], [Offset(35, 3), Offset(35, 14)], [Offset(3, 3), Offset(37, 3)],
-      [Offset(30, 14), Offset(37, 14)], [Offset(4, 3), Offset(4, 12)], [Offset(4, 12), Offset(16, 12)],
-      [Offset(4, 7), Offset(18, 7)],
-    ]),
-    // 타도시 (도심): 순환로를 반 바퀴 넘게 돌아 안쪽 센터로, 광장 분수와 바깥 블록
-    _Spec(42, 36, Offset(1.4, 33), Offset(19, 18), [
-      Offset(5, 32), Offset(12, 32), Offset(12, 26), Offset(30, 26), Offset(30, 8), Offset(12, 8),
-      Offset(12, 17), Offset(19, 17),
-    ], [
-      [Offset(12, 17), Offset(12, 26)], [Offset(21, 0), Offset(21, 8)], [Offset(30, 13), Offset(42, 13)],
-      [Offset(0, 20), Offset(11, 20)],
-    ], [
-      [Offset(24, 17), Offset(26, 17)], [Offset(26, 11), Offset(26, 23)], [Offset(14, 11), Offset(28, 11)],
-      [Offset(14, 23), Offset(28, 23)], [Offset(26, 20), Offset(35, 20)], [Offset(35, 3), Offset(35, 33)],
-      [Offset(32, 6), Offset(41, 6)], [Offset(32, 17), Offset(41, 17)], [Offset(32, 30), Offset(41, 30)],
-      [Offset(2, 3), Offset(41, 3)], [Offset(4, 3), Offset(4, 24)], [Offset(4, 14), Offset(10, 14)],
-      [Offset(4, 24), Offset(10, 24)],
-    ]),
-    // 전국 (물류 인터체인지): 촘촘한 ㄹ자 램프가 이어지는 긴 간선, 주유소·표지판
-    _Spec(46, 40, Offset(1.4, 37), Offset(36, 25), [
-      Offset(5, 36), Offset(10, 36), Offset(10, 24), Offset(5, 24), Offset(5, 14), Offset(12, 14),
-      Offset(12, 4), Offset(20, 4), Offset(20, 20), Offset(16, 20), Offset(16, 30), Offset(26, 30),
-      Offset(26, 10), Offset(32, 10), Offset(32, 24), Offset(36, 24),
-    ], [
-      [Offset(26, 27), Offset(46, 27)], [Offset(0, 18), Offset(5, 18)],
-    ], [
-      [Offset(41, 24), Offset(43, 24)], [Offset(43, 3), Offset(43, 38)], [Offset(28, 6), Offset(45, 6)],
-      [Offset(34, 15), Offset(45, 15)], [Offset(18, 34), Offset(45, 34)],
-    ]),
-  ];
-
-  /// 지역 특색 큰 소품: (이름, x, 발 y, 폭, 높이)
-  static const List<List<(String, double, double, double, double)>> specials = [
-    [],
-    [],
-    [],
-    [('p:fountain', 16, 21, 2.0, 1.6)], // 순환로 안 광장
-    [('p:gas', 16, 12, 3.4, 3.2)], // 램프 사이 휴게소
-  ];
-
-  /// 지역마다 배달지 집 모양. 'house1~3'은 가게(장식 폴더), 나머지는 지도 전용 집
-  static const List<List<String>> housePool = [
-    ['d0', 'd1', 'd2', 'd3', 'd4', 'd7'], // 동네: 알록달록 단독주택
-    ['v0', 'house1', 'v1', 'v2', 'house3', 'house2'], // 시내: 빌라·가게
-    ['d8', 'd9', 'd10', 'd11', 'd6', 'd5'], // 근교: 나무·돌집
-    ['v1', 'd5', 'v2', 'd3', 'v0', 'house3'], // 타도시
-    ['d6', 'v2', 'd4', 'house1', 'd9', 'v0'], // 전국
-  ];
-
-  /// 지역별 소품 ('p:이름'은 assets/sprites/map/prop_<이름>.png, 나머지는 장식 폴더)
-  static const List<List<String>> roadside = [
-    ['lamp', 'p:mailbox', 'lamp', 'bench'], // 동네
-    ['lamp', 'p:busstop', 'light', 'p:billboard'], // 시내
-    ['p:fence', 'lamp', 'p:haystack', 'p:fence'], // 근교
-    ['lamp', 'p:billboard', 'light', 'sign'], // 타도시
-    ['p:hwsign', 'lamp', 'lamp', 'p:billboard'], // 전국
-  ];
-  static const List<List<String>> townProps = [
-    ['p:mailbox', 'p:vending', 'bench', 'flower'],
-    ['p:vending', 'bench', 'lamp', 'p:busstop'],
-    ['p:crops', 'p:haystack', 'p:crops', 'p:fence'],
-    ['bench', 'lamp', 'p:vending', 'flower'],
-    ['p:vending', 'lamp', 'bench', 'p:mailbox'],
-  ];
-  static const List<List<String>> decorKinds = [
-    ['tree', 'tree2', 'bush', 'flower', 'tree', 'bush', 'tree'],
-    ['tree2', 'bush', 'bush', 'flower', 'tree', 'lamp'],
-    ['tree', 'tree', 'tree2', 'bush', 'flower', 'tree'],
-    ['tree2', 'bush', 'flower', 'tree', 'bush'],
-    ['tree', 'tree2', 'bush', 'tree', 'flower', 'bush'],
-  ];
-
   /// 소품 배율 (64 캔버스로 뽑아 원본이 커서 집 크기에 맞게 줄임)
   static const Map<String, double> propScale = {
     'mailbox': 0.55, 'vending': 0.6, 'busstop': 0.85, 'billboard': 0.8, 'haystack': 0.5,
     'fence': 0.6, 'crops': 0.9, 'fountain': 0.9, 'hwsign': 0.75, 'gas': 1.0,
+    'container': 0.55, 'crane': 0.75, 'boat': 0.7, 'factory': 0.75, 'tank': 0.5,
   };
 
-  static final Map<int, _Layout> _cache = {};
-
-  static _Layout layout(int r) {
-    final cached = _cache[r];
-    if (cached != null) return cached;
-    final sp = specs[r % specs.length];
-    final l = _Layout(sp);
-    final gw = sp.gw, gh = sp.gh;
-    final side = Uint8List(gw * gh); // 간선이 아닌 차도 (교차로 찾기용)
-
-    // 중심선 양옆 한 칸씩 = 2칸 폭 차도
-    void road(List<Offset> pts, {bool isSide = false}) {
-      void mark(int x, int y) {
-        l.set(x, y, 1);
-        if (isSide && x >= 0 && y >= 0 && x < gw && y < gh) side[y * gw + x] = 1;
-      }
-
-      for (var i = 0; i + 1 < pts.length; i++) {
-        final a = pts[i], b = pts[i + 1];
-        if (a.dy == b.dy) {
-          final y = a.dy.toInt();
-          for (var x = min(a.dx, b.dx).toInt() - 1; x <= max(a.dx, b.dx).toInt(); x++) {
-            mark(x, y - 1);
-            mark(x, y);
-          }
-        } else {
-          final x = a.dx.toInt();
-          for (var y = min(a.dy, b.dy).toInt() - 1; y <= max(a.dy, b.dy).toInt(); y++) {
-            mark(x - 1, y);
-            mark(x, y);
-          }
-        }
-      }
-    }
-
-    // 허브 앞마당 (트럭 도크)
-    for (var y = l.hubFoot.toInt() - 3; y < l.hubFoot.toInt(); y++) {
-      l.set(5, y, 1);
-      l.set(6, y, 1);
-    }
-    road(sp.trunk);
-    for (final rd in sp.roads) {
-      road(rd, isSide: true);
-    }
-    // 골목: 차도와 만나는 칸은 건널목
-    for (final ln in sp.lanes) {
-      for (var i = 0; i + 1 < ln.length; i++) {
-        final a = ln[i], b = ln[i + 1];
-        for (var y = min(a.dy, b.dy).toInt(); y <= max(a.dy, b.dy).toInt(); y++) {
-          for (var x = min(a.dx, b.dx).toInt(); x <= max(a.dx, b.dx).toInt(); x++) {
-            if (x < 0 || y < 0 || x >= gw || y >= gh) continue;
-            if (l.at(x, y) == 1) {
-              l.cross.add(y * gw + x);
-            } else {
-              l.set(x, y, 2);
-            }
-          }
-        }
-      }
-    }
-
-    // 집: 가로 골목 위쪽 빈 땅에 자동 배치 (허브·센터 자리는 피함)
-    final blocked = <Rect>[
-      Rect.fromLTRB(l.hubX - 0.6, l.hubFoot - 5.4, l.hubX + 7.1, l.hubFoot + 3.2), // 허브 + 대기 트럭
-      Rect.fromLTRB(l.cx0 - 2.5, l.cFoot - 5.4, l.cx0 + 5.5, l.cFoot + 2.6), // 센터 + 택배 더미 + 대기 차
-    ];
-    final rnd = Random(r * 977 + 13);
-    final pool = housePool[r % housePool.length];
-    var hi = rnd.nextInt(6);
-    for (final ln in sp.lanes) {
-      for (var i = 0; i + 1 < ln.length; i++) {
-        final a = ln[i], b = ln[i + 1];
-        if (a.dy != b.dy || (b.dx - a.dx).abs() < 3) continue;
-        final y = a.dy.toInt();
-        var x = min(a.dx, b.dx) + 1.5;
-        while (x < max(a.dx, b.dx) + 0.5) {
-          var ok = true;
-          for (var yy = y - 3; yy < y && ok; yy++) {
-            for (var xx = (x - 1).floor(); xx <= (x + 0.99).floor(); xx++) {
-              if (yy < 0 || xx < 0 || xx >= gw || l.at(xx, yy) != 0) ok = false;
-            }
-          }
-          final rect = Rect.fromLTRB(x - 1.2, y - 2.6, x + 1.2, y.toDouble());
-          if (ok && blocked.any((b) => b.overlaps(rect))) ok = false;
-          if (ok && l.houses.any((h) => h.y == y && (h.x - x).abs() < 2.4)) ok = false;
-          if (ok) {
-            l.houses.add(_House(x, y.toDouble(), pool[hi++ % pool.length]));
-            x += 2.6;
-          } else {
-            x += 0.5;
-          }
-        }
-      }
-    }
-    for (final h in l.houses) {
-      blocked.add(Rect.fromLTRB(h.x - 1.4, h.y - 3.0, h.x + 1.4, h.y + 0.2));
-    }
-
-    // 배달지 6채를 고르게 고르고, 센터 출구에서 골목·건널목을 따라 길을 찾음
-    final n = l.houses.length;
-    final start = sp.lanes.first.first;
-    for (var k = 0; k < 6 && n > 0; k++) {
-      final hk = ((k + 0.5) * n / 6).floor().clamp(0, n - 1);
-      final h = l.houses[hk];
-      final cells = _bfs(l, start.dx.toInt(), start.dy.toInt(), h.x.floor(), h.y.toInt());
-      final path = <Offset>[];
-      final stops = <double>[];
-      var dist = 0.0;
-      var inCross = false;
-      for (final c in cells) {
-        final p = Offset(c.dx + 0.5, c.dy + 0.5);
-        if (path.isNotEmpty) dist += (p - path.last).distance;
-        final isCross = l.cross.contains(c.dy.toInt() * gw + c.dx.toInt());
-        if (isCross && !inCross) stops.add(max(0.0, dist - 0.6));
-        inCross = isCross;
-        // 같은 방향으로 이어지는 칸은 합쳐서 꺾이는 곳만 남김
-        if (path.length >= 2) {
-          final a = path[path.length - 2], b = path.last;
-          if ((a.dx == b.dx && b.dx == p.dx) || (a.dy == b.dy && b.dy == p.dy)) path.removeLast();
-        }
-        path.add(p);
-      }
-      if (path.isEmpty) path.add(Offset(start.dx + 0.5, start.dy + 0.5));
-      path.add(Offset(h.x, h.y + 0.5));
-      l.deliver.add(hk);
-      l.courier.add(path);
-      l.courierStops.add(stops);
-    }
-    if (l.courier.isEmpty) {
-      l.courier.add([Offset(start.dx + 0.5, start.dy + 0.5), Offset(start.dx + 1.5, start.dy + 0.5)]);
-      l.courierStops.add([]);
-    }
-
-    // 간선의 교차로(옆에서 다른 차도가 붙는 곳)·건널목: 정차 지점과 신호등
-    final tl = _len(sp.trunk);
-    bool sideAt(int x, int y) => x >= 0 && y >= 0 && x < gw && y < gh && side[y * gw + x] == 1;
-    var run = false;
-    for (var d = 0.5; d < tl; d += 0.5) {
-      final p = _pointAt(sp.trunk, d);
-      final q = _pointAt(sp.trunk, min(tl, d + 0.01));
-      final horiz = (q.dy - p.dy).abs() < (q.dx - p.dx).abs();
-      final x = p.dx.floor(), y = p.dy.floor();
-      final hit = horiz
-          ? (sideAt(x, y - 2) || sideAt(x, y + 1))
-          : (sideAt(x - 2, y) || sideAt(x + 1, y));
-      final cw = l.cross.contains(y * gw + x) ||
-          l.cross.contains(y * gw + x - 1) ||
-          l.cross.contains((y - 1) * gw + x) ||
-          l.cross.contains((y - 1) * gw + x - 1);
-      final on = hit || cw;
-      if (on && !run && d > 2) {
-        l.trunkStops.add(max(0.0, d - 1.4));
-        if (hit) l.lights.add(p);
-      }
-      run = on;
-    }
-
-    // 장식·소품
-    bool free(double x, double y) {
-      if (l.nearPath(x, y)) return false;
-      for (final b in blocked) {
-        if (b.contains(Offset(x, y)) || b.contains(Offset(x, y - 1))) return false;
-      }
-      for (final d in l.decor) {
-        if ((d.x - x).abs() < 1.2 && (d.y - y).abs() < 0.9) return false;
-      }
-      return true;
-    }
-
-    // 크기가 있는 소품: 차지하는 칸에 길·건물·다른 장식이 없을 때만 놓음
-    bool place(String key, double x, double y, {double w = 1.0, double h = 1.0, int pad = 1}) {
-      for (var cy = (y - h).floor(); cy <= y.floor(); cy++) {
-        for (var cx = (x - w / 2).floor() - pad; cx <= (x + w / 2).floor() + pad; cx++) {
-          if (l.at(cx, cy) != 0 || cy < 1 || cy >= gh) return false;
-        }
-      }
-      final area = Rect.fromLTRB(x - w / 2, y - h, x + w / 2, y);
-      for (final b in blocked) {
-        if (b.overlaps(area)) return false;
-      }
-      for (final d in l.decor) {
-        if ((d.x - x).abs() < (w + 1) / 2 && (d.y - y).abs() < 0.9) return false;
-      }
-      l.decor.add(_Dec(key, x, y));
-      return true;
-    }
-
-    for (final (key, x, y, w, h) in specials[r % specials.length]) {
-      place(key, x, y, w: w, h: h, pad: 0);
-    }
-    // 교차로 모서리에 신호등 (네 모서리 중 빈 곳 하나)
-    for (final p in l.lights) {
-      for (final o in const [Offset(1.9, -1.3), Offset(-1.9, -1.3), Offset(1.9, 2.4), Offset(-1.9, 2.4)]) {
-        if (place('light', p.dx + o.dx, p.dy + o.dy, pad: 0)) break;
-      }
-    }
-    // 차도변: 6칸마다 가로등·지역 소품 (가로 구간은 길 위쪽, 세로 구간은 길 오른쪽, 안 되면 반대쪽)
-    final roadKeys = roadside[r % roadside.length];
-    var ri = 0;
-    for (final pts in [sp.trunk, ...sp.roads]) {
-      for (var i = 0; i + 1 < pts.length; i++) {
-        final a = pts[i], b = pts[i + 1];
-        final len = (b - a).distance;
-        for (var d = 3.0; d < len - 1; d += 6) {
-          final q = Offset.lerp(a, b, d / len)!;
-          final key = roadKeys[ri % roadKeys.length];
-          final ok = a.dy == b.dy
-              ? (place(key, q.dx, q.dy - 1.15) || place(key, q.dx, q.dy + 2.2))
-              : (place(key, q.dx + 2.8, q.dy + 0.5) || place(key, q.dx - 2.8, q.dy + 0.5));
-          if (ok) ri++;
-        }
-      }
-    }
-    // 동네: 가로 골목 아래쪽(집 건너편) 4칸마다 생활 소품
-    final town = townProps[r % townProps.length];
-    var ti = 0;
-    for (final ln in sp.lanes) {
-      for (var i = 0; i + 1 < ln.length; i++) {
-        final a = ln[i], b = ln[i + 1];
-        if (a.dy != b.dy) continue;
-        for (var x = min(a.dx, b.dx) + 3.0; x < max(a.dx, b.dx) - 0.5; x += 4) {
-          if (place(town[ti % town.length], x, a.dy + 2.2)) ti++;
-        }
-      }
-    }
-    // 근교: 빈 들판의 밭·건초
-    if (r == 2) {
-      for (var k = 0; k < 60; k++) {
-        place(rnd.nextBool() ? 'p:crops' : 'p:haystack', 2 + rnd.nextDouble() * (gw - 4),
-            3 + rnd.nextDouble() * (gh - 4),
-            w: 1.8);
-      }
-    }
-
-    final kinds = decorKinds[r % decorKinds.length];
-    final want = gw * gh ~/ 9;
-    var tries = 0;
-    while (l.decor.length < want && tries < want * 25) {
-      tries++;
-      final x = 0.6 + rnd.nextDouble() * (gw - 1.2);
-      final y = 1.6 + rnd.nextDouble() * (gh - 1.8);
-      if (!free(x, y)) continue;
-      l.decor.add(_Dec(kinds[rnd.nextInt(kinds.length)], x, y));
-    }
-    // 아래쪽 순서로 그릴 때 매번 정렬하지 않아도 되게 미리 정렬
-    l.decor.sort((a, b) => a.y.compareTo(b.y));
-    _cache[r] = l;
-    return l;
-  }
-
-  /// 골목·건널목 칸만 지나는 최단 길 (칸 좌표 목록). 못 찾으면 출발 칸만.
-  static List<Offset> _bfs(_Layout l, int sx, int sy, int gx, int gy) {
-    final gw = l.gw, gh = l.gh;
-    bool ok(int x, int y) =>
-        x >= 0 && y >= 0 && x < gw && y < gh && (l.at(x, y) == 2 || l.cross.contains(y * gw + x));
-    final prev = Int32List(gw * gh)..fillRange(0, gw * gh, -1);
-    final s = sy * gw + sx, goal = gy * gw + gx;
-    prev[s] = s;
-    final q = <int>[s];
-    for (var qi = 0; qi < q.length; qi++) {
-      final c = q[qi];
-      if (c == goal) break;
-      final x = c % gw, y = c ~/ gw;
-      for (final (dx, dy) in const [(1, 0), (-1, 0), (0, 1), (0, -1)]) {
-        final nx = x + dx, ny = y + dy;
-        if (!ok(nx, ny)) continue;
-        final ni = ny * gw + nx;
-        if (prev[ni] != -1) continue;
-        prev[ni] = c;
-        q.add(ni);
-      }
-    }
-    if (prev[goal] == -1) return [Offset(sx.toDouble(), sy.toDouble())];
-    final out = <Offset>[];
-    for (var c = goal; ; c = prev[c]) {
-      out.add(Offset((c % gw).toDouble(), (c ~/ gw).toDouble()));
-      if (c == s) break;
-    }
-    return out.reversed.toList();
-  }
+  /// 지역 지도 (lib/game/region_map.dart 가 설정값으로 만든다)
+  static RegionMap layout(int r) => RegionMap.of(r);
 
   // ---- 길 따라 위치 구하기 ----
   static double _len(List<Offset> p) {
@@ -1284,14 +843,14 @@ class _MapPainter extends CustomPainter {
     return min(len, prev + tt * v);
   }
 
-  static List<Offset> _path(FleetUnit u, _Layout l) =>
+  static List<Offset> _path(FleetUnit u, RegionMap l) =>
       u.isTrunk ? l.trunk : l.courier[u.house % l.courier.length];
 
-  static List<double> _stops(FleetUnit u, _Layout l) =>
+  static List<double> _stops(FleetUnit u, RegionMap l) =>
       u.isTrunk ? l.trunkStops : l.courierStops[u.house % l.courierStops.length];
 
   /// 차량의 지도 위 위치(칸 좌표). slot 은 대기 줄 순서.
-  static Offset unitPos(FleetUnit u, _Layout l, int slot) {
+  static Offset unitPos(FleetUnit u, RegionMap l, int slot) {
     final path = _path(u, l);
     final len = _len(path);
     final stops = _stops(u, l);
@@ -1307,7 +866,7 @@ class _MapPainter extends CustomPainter {
     // 대형 트럭은 허브 도크 앞, 배달 차량은 센터 앞에서 대기
     return u.isTrunk
         ? Offset(l.hubX + 1.2 + (slot % 3) * 2.7, l.hubFoot + 1.9)
-        : Offset(l.cx0 + 1.2 + (slot % 3) * 1.4, l.cFoot + 1.4);
+        : l.courierHome.translate((slot % 3) * 1.2, 0);
   }
 
   /// 지역 sel 의 차량별 위치 (그리기·따라가기·미니맵이 같이 씀)
@@ -1324,7 +883,7 @@ class _MapPainter extends CustomPainter {
 
   // ---- 그리기 ----
   final double t = T;
-  late _Layout l;
+  late RegionMap l;
   late Rect view; // 보이는 영역 (칸 좌표)
 
   Offset _px(Offset tile) => tile * t;
@@ -1341,13 +900,17 @@ class _MapPainter extends CustomPainter {
     c.save();
     c.translate(-ox, -oy);
 
-    // 1) 땅: 잔디 + 도로 + 동네 길 (보이는 칸만)
-    _ground(c);
-    _roadMarks(c, l.trunk);
-    for (final rd in l.sp.roads) {
-      _roadMarks(c, rd);
+    // 1) 땅: 잔디 + 도로 + 동네 길 + 차선·건널목. 8x8칸 묶음 이미지로 구워 두고 보이는 묶음만 그림
+    if (Sprites.wangRoad != null && Sprites.wangWalk != null) {
+      _groundChunks(c);
+    } else {
+      _ground(c);
+      _roadMarks(c, l.trunk);
+      for (final rd in l.roads) {
+        _roadMarks(c, rd);
+      }
+      _crosswalks(c);
     }
-    _crosswalks(c);
 
     // 2) 세워진 것들을 아래쪽 순서대로 그림 (앞에 있는 게 위에 오도록). 화면 밖은 건너뜀
     final cull = view.inflate(3);
@@ -1387,6 +950,50 @@ class _MapPainter extends CustomPainter {
 
   /// 이중 격자: 그리는 칸(i,j)은 지도 칸 (i-1..i, j-1..j) 네 칸의 중심을 꼭짓점으로 써서
   /// Wang 코너 타일을 고른다. 그래서 길이 정확히 칸 폭으로 나오고 가장자리가 자연스럽다.
+  // ---- 땅 묶음 이미지 (한 지역만 보관, 지역을 바꾸면 비움) ----
+  static const int chunk = 8;
+  static final Map<int, ui.Image> _chunks = {};
+  static int _chunkRegion = -1;
+
+  void _groundChunks(Canvas c) {
+    if (_chunkRegion != sel) {
+      for (final im in _chunks.values) {
+        im.dispose();
+      }
+      _chunks.clear();
+      _chunkRegion = sel;
+    }
+    const px = chunk * T;
+    final cx0 = max(0, (view.left / chunk).floor()), cx1 = min((l.gw - 1) ~/ chunk, (view.right / chunk).floor());
+    final cy0 = max(0, (view.top / chunk).floor()), cy1 = min((l.gh - 1) ~/ chunk, (view.bottom / chunk).floor());
+    for (var cy = cy0; cy <= cy1; cy++) {
+      for (var cx = cx0; cx <= cx1; cx++) {
+        final img = _chunks[cy * 1000 + cx] ??= _bakeChunk(cx, cy);
+        c.drawImageRect(img, const Rect.fromLTWH(0, 0, px, px),
+            Rect.fromLTWH(cx * px, cy * px, px, px), _tp);
+      }
+    }
+  }
+
+  /// 묶음 하나를 도트 1px = 1dp 크기 이미지로 굽기
+  ui.Image _bakeChunk(int cx, int cy) {
+    const px = chunk * T;
+    final rec = ui.PictureRecorder();
+    final cc = Canvas(rec);
+    cc.clipRect(const Rect.fromLTWH(0, 0, px, px));
+    cc.translate(-cx * px, -cy * px);
+    final saved = view;
+    view = Rect.fromLTWH(cx * chunk.toDouble(), cy * chunk.toDouble(), chunk.toDouble(), chunk.toDouble());
+    _ground(cc);
+    _roadMarks(cc, l.trunk);
+    for (final rd in l.roads) {
+      _roadMarks(cc, rd);
+    }
+    _crosswalks(cc);
+    view = saved;
+    return rec.endRecording().toImageSync(px.toInt(), px.toInt());
+  }
+
   void _ground(Canvas c) {
     final road = Sprites.wangRoad, walk = Sprites.wangWalk;
     final x0 = max(0, view.left.floor()), x1 = min(l.gw, view.right.ceil() + 1);
@@ -1397,11 +1004,23 @@ class _MapPainter extends CustomPainter {
         int mask(int v) =>
             (nw == v ? 8 : 0) | (ne == v ? 4 : 0) | (sw == v ? 2 : 0) | (se == v ? 1 : 0);
         final dst = Rect.fromLTWH((i - 0.5) * t, (j - 0.5) * t, t, t);
-        final mr = mask(1), mw = mask(2);
+        final mr = mask(1), mw = mask(2), ms = mask(3);
         if (road == null || walk == null) {
           // 타일셋이 없으면 단색
-          final v = mr != 0 ? 1 : (mw != 0 ? 2 : 0);
-          c.drawRect(dst, Paint()..color = const [Color(0xFF69A857), Color(0xFF3A3A48), Color(0xFFB9B5A8)][v]);
+          final v = mr != 0 ? 1 : (mw != 0 ? 2 : (ms != 0 ? 3 : 0));
+          c.drawRect(
+              dst,
+              Paint()
+                ..color = const [Color(0xFF69A857), Color(0xFF3A3A48), Color(0xFFB9B5A8), Color(0xFF3F78C8)][v]);
+          continue;
+        }
+        if (ms != 0 && mr == 0 && mw == 0) {
+          final sea = Sprites.wangWater;
+          if (sea != null) {
+            _wang(c, sea, ms, dst);
+          } else {
+            c.drawRect(dst, Paint()..color = ms == 15 ? const Color(0xFF3F78C8) : const Color(0xFF69A857));
+          }
           continue;
         }
         if (mr != 0) {
@@ -1489,7 +1108,7 @@ class _MapPainter extends CustomPainter {
     return dst;
   }
 
-  void _decor(Canvas c, _Dec d) {
+  void _decor(Canvas c, MapDec d) {
     final img = d.key.startsWith('p:') ? Sprites.mapProps[d.key.substring(2)] : Sprites.decor[d.key];
     if (img == null && d.key.startsWith('p:')) return; // 소품 그림이 없으면 생략
     if (img != null && d.key.startsWith('p:')) {
@@ -1503,7 +1122,7 @@ class _MapPainter extends CustomPainter {
     _sprite(c, img, d.x, d.y, 1);
   }
 
-  void _house(Canvas c, _House hs) {
+  void _house(Canvas c, MapHouse hs) {
     final img = Sprites.mapHouses[hs.key] ?? Sprites.decor[hs.key] ?? Sprites.decor['house1'];
     if (img == null) {
       final r = Rect.fromLTWH((hs.x - 1) * t, (hs.y - 1.6) * t, 2 * t, 1.6 * t);
@@ -1597,7 +1216,7 @@ class _MapPainter extends CustomPainter {
     // 내려둔 택배 더미 (센터 왼쪽 앞, 도로 끝)
     final n = g.centerStock[sel];
     if (n > 0) {
-      final base = _px(Offset(l.cx0 - 1.6, l.cFoot + 0.2));
+      final base = _px(Offset(l.cx0 + 4.9, l.cFoot - 1.0));
       final img = Sprites.boxS;
       final cnt = min(n, 9);
       final bs = t * 0.4;
@@ -1832,16 +1451,19 @@ class _MiniMap extends CustomPainter {
           ..strokeWidth = 1.5);
   }
 
-  ui.Picture _drawBg(_Layout l, double k, Size s) {
+  ui.Picture _drawBg(RegionMap l, double k, Size s) {
     final rec = ui.PictureRecorder();
     final c = Canvas(rec);
     c.drawRect(Offset.zero & s, Paint()..color = const Color(0xFF4F8A43));
     final road = Paint()..color = const Color(0xFF3A3A48);
     final walk = Paint()..color = const Color(0xFFCFC8B4);
+    final sea = Paint()..color = const Color(0xFF3F78C8);
     for (var y = 0; y < l.gh; y++) {
       for (var x = 0; x < l.gw; x++) {
         final v = l.at(x, y);
-        if (v != 0) c.drawRect(Rect.fromLTWH(x * k, y * k, k + 0.3, k + 0.3), v == 1 ? road : walk);
+        if (v != 0) {
+          c.drawRect(Rect.fromLTWH(x * k, y * k, k + 0.3, k + 0.3), v == 1 ? road : (v == 3 ? sea : walk));
+        }
       }
     }
     final house = Paint()..color = const Color(0xFFE8D9B5);

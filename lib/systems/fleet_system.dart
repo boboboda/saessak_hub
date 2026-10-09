@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/region_map.dart';
 import '../models/models.dart';
 
 /// 내 차량(플릿)의 운행: 허브 → 지역센터(대형 트럭) → 동네 배달(소형 트럭·오토바이)
@@ -111,7 +112,7 @@ extension FleetSystem on HubGame {
   void startTrunkTrip(FleetUnit u) {
     u.state = 1;
     u.t = 0;
-    u.dur = Cfg.regionTrip[u.region];
+    u.dur = RegionMap.of(u.region).tripSec;
     _planEvent(u);
   }
 
@@ -126,8 +127,9 @@ extension FleetSystem on HubGame {
     u.full = n >= u.cap;
     u.state = 1;
     u.t = 0;
-    u.dur = Cfg.deliverTime[u.region];
-    u.house = rnd.nextInt(6);
+    final m = RegionMap.of(u.region);
+    u.house = rnd.nextInt(m.courier.length);
+    u.dur = m.deliverSec(u.house);
     _planEvent(u);
   }
 
@@ -215,7 +217,7 @@ extension FleetSystem on HubGame {
       u.cargo = 0;
       u.state = 2;
       u.t = 0;
-      u.dur = Cfg.regionTrip[u.region] * 0.8;
+      u.dur = RegionMap.of(u.region).tripSec * 0.8;
     } else {
       final n = u.cargo;
       final unit = Cfg.parcelPay *
@@ -262,7 +264,7 @@ extension FleetSystem on HubGame {
       u.cargo = 0;
       u.state = 2;
       u.t = 0;
-      u.dur = Cfg.deliverTime[u.region] * 0.7;
+      u.dur = RegionMap.of(u.region).deliverSec(u.house) * 0.7;
     }
   }
 }

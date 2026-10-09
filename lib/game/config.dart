@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/building.dart';
 import '../models/mission.dart';
 import '../models/vehicle.dart';
+import 'region_map.dart';
 
 class Cfg {
   static const double tile = 32; // 한 칸 픽셀 (도트 에셋과 1:1)
@@ -121,13 +122,23 @@ class Cfg {
   static const int vipTip = 200;
   static const double vipPatience = 0.55; // VIP 인내심 배수
 
-  // ---- 배송 지역 (택배 색과 같은 순서) ----
-  static const List<String> regionName = ['동네', '시내', '근교', '타도시', '전국'];
-  static const List<int> regionUnlock = [0, 8000, 25000, 60000, 150000];
-  static const List<double> regionPay = [1.0, 1.3, 1.7, 2.2, 3.0]; // 수익 배수
+  // ---- 배송 지역: 같은 급의 서로 다른 지역 (이름·분위기만 다름). 명성으로 열고, 뒤에 열수록 지도가 크다 ----
+  // 지역 수를 바꾸려면 아래 목록들과 regionColor·regionFame 의 길이를 같이 맞춘다.
+  static const List<String> regionName = ['주택가', '상가', '항구', '산업단지', '신도시'];
+  static const List<String> regionStyle = ['residential', 'commercial', 'harbor', 'industrial', 'newtown'];
+  static const List<double> regionPay = [1.0, 1.0, 1.0, 1.0, 1.0]; // 같은 급이라 수익 배수 같음
+  // 지도 규격 (칸). 첫 지역 대비 마지막 지역 면적 약 3.4배
+  static const List<(int, int)> regionSize = [(28, 22), (34, 26), (42, 32), (47, 36), (52, 40)];
+  static const List<int> regionTowns = [3, 6, 10, 13, 16]; // 집이 들어서는 동네 블록 수
+  static const List<(int, int)> regionGrid = [(10, 7), (11, 7), (11, 7), (10, 7), (10, 8)]; // 큰길 간격
+  static const List<double> regionRoadCut = [0.10, 0.0, 0.15, 0.12, 0.0]; // 큰길을 빼는 확률 (모양 차이)
+  static const List<int> regionSea = [0, 0, 5, 0, 0]; // 위쪽 바다 폭 (항구)
+  static const List<int> regionTrunkTarget = [24, 40, 56, 72, 96]; // 간선 목표 길이(칸)
+  static const List<int> regionSeed = [11, 23, 37, 41, 53]; // 지도 모양 고정용
+  static const double trunkSecPerTile = 0.6; // 간선 1칸 달리는 시간(초)
+  static const double courierSecPerTile = 0.45; // 배달 길 1칸 달리는 시간(초)
 
   static const List<int> regionFame = [0, 60, 250, 800, 2000]; // 지역을 여는 데 필요한 명성
-  static const List<double> deliverTime = [8, 12, 16, 22, 28]; // 지역센터→동네 배달 구간(초)
 
   // ---- 차량(플릿) ----
   static const List<int> unitCost = [12000, 8000, 3000]; // Cfg.vehicles 순서
@@ -141,10 +152,11 @@ class Cfg {
   // 이벤트: 이름, 실패 시 지연(초)
   static const List<String> evtName = ['교통 정체', '폭우', '타이어 펑크', '분실 위험'];
   static const List<double> evtDelay = [6, 5, 8, 2];
-  static double evtChance(bool trunk, int region) => trunk ? 0.3 + 0.08 * region : 0.2;
+  /// 이벤트 확률: 간선이 길수록 조금 높음
+  static double evtChance(bool trunk, int region) =>
+      trunk ? 0.2 + RegionMap.of(region).trunkLen / 400 : 0.2;
   static double evtSuccess(int skill) => 0.3 + 0.12 * skill;
 
-  static const List<double> regionTrip = [15, 30, 50, 80, 120]; // 노선 지도에서 달리는 시간(초)
   static const List<double> waitOptions = [5, 15, 30];
 
   // ---- 접수량: 오직 ① 명성 구간 ② 달력 성수기 배수로만 늘어난다 ----
@@ -179,8 +191,10 @@ class Cfg {
   // ---- 배송 기한: 접수부터 배달 완료까지. 지역이 멀수록(운행 시간이 길수록) 길다 ----
   static const double deadlineBase = 240; // 게임 초
   static const double deadlinePerTrip = 2.5; // 노선 왕복 시간 1초당 추가
-  static double deadline(int region) =>
-      deadlineBase + deadlinePerTrip * (regionTrip[region] + deliverTime[region]);
+  static double deadline(int region) {
+    final m = RegionMap.of(region);
+    return deadlineBase + deadlinePerTrip * (m.tripSec + m.avgDeliverSec);
+  }
   static const int onTimeFame = 1; // 정시 1건당 명성
   static const int lateFame = 1; // 지각 1건당 명성 감소
   static const double latePay = 0.5; // 지각이면 수익 배수

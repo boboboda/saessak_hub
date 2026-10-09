@@ -954,5 +954,76 @@
       "size": 128,
       "view": "sidescroller"
     }
+  },
+  "map_tiles_water": {
+    "endpoint": "/create-tileset",
+    "note": "노선 지도 타일셋: 잔디 / 바다 (항구)",
+    "body": {
+      "lower_description": "soft green grass lawn, muted natural green, small darker tufts",
+      "upper_description": "calm deep blue sea water with small light wave highlights",
+      "transition_description": "grey concrete harbor quay edge",
+      "transition_size": 0.25,
+      "tile_size": {
+        "width": 32,
+        "height": 32
+      },
+      "view": "high top-down",
+      "outline": "lineless",
+      "detail": "medium detail",
+      "shading": "basic shading",
+      "lower_reference_image": {
+        "type": "base64",
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACO0lEQVR4nJ1Xu04DMRA8rBSJTlQgQUnBX/ER/BlfREEJElToFDrQRhlrMjdr+1jplPN5vZ59b66eX55+pw10XH6m2/ubafleTu+HeV9/mYfXQfP1fDqjVII5nuwyFhBPCIagAMIgQFgHPwiAVwAmQzjIWoQA1SDWqikIVtJvKwCHeV+FAKEzFfZZKwasQJyMz/evlZKFGTJteL8neJQgp4wwO9+pz0FqIV5roKYAVIiLaHxTXrUQrMOAOUt2DoAzM9JIrZHFi4LLAJeeefWiXpz0wOFbdcHBCOSsYMQKLPayGtIj3FF6TKyFS7XMIi1grFRxec1CICgTmJ1vuYrdUFqoQwiX25aw/1DILIjs7JLMzFkPafWWt9ePi74StMsKSaYZ0nFLNuDyh8e7KhsKF3dxy6ytPgFlNOe1CIEvqLBgpBUOwmQj5AoNqmDshfba3k8AtGfjl02m6BlYqzKqm9g6tRktdAA13hWcoMgIBZaV2NH0LryhJnOWGSEdvzQWQpEaA8fzx0wDDSAAa5me34PPTVKgAiQ6VOjQCeRbiePApW7h+S8e10I1cLRoZf52ZXzVjhdjnl4A6WSj1tNcZ/7gvWhGkyGA4JLJQtVKmgmtKskddtWMVINA6waRLBu2NKZaio8mC2IjLteg6w0fLnOy8wjugkt03nMjuJo2S8XMBRq4tR2P+K4n0GmtIxu/X/wvWM4LdkMrE9wsuGWWYCrZZewSZ2rNhhGyhYhLpdYAl8cMSGOkNyW7vT/lKvEwHRzTuQAAAABJRU5ErkJggg==",
+        "format": "png"
+      }
+    }
+  },
+  "prop_container": {
+    "endpoint": "/create-1-direction-object",
+    "note": "항구: 컨테이너",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single shipping container, corrugated metal, red or blue, side view",
+      "size": 64
+    }
+  },
+  "prop_crane": {
+    "endpoint": "/create-1-direction-object",
+    "note": "항구: 크레인",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single harbor gantry container crane, tall, yellow steel frame, side view",
+      "size": 128
+    }
+  },
+  "prop_boat": {
+    "endpoint": "/create-1-direction-object",
+    "note": "항구: 배",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single small cargo boat on water, side view, red hull, white cabin",
+      "size": 64
+    }
+  },
+  "prop_factory": {
+    "endpoint": "/create-1-direction-object",
+    "note": "산업단지: 공장",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single small factory building, saw-tooth roof, brick chimney with smoke, grey walls, roll-up door",
+      "size": 128
+    }
+  },
+  "prop_tank": {
+    "endpoint": "/create-1-direction-object",
+    "note": "산업단지: 저장 탱크",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single white cylindrical industrial storage tank with ladder",
+      "size": 64
+    }
+  },
+  "house_apt": {
+    "endpoint": "/create-1-direction-object",
+    "note": "신도시: 아파트 (배달지)",
+    "body": {
+      "description": "pixel art, black outline, front view, flat orthographic, no perspective, single modern tall apartment building, many windows, light beige walls, flat roof, entrance at bottom",
+      "size": 128
+    }
   }
 }

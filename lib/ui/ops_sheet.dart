@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/region_map.dart';
 import 'theme.dart';
 
 /// 운영 시트: 접수량·달력 / 수익 부스트 / 배송 지역 / 목표
@@ -51,7 +52,7 @@ class OpsSheet extends StatelessWidget {
           const SizedBox(height: 16),
           const Text('배송 지역', style: Tx.h2),
           const SizedBox(height: 4),
-          const Text('명성이 쌓이면 새 지역이 열리고 수익이 더 커져요', style: Tx.sub),
+          const Text('명성이 쌓이면 새 지역이 열려요. 뒤에 여는 지역일수록 지도가 넓고 집이 많아요', style: Tx.sub),
           const SizedBox(height: 8),
           for (var i = 0; i < Cfg.regionName.length; i++) ...[
             _region(i),
@@ -154,7 +155,9 @@ class OpsSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(Cfg.regionName[i], style: Tx.h2),
-                Text('수익 ×${Cfg.regionPay[i]}', style: Tx.sub),
+                Text(
+                    '지도 ${Cfg.regionSize[i].$1}×${Cfg.regionSize[i].$2} · 동네 ${Cfg.regionTowns[i]}곳 · 집 ${RegionMap.of(i).houses.length}채',
+                    style: Tx.sub),
               ],
             ),
           ),

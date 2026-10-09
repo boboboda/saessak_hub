@@ -265,5 +265,26 @@
   },
   "veh_van_driver_full": {
     "object_id": "bd7c4400-37c4-4609-8dd2-a0db41358683"
+  },
+  "map_tiles_water": {
+    "tileset_id": "fd557765-1e36-4fc6-a685-e8ee938b5c57"
+  },
+  "prop_container": {
+    "object_id": "8adf0235-1761-409e-8d7e-d1ed67096d29"
+  },
+  "prop_crane": {
+    "object_id": "ea304ec9-4ee1-4667-a8d1-250eb280f0b7"
+  },
+  "prop_boat": {
+    "object_id": "8e2b7eca-053d-4bcf-958c-c4a487cb8db3"
+  },
+  "prop_factory": {
+    "object_id": "464edc3d-4e12-4eae-ac28-71fa8f2ae2ad"
+  },
+  "prop_tank": {
+    "object_id": "29c66336-61f8-4cf9-bf63-e0d51899c787"
+  },
+  "house_apt": {
+    "object_id": "b74e828e-0df5-462b-bdca-33a4cb5a5986"
   }
 }

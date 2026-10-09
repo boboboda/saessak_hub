@@ -27,19 +27,20 @@ class Sprites {
   /// 노선 지도 Wang 타일 시트 (가로 16칸, 칸 번호 = NW*8+NE*4+SW*2+SE). 잔디/도로, 잔디/동네 길
   static ui.Image? wangRoad, wangWalk;
   static ui.Image? wangWalkOver; // 동네 길 시트에서 잔디만 투명하게 뺀 것 (차도 위에 겹쳐 그림)
+  static ui.Image? wangWater; // 잔디/바다 (항구)
 
   /// 노선 지도 지역 소품 (assets/sprites/map/prop_<이름>.png). 없는 건 빠짐
   static final Map<String, ui.Image> mapProps = {};
   static const List<String> mapPropNames = [
     'mailbox', 'vending', 'busstop', 'billboard', 'haystack', 'fence', 'crops', 'fountain', 'gas',
-    'hwsign',
+    'hwsign', 'container', 'crane', 'boat', 'factory', 'tank',
   ];
 
   /// 노선 지도 배달지 집 (assets/sprites/map/house_<이름>.png). d0~d11 단독주택, v0~v2 빌라
   static final Map<String, ui.Image> mapHouses = {};
   static const List<String> mapHouseNames = [
     'd0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9', 'd10', 'd11',
-    'v0', 'v1', 'v2',
+    'v0', 'v1', 'v2', 'apt',
   ];
 
   /// 배경 장식 도트 (assets/sprites/decor/<이름>.png). 없는 건 null.
@@ -86,6 +87,7 @@ class Sprites {
     wangRoad = await _img('assets/sprites/map/wang_road.png');
     wangWalk = await _img('assets/sprites/map/wang_walk.png');
     wangWalkOver = await _img('assets/sprites/map/wang_walk_over.png');
+    wangWater = await _img('assets/sprites/map/wang_water.png');
     for (final n in mapPropNames) {
       final im = await _img('assets/sprites/map/prop_$n.png');
       if (im != null) mapProps[n] = im;
