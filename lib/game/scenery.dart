@@ -21,6 +21,9 @@ class Scenery {
   ];
 
   /// 길 위에 서도 되는 장식 (가로등·신호등·벤치·표지판)
+  /// 서 있는 칸을 못 지나가는 장식 (직원·손님 길찾기에서 막음)
+  static const Set<String> solid = {'lamp', 'light', 'sign', 'tree', 'tree2', 'cone', 'pallet', 'bench'};
+
   static const Set<String> onPath = {'lamp', 'light', 'bench', 'sign'};
 
   static final List<Deco> items = _build();
@@ -67,16 +70,20 @@ class Scenery {
       out.add(Deco(rnd.nextBool() ? 'tree' : 'tree2', tx, 2.4 + rnd.nextDouble() * 0.8, 2));
     }
 
-    // 가로등: 큰길·왼쪽 길·도로 인도를 따라
+    // 가로등: 큰길·왼쪽 길·도로 인도를 따라. 걷는 길 위가 아니라 길 바로 옆 풀밭에 세움 (가로등 칸은 못 지나감)
+    void lamp(double x, double y) {
+      out.add(Deco('lamp', x, y, 1));
+      reserved.add(Rect.fromLTRB(x - 0.6, y - 1.2, x + 0.6, y + 0.3));
+    }
     for (var x = 4.0; x < Cfg.road.left; x += 6) {
-      out.add(Deco('lamp', x, 7.0, 1));
-      out.add(Deco('lamp', x, 30.0, 1));
+      lamp(x, 7.85);
+      lamp(x, 30.85);
     }
     for (var y = 12.0; y < 29; y += 6) {
-      out.add(Deco('lamp', 2.3, y, 1));
+      lamp(2.4, y);
     }
     for (var y = 3.0; y < Cfg.rows; y += 6) {
-      out.add(Deco('lamp', Cfg.road.right + 0.5, y, 1));
+      lamp(Cfg.road.right + 0.5, y); // 오른쪽 인도의 차도 쪽 끝 (행인은 안쪽으로 걸음)
     }
     // 신호등 + 표지판: 도로 횡단보도 옆
     out.add(Deco('light', Cfg.road.left - 0.4, 7.0, 1));

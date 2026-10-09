@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/scenery.dart';
 import '../models/models.dart';
 
 /// 직원 통로와 길찾기.
@@ -101,6 +102,13 @@ extension PathSystem on HubGame {
         final p = Offset(i + 0.5, j + 0.5);
         if (a.contains(p) || y.contains(p)) walkGrid[tileKey(i, j)] = true;
       }
+    }
+    // 가로등·나무 같은 장식이 서 있는 칸 (마당 등 걸을 수 있는 곳에 있으면 막음)
+    for (final d in Scenery.items) {
+      if (!Scenery.solid.contains(d.key)) continue;
+      if (a.inflate(0.6).contains(Offset(d.x, d.y - 0.3))) continue; // 창고에 덮여 안 보이는 장식
+      final k = tileKey(d.x.floor(), (d.y - 0.05).floor());
+      if (k >= 0 && k < walkGrid.length) walkGrid[k] = false;
     }
     for (final b in buildings) {
       for (var j = b.ty; j < b.ty + b.type.h; j++) {
