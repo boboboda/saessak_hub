@@ -140,7 +140,7 @@ extension FleetSystem on HubGame {
     final ok = rnd.nextDouble() < Cfg.evtSuccess(u.skill);
     u.evtKind = k;
     u.evtOk = ok;
-    u.evtT = 4;
+    u.evtT = Cfg.evtShow;
     final who = '${u.driver}(${Cfg.skillName[u.skill]})';
     if (ok) {
       fame += 1;
@@ -162,6 +162,23 @@ extension FleetSystem on HubGame {
       u.evtText = '${Cfg.evtName[k]}… 대응 실패';
       note('$who ${Cfg.evtName[k]} 대응 실패 +${Cfg.evtDelay[k].round()}초 지연$extra', 0xFFE5484D);
     }
+  }
+
+  /// (디버그) 달리는 차량 하나에 사건을 일으킴: 정체·폭우·펑크·분실 실패 → 성공 차례로. 일으켰으면 true
+  bool debugRouteEvent(int n) {
+    var list = fleet.where((u) => u.state == 1 || u.state == 2).toList();
+    if (list.isEmpty) list = fleet.toList(); // 달리는 차가 없으면 서 있는 차에
+    if (list.isEmpty) return false;
+    final u = list[n % list.length];
+    final k = n % 5;
+    u.evtDone = true;
+    u.evtKind = k % 4;
+    u.evtOk = k == 4;
+    u.evtT = Cfg.evtShow;
+    u.evtText = '${Cfg.evtName[u.evtKind]}${u.evtOk ? '! 대응 성공' : '… 대응 실패'}';
+    mapSel = u.region;
+    mapFollow = u.id; // 노선 지도를 열면 이 차량을 따라감
+    return true;
   }
 
   void updateFleet(double d) {

@@ -1113,6 +1113,17 @@ class _MapPainter extends CustomPainter {
       final h = w * img.height / img.width;
       final dst = Rect.fromLTWH(foot.dx - w / 2, foot.dy - h, w, h);
       c.save();
+      final age = u.evtT > 0 ? Cfg.evtShow - u.evtT : 99.0; // 사건이 난 뒤 지난 시간
+      if (age < 0.6) {
+        c.translate(sin(age * 60) * t * 0.08 * (1 - age / 0.6), 0); // 덜컹
+      }
+      if (u.evtT > 0 && !u.evtOk && u.evtKind == 2) {
+        // 펑크: 뒷바퀴 쪽으로 주저앉음
+        final k = min(1.0, age / 0.3);
+        c.translate(foot.dx, foot.dy);
+        c.rotate((right ? 1 : -1) * 0.09 * k);
+        c.translate(-foot.dx, -foot.dy);
+      }
       if (!right) {
         c.translate(foot.dx, 0);
         c.scale(-1, 1);
@@ -1147,6 +1158,7 @@ class _MapPainter extends CustomPainter {
           Paint()..color = const Color(0xCC1E1B2E));
       _label(c, '${u.cargo}', tag.center, t * 0.36, Colors.white);
     }
+    if (u.evtT > 0) _evtFx(c, u, foot, top, w, right);
     // 정체·펑크는 라바콘
     if (u.evtT > 0 && !u.evtOk && (u.evtKind == 0 || u.evtKind == 2)) {
       final cone = Sprites.decor['cone'];
@@ -1168,8 +1180,19 @@ class _MapPainter extends CustomPainter {
             style: TextStyle(color: Colors.white, fontSize: t * 0.42, fontWeight: FontWeight.w800)),
         textDirection: TextDirection.ltr,
       )..layout();
+      // 처음 0.25초는 커지며 튀어나오고(살짝 넘침), 마지막 0.5초는 위로 떠오르며 사라짐
+      final age = Cfg.evtShow - u.evtT;
+      final pop = age < 0.25 ? Curves.easeOutBack.transform(age / 0.25) : 1.0;
+      final fade = u.evtT < 0.5 ? (u.evtT / 0.5).clamp(0.0, 1.0) : 1.0;
+      final lift = (1 - fade) * t * 0.6;
+      c.save();
+      final anchor = Offset(foot.dx, top - t * 0.5 - lift);
+      c.translate(anchor.dx, anchor.dy);
+      c.scale(pop, pop);
+      c.translate(-anchor.dx, -anchor.dy);
+      c.saveLayer(null, Paint()..color = Color.fromRGBO(0, 0, 0, fade));
       final r = Rect.fromCenter(
-          center: Offset(foot.dx, top - t * 0.95),
+          center: Offset(foot.dx, top - t * 0.95 - lift),
           width: tp.width + t * 0.6,
           height: tp.height + t * 0.3);
       final bubble = Path()
@@ -1179,7 +1202,105 @@ class _MapPainter extends CustomPainter {
         ..lineTo(foot.dx + t * 0.15, r.bottom);
       c.drawPath(bubble, Paint()..color = col);
       tp.paint(c, Offset(r.left + t * 0.3, r.top + t * 0.15));
+      c.restore();
+      c.restore();
     }
+  }
+
+  /// 노선 사건 연출 (evtT: Cfg.evtShow → 0). 성공은 반짝임, 실패는 종류별
+  void _evtFx(Canvas c, FleetUnit u, Offset foot, double top, double w, bool right) {
+    final age = Cfg.evtShow - u.evtT;
+    final back = right ? -1.0 : 1.0; // 차 뒤쪽 방향
+    if (u.evtOk) {
+      // 성공: 별 8개가 퍼지며 사라짐
+      if (age > 1.2) return;
+      final k = age / 1.2;
+      final p = Paint()..color = Color.fromRGBO(255, 214, 102, 1 - k);
+      final ctr = Offset(foot.dx, (foot.dy + top) / 2);
+      for (var i = 0; i < 8; i++) {
+        final a = i * pi / 4 + 0.3;
+        final q = ctr + Offset(cos(a), sin(a)) * (w * 0.3 + k * t * 1.2);
+        _star(c, q, t * 0.14 * (1 - k * 0.5), p);
+      }
+      return;
+    }
+    switch (u.evtKind) {
+      case 0: // 정체: 앞에 막힌 차 2대 + 빵! + 브레이크등
+        final cars = Sprites.roadCars;
+        for (var i = 0; i < 2 && cars.isNotEmpty; i++) {
+          final img = cars[(u.id + i) % cars.length];
+          final cw = t * 1.1, chh = cw * img.height / img.width;
+          final x = foot.dx - back * (w * 0.6 + t * 0.7 + i * t * 1.2);
+          c.drawImageRect(img, Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+              Rect.fromLTWH(x - cw / 2, foot.dy - chh, cw, chh),
+              Paint()
+                ..filterQuality = FilterQuality.none
+                ..color = const Color(0xCCFFFFFF));
+        }
+        if (sin(g.clock * 8) > 0) {
+          c.drawCircle(Offset(foot.dx + back * w * 0.5, foot.dy - t * 0.25), t * 0.12, Paint()..color = const Color(0xCCFF3B30));
+        }
+        final h = (age * 1.5) % 1.0; // 0.7초마다 '빵!'
+        if (h < 0.5) {
+          _label(c, '빵!', Offset(foot.dx - back * w * 0.9, top - t * 0.2 - h * t * 0.6), t * 0.4,
+              Color.fromRGBO(255, 255, 255, 1 - h * 2));
+        }
+        break;
+      case 1: // 폭우: 바퀴 밑 물 튀김
+        for (var i = 0; i < 3; i++) {
+          final ph = (g.clock * 2.5 + i / 3) % 1.0;
+          c.drawOval(
+              Rect.fromCenter(
+                  center: foot.translate((i - 1) * w * 0.35, -t * 0.02),
+                  width: t * (0.3 + ph * 0.6),
+                  height: t * (0.1 + ph * 0.2)),
+              Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1.5
+                ..color = Color.fromRGBO(191, 216, 255, 0.8 * (1 - ph)));
+        }
+        break;
+      case 2: // 펑크: 뒤에서 회색 연기가 피어오름
+        for (var i = 0; i < 4; i++) {
+          final ph = (g.clock * 0.9 + i / 4) % 1.0;
+          final q = Offset(foot.dx + back * w * 0.45 + back * ph * t * 0.4, foot.dy - t * 0.3 - ph * t * 1.2);
+          c.drawCircle(q, t * (0.12 + ph * 0.25), Paint()..color = Color.fromRGBO(150, 150, 160, 0.55 * (1 - ph)));
+        }
+        break;
+      case 3: // 분실: 상자 하나가 뒤로 떨어져 튕기다 사라짐
+        final box = Sprites.box;
+        if (box == null || age > 2.2) break;
+        final k = (age / 1.4).clamp(0.0, 1.0);
+        final x = foot.dx + back * (w * 0.4 + k * t * 1.6);
+        final bounce = sin(k * pi * 3).abs() * t * (1.0 - k) * 1.1;
+        final alpha = age < 1.4 ? 1.0 : (1 - (age - 1.4) / 0.8).clamp(0.0, 1.0);
+        final bs = t * 0.5;
+        c.save();
+        c.translate(x, foot.dy - bs / 2 - bounce);
+        c.rotate(k * 4 * back);
+        c.drawImageRect(box, Rect.fromLTWH(0, 0, box.width.toDouble(), box.height.toDouble()),
+            Rect.fromCenter(center: Offset.zero, width: bs, height: bs),
+            Paint()
+              ..filterQuality = FilterQuality.none
+              ..color = Color.fromRGBO(255, 255, 255, alpha));
+        c.restore();
+        break;
+    }
+  }
+
+  /// 작은 네 갈래 별
+  void _star(Canvas c, Offset p, double r, Paint paint) {
+    final path = Path()
+      ..moveTo(p.dx, p.dy - r)
+      ..lineTo(p.dx + r * 0.3, p.dy - r * 0.3)
+      ..lineTo(p.dx + r, p.dy)
+      ..lineTo(p.dx + r * 0.3, p.dy + r * 0.3)
+      ..lineTo(p.dx, p.dy + r)
+      ..lineTo(p.dx - r * 0.3, p.dy + r * 0.3)
+      ..lineTo(p.dx - r, p.dy)
+      ..lineTo(p.dx - r * 0.3, p.dy - r * 0.3)
+      ..close();
+    c.drawPath(path, paint);
   }
 
   /// 차량이 지금 가는 방향의 좌우 성분 (오른쪽 +, 왼쪽 -)

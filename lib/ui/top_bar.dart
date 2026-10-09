@@ -87,7 +87,10 @@ class TopBar extends StatelessWidget {
                                         case 11:
                       g.rp += 1000;
                       break;
-                                                            case 16:
+                                                            case 17:
+                      if (!g.debugRouteEvent(g.debugStory++)) g.showToast('달리는 차량이 없어요');
+                      break;
+                    case 16:
                       // 실패 엽서 미리보기 (파손 → 지연 차례로)
                       g.postcard = StoryResult(g.debugStory % Cfg.storyDefs.length, false, 1 + g.debugStory++ % 2, false, 0, 0);
                       break;
@@ -180,6 +183,10 @@ class TopBar extends StatelessWidget {
                     child: Text('회사 등급 +1', style: Tx.body),
                   ),
                                     PopupMenuItem(
+                    value: 17,
+                    child: Text('노선 사건 일으키기 (차례로)', style: Tx.body),
+                  ),
+                  PopupMenuItem(
                     value: 16,
                     child: Text('실패 엽서 보기 (파손·지연)', style: Tx.body),
                   ),

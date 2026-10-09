@@ -212,6 +212,7 @@ class Cfg {
   // 이벤트: 이름, 실패 시 지연(초)
   static const List<String> evtName = ['교통 정체', '폭우', '타이어 펑크', '분실 위험'];
   static const List<double> evtDelay = [6, 5, 8, 2];
+  static const double evtShow = 4; // 노선 사건 말풍선·연출 시간(초)
   /// 이벤트 확률: 간선이 길수록 조금 높음
   static double evtChance(bool trunk, int region) =>
       trunk ? 0.2 + RegionMap.of(region).trunkLen / 400 : 0.2;
