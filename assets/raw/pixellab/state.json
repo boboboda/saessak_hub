@@ -335,5 +335,14 @@
   },
   "dock_truck_full": {
     "object_id": "cebbb489-3ea0-4069-9d4b-35c8c374ca89"
+  },
+  "hub_shelf_front": {
+    "object_id": "b0a956c5-a42d-4eb1-85dd-66ee86fe6b0c"
+  },
+  "hub_shelf_front2": {
+    "object_id": "8c6e6f03-f5fe-45b7-b361-76bd9af91049"
+  },
+  "hub_shelf_front3": {
+    "object_id": "6ad562b0-fd0c-486f-a6f4-f9c74b0f6193"
   }
 }

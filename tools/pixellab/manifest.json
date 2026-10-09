@@ -1224,5 +1224,36 @@
         }
       ]
     }
+  },
+  "hub_shelf_front": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 선반: 정면·대칭 (2x3)",
+    "body": {
+      "description": "pixel art, black outline, front view, straight on, symmetrical, flat orthographic, no perspective, no diagonal, same style as reference, game asset, empty tall blue metal warehouse storage shelf rack with two vertical posts on the left and right and three horizontal empty shelf boards, nothing on the shelves, taller than wide, centered",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEw0lEQVR4nO2abWgcRRiA351OtrmLvcYmXjB+Nb3aix9ojUhJfgSraAnWf0UtEUpVsAaL338EkYL2h0WqqGmFpqHQUpEqaPqnRIqklNgfaVo9JU2NFUz9aDWG09xdLtdbmTlnb3Zu9iP3kUt394EwMzvvvO87czPvu7tZAB8fHx8f76KAy0CKoln1ZzVNce0CIEXR3t/7oaXMC9ueNywCBpcxNjEB3wwOSvu6H+4ouIbA42BwIeyXntDqhJ6ZAlkFPBQAzQKhayEL8sZbOzSrhUHgcXC5ttXVuuWw3eSfe+2lko3s2bVbW6yLgO0ExmK/gJtBcBXTuiZCA5zszxP3AePnf4JvD70OmUwGop0b4NzQMXq9bcs7ukz4ukb3LACS/LKRjgf1+k1331ogS+79HS0AKkO0t6Ic+kdiMYiduaC3tzz5KJw6eojW123shu9ODOt9Bw4O6PXmSAM81N5hsM+CMmbOHf/gKagPNUIwkIFEEgPGGO7q3gnlgmxVglqTovqdQv2JJ6Dtmb3S/tnpf2k5dPBjqEHyRLNiWYiWZI6MB7bvp5lJ96S5qR4S8Tgk5nLtDOQGWTH925her7++1VL20s8TeYeargWnMH+cMJfVTBeBUR9QYTqZ1tuYVSbPXxSUTdlOnp/0xR9Pww2r20zlrSY99cfflrZQSHyoyfP9rxlD+45m892Vjc/AVHzGoA87cbDS2NkOhoKmfa/u+bwkO9hqwOl920zPHmE9twNISiJ/Mg6/shEqAR/oigXbbcOv3n7c0A6vjNC8y+daRuyTNyF7ZQ7+nPq9cOtJ9Nv98mwMP/bOtS25a//ELcca9PwvS85+dr5HIChsv9bHdkqDIHXuiR20HPv0ZRq5dQIqFIPo074DfcXpCS3PB/qAapgTths8emocEvmgSVnftcnQbgjOQSQSofUjn30BJ0+M632p9BWI3myfUewCX+/WTujZtRuK5aNnu4w/itMjEL3tRhg9O2k4z5vfPWJqqG+78by333cLlArZuq1tq6EXAHr6h3Q7ZHHNSKKAHiDJ5Fdcs0RPf3waVAw3Qg63Kq/ADKe65oMTu059IsE9y98IrYk2OVYUhupQDrtLw6sMbcwqXx4+CYsVTc3FAyU9U7IOgDPyBdDUugID+UHOkTlZjB6RWnUJpKDOkZwMFi/EfkV8WlOhog+FRZHm3t7b+cfL8vLidfY0qPAXySIcvT+gt0M14Do6B5PW/xtc25LbZvu/vlxxZ3rac2/keoezC2IrtbSBJEjDdSwK1s7+pddffPreijn0Xt+Iob2Qtniw3eD0D6Pl9gfU2++pui3Tt8Ipuk3cCdndYhBF4HEQeAiyu8V0iMBD+EdAAuIbi/EusNzYHoFa7j7AbcgyHBJXx81pUAYCj4O8FgNEEHgcBB4HF/sUVRLDI1WxJctwivhCZHJrIxUk2YAfwGcH1j+fFMrrE3VXGmaPlKv6L0NKy88bmw3gS7N+p9dl/aIsvzh826luEXGx2fjcjVA+2CviQLILSDbYEK4FNzFwaZaW4ud6WBQkAmlF0boeWQfJC+cWzMFAS5SWzGZTSzPEYVmBHO8TGUParDTTQxjoH5V+sKnInKn090LVYrF+rOnj4+Pj4wPV4T9tFdM+mRCyHAAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "hub_shelf_front2": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 선반 2차: 평면 정면",
+    "body": {
+      "description": "pixel art, black outline, flat 2D front elevation view, straight on, perfectly symmetrical left and right, perfectly horizontal straight shelf boards, no perspective, no depth, no diagonal lines, game asset, empty tall blue metal warehouse storage shelf rack, two vertical blue posts on the left and right edges, three horizontal empty shelf boards evenly spaced, small feet at the bottom, nothing on the shelves, taller than wide",
+      "size": 64,
+      "view": "sidescroller"
+    }
+  },
+  "hub_shelf_front3": {
+    "endpoint": "/create-1-direction-object",
+    "note": "허브 선반 3차: 평면 정면, 넓게",
+    "body": {
+      "description": "pixel art, black outline, flat 2D front elevation view, straight on, perfectly symmetrical left and right, perfectly horizontal straight shelf boards, no perspective, no depth, no diagonal lines, game asset, wide empty blue metal warehouse storage shelf rack as wide as it is tall, square proportions, long horizontal shelf boards spanning the full width, two vertical blue posts at the far left and far right edges, three empty shelf levels evenly spaced, small feet at the bottom, nothing on the shelves",
+      "size": 64,
+      "view": "sidescroller"
+    }
   }
 }

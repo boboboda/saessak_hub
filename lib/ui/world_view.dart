@@ -462,17 +462,13 @@ extension WorldView on HubGame {
         case 'pack':
           break; // 상자·진행 막대는 직원 뒤에 다시 그림 (_drawPackContent)
         case 'shelf':
-          // 들어온 택배 수만큼 선반 칸에 상자가 쌓임 (아래 칸부터)
           // 들어온 택배 수만큼 선반 판 위에 상자가 쌓임 (아래 판부터). 수량 표시는 선반 위 빈칸에
           final sh = Sprites.forBuilding('shelf');
           if (sh != null && Sprites.boxS != null) {
             final d = Sprites.fitBottom(sh, r);
             final k = d.width / sh.width;
-            const tierBase = [
-              48.0,
-              31.0,
-              14.0,
-            ]; // 각 판 위 상자 바닥 (그림 기준 픽셀, hub_shelf)
+            // 각 판 윗면 = 상자 바닥 (그림 기준 픽셀, 정면 선반 hub_shelf 62x57)
+            const tierBase = [47.0, 27.0, 7.0];
             const perTier = 4;
             final slots = (b.stored / b.cap * perTier * 3).ceil().clamp(
               0,
