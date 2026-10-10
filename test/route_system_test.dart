@@ -39,7 +39,7 @@ void main() {
     }
     expect(g.rs.policeN, greaterThan(10));
     expect(g.money, lessThan(1000000));
-    expect(u.wear, greaterThan(100));
+    expect(u.wear, Cfg.wearMax);
   });
 
   test('단골 집: 같은 집에 배달하면 하트가 쌓여 단골이 되고 팁이 붙음', () {
@@ -137,5 +137,28 @@ void main() {
     expect(Cfg.evtSuccess(5), closeTo(0.65, 1e-9));
     final g = HubGame();
     expect(g.tvChance, lessThanOrEqualTo(0.7));
+  });
+
+  test('차량 지역을 옮기면 지정 집·구역이 비워지고, 과적 무리는 상한이 있고 정량 운행으로 회복', () {
+    final g = HubGame();
+    g.regionOpen[1] = true;
+    final u = g.makeUnit(2, 0);
+    g.makeUnit(2, 0);
+    g.toggleHome(u, 2);
+    u.zone = 1;
+    g.cycleRegion(u);
+    expect(u.region, 1);
+    expect(u.homes, isEmpty);
+    expect(u.zone, -1);
+    u.loadIdx = 3;
+    for (var i = 0; i < 100; i++) {
+      u.cargo = 5;
+      g.checkPolice(u);
+    }
+    expect(u.wear, Cfg.wearMax);
+    u.loadIdx = 1;
+    u.cargo = 5;
+    g.checkPolice(u);
+    expect(u.wear, Cfg.wearMax - 1);
   });
 }

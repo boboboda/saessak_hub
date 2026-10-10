@@ -333,6 +333,7 @@ void main() {
         '명성 ${g.fame} · 등급 ${Cfg.corpName[g.companyGrade]} · 창고 ${Cfg.areaName[g.areaLevel]} · 지역 ${g.openRegions}\n'
         '직원 ${g.staff.length} · 건물 ${g.buildings.length} · 차량 ${g.fleet.length} · 연구 ${g.researched.length}/${Cfg.research.length}\n'
         '누적 접수 ${g.done} · 놓침 ${g.lost} · 배송 ${g.delivered} · 업적 ${g.claimed.length}/${Cfg.missions.length} · 대상 ${g.awardWins} · 최고순위 ${g.bestRank}\n'
-        '도감 ${(g.bookPct * 100).round()}% · 사연 완료 ${g.rt.storyDone.length}/${Cfg.storyDefs.length}');
+        '도감 ${(g.bookPct * 100).round()}% · 사연 완료 ${g.rt.storyDone.length}/${Cfg.storyDefs.length}\n'
+        '노선: 정시 ${g.onTimeCount} · 지각 ${g.lateCount} · 의뢰 완료 ${g.rs.reqDone} · 단속 ${g.rs.policeN} · 평판 ${g.rs.rep} · 단골 ${[for (var r = 0; r < 5; r++) g.regularCount(r)]}');
   }, timeout: Timeout.none);
 }

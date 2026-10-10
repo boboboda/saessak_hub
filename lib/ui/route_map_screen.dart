@@ -107,7 +107,11 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     for (final u in g.fleet) {
       if (u.id == cam.pick && u.region == sel && !u.isTrunk) pk = u;
     }
-    if (pk != null) {
+    var nearUnit = false; // 차량을 누른 거면 집보다 차량을 고름
+    for (final (_, pos) in _MapPainter.units(g, sel)) {
+      if ((tile - pos.translate(0, -0.3)).distance < 0.8) nearUnit = true;
+    }
+    if (pk != null && !nearUnit) {
       final l = _MapPainter.layout(sel);
       int? hk;
       var hd = 1.4;

@@ -95,6 +95,8 @@ extension FleetSystem on HubGame {
       final r = (u.region + k) % regionOpen.length;
       if (regionOpen[r]) {
         u.region = r;
+        u.homes.clear(); // 집 번호·구역은 지역마다 달라서 비움
+        u.zone = -1;
         break;
       }
     }

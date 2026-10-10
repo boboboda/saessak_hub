@@ -36,6 +36,7 @@ class RouteState {
   int reqDone = 0;
   int weather = 0, tomorrow = 0; // 오늘·내일 날씨
   int policeN = 0, breakN = 0; // 기록 (단속·과적 파손)
+  final List<int> today = List.filled(5, 0), yday = List.filled(5, 0); // 지역별 오늘·어제 배달 수 (의뢰 크기)
 
   Map<String, dynamic> toJson() => {
         'h': [for (final m in hearts) m.map((k, v) => MapEntry('$k', v))],
@@ -47,6 +48,7 @@ class RouteState {
         'tw': tomorrow,
         'pn': policeN,
         'bn': breakN,
+        'yd': yday,
       };
 
   void load(Map<String, dynamic> j) {
@@ -74,6 +76,10 @@ class RouteState {
     tomorrow = (j['tw'] as int?) ?? 0;
     policeN = (j['pn'] as int?) ?? 0;
     breakN = (j['bn'] as int?) ?? 0;
+    final yd = j['yd'] as List?;
+    for (var i = 0; yd != null && i < yd.length && i < 5; i++) {
+      yday[i] = yd[i] as int;
+    }
   }
 }
 
@@ -189,6 +195,10 @@ extension RouteSystem on HubGame {
 
   /// 하루가 바뀔 때: 날씨 넘기고 내일 예보, 기한 지난 의뢰 정리, 새 의뢰, 차량 무리 회복
   void routeNewDay() {
+    for (var i = 0; i < 5; i++) {
+      rs.yday[i] = rs.today[i];
+      rs.today[i] = 0;
+    }
     rs.weather = rs.tomorrow;
     rs.tomorrow = _rollWeather(day + 1);
     if (rs.weather != 0) {
@@ -214,11 +224,13 @@ extension RouteSystem on HubGame {
       if (kind == 3 && regularCount(r) == 0) kind = 0;
       if (rs.reqs.any((q) => q.kind == kind && q.region == r)) continue;
       final lv = repLv(r);
+      // 의뢰 크기: 그 지역 어제 배달 수 기준 (기한 2일). 막 연 지역도 해낼 만하게
+      final base = max(6, rs.yday[r]);
       final need = switch (kind) {
-        0 => 15 + 5 * lv + rnd.nextInt(10),
-        1 => 6 + 2 * lv + rnd.nextInt(5),
-        2 => 8 + 2 * lv + rnd.nextInt(6),
-        _ => 3 + lv,
+        0 => (base * (1.1 + 0.1 * lv) + rnd.nextInt(5)).round().clamp(6, 80),
+        1 => (base * 0.4 + rnd.nextInt(3)).round().clamp(3, 30),
+        2 => (base * 0.5 + rnd.nextInt(3)).round().clamp(3, 40),
+        _ => 2 + lv,
       };
       final k = (1 + 0.3 * lv) * (hasFac(r, 3) ? 1.3 : 1.0) * Cfg.regionPayMul[r];
       final reward = ((need * 120 * k) / 100).round() * 100;
@@ -270,8 +282,12 @@ extension RouteSystem on HubGame {
 
   /// 출발할 때 과적 단속 (벌금) 확인
   void checkPolice(FleetUnit u) {
-    if (!u.overloaded || u.cargo <= 0) return;
-    u.wear += u.loadIdx == 3 ? 3 : 1;
+    if (u.cargo <= 0) return;
+    if (!u.overloaded) {
+      u.wear = max(0, u.wear - 1); // 무리 안 한 운행은 조금씩 회복
+      return;
+    }
+    u.wear = min(Cfg.wearMax, u.wear + (u.loadIdx == 3 ? 3 : 1));
     final p = Cfg.loadPolice[u.loadIdx] * Cfg.regionPolice[u.region] * (u.trait == 4 ? 0.5 : 1.0);
     if (rnd.nextDouble() >= p) return;
     final fine = Cfg.policeFinePer * u.cargo;
@@ -314,6 +330,7 @@ extension RouteSystem on HubGame {
     // 평판·의뢰
     final lv0 = repLv(r);
     rs.rep[r] += ok;
+    rs.today[r] += n;
     if (repLv(r) > lv0) {
       note('${Cfg.regionName[r]} 평판 상승: ${Cfg.repName[repLv(r)]} (수익 +${(Cfg.repPay * repLv(r) * 100).round()}%)', 0xFF3FB27F);
       showToast('${Cfg.regionName[r]} 평판 ${Cfg.repName[repLv(r)]}!');

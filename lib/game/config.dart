@@ -224,6 +224,7 @@ class Cfg {
   static const List<double> loadPolice = [0, 0, 0.08, 0.22]; // 출발 때 단속 확률
   static const List<double> loadBreak = [0, 0, 0.03, 0.07]; // 배달할 때 택배 하나가 파손될 확률
   static const int policeFinePer = 40; // 단속 벌금: 실은 택배 1건당
+  static const int wearMax = 30; // 차량 무리 최대 (사건 확률 +30%까지)
 
   // ---- 단골 집: 같은 집에 배달할수록 하트, 단계마다 팁 ----
   static const List<int> heartNeed = [8, 30, 80]; // 단골 Lv1·2·3
