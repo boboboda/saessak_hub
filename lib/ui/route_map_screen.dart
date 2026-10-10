@@ -9,6 +9,7 @@ import '../game/region_map.dart';
 import '../game/sprites.dart';
 import '../models/models.dart';
 import 'fleet_widgets.dart';
+import 'route_widgets.dart';
 import 'theme.dart';
 
 /// 전체화면 노선 지도. 한 번에 한 지역만 보여 준다: 허브 → (도로) → 지역센터 → 동네 집들.
@@ -55,6 +56,12 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     const T = _MapPainter.T;
     final l = _MapPainter.layout(sel);
     final half = Offset(v.width / 2, v.height / 2);
+    // 고를 사건이 생기면 그 차량으로 카메라를 옮김
+    final pe = g.pendingEvt;
+    if (pe != null && pe.region == sel && cam.follow != pe.id) {
+      cam.follow = pe.id;
+      cam.pick = pe.id;
+    }
     if (cam.reset) {
       // 처음 들어올 때·지역을 바꿀 때: 허브와 출발 도로가 보이게
       cam.reset = false;
@@ -119,7 +126,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     final img = unitImage(unit.type, full: unit.state == 1 && unit.cargo > 0);
     final following = cam.follow == unit.id;
     return Container(
-      width: 230,
+      width: 270,
       padding: const EdgeInsets.fromLTRB(8, 6, 6, 6),
       decoration: BoxDecoration(
         color: const Color(0xF2FFF6DE),
@@ -129,62 +136,70 @@ class _RouteMapScreenState extends State<RouteMapScreen>
           BoxShadow(color: Color(0x55000000), offset: Offset(0, 3)),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 44,
-            height: 34,
-            child: img == null
-                ? const SizedBox()
-                : RawImage(
-                    image: img,
-                    fit: BoxFit.contain,
-                    filterQuality: FilterQuality.none,
+          Row(
+            children: [
+              SizedBox(
+                width: 44,
+                height: 34,
+                child: img == null
+                    ? const SizedBox()
+                    : RawImage(
+                        image: img,
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.none,
+                      ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${unit.driver} · ${Cfg.skillName[unit.skill]}',
+                      style: const TextStyle(
+                        color: C.text,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      '${skillStars(unit.skill)}  ${unit.name} Lv.${unit.level}',
+                      style: const TextStyle(color: C.gold, fontSize: 10),
+                    ),
+                    Text(
+                      unitState(unit),
+                      style: const TextStyle(color: C.sub, fontSize: 10),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () => setState(() {
+                  cam.follow = following ? null : unit.id;
+                  cam.vel = Offset.zero;
+                }),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: following ? C.accent : C.line,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${unit.driver} · ${Cfg.skillName[unit.skill]}',
-                  style: const TextStyle(
+                  child: const Icon(
+                    Icons.my_location,
+                    size: 16,
                     color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
-                Text(
-                  '${skillStars(unit.skill)}  ${unit.name} Lv.${unit.level}',
-                  style: const TextStyle(color: C.gold, fontSize: 10),
-                ),
-                Text(
-                  unitState(unit),
-                  style: const TextStyle(color: C.sub, fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => setState(() {
-              cam.follow = following ? null : unit.id;
-              cam.vel = Offset.zero;
-            }),
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: following ? C.accent : C.line,
-                borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.my_location,
-                size: 16,
-                color: Colors.white,
-              ),
-            ),
+            ],
           ),
+          const SizedBox(height: 4),
+          UnitRouteControls(g, unit),
         ],
       ),
     );
@@ -363,7 +378,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
                 Expanded(
                   child: Text(
                     g.regionOpen[sel]
-                        ? '${Cfg.regionName[sel]} 노선 설정 · 차량 $n대 · 출발 대기 ${rt.wait.round()}초'
+                        ? '${Cfg.regionName[sel]} · ${Cfg.weatherName[g.rs.weather]} · 의뢰 ${g.rs.reqs.length} · 평판 ${g.repLv(sel) == 0 ? '☆' : '★' * g.repLv(sel)} · 차량 $n대'
                         : '${Cfg.regionName[sel]} · 아직 닫힌 지역',
                     style: Tx.h2.copyWith(fontSize: 12),
                     maxLines: 1,
@@ -488,9 +503,20 @@ class _RouteMapScreenState extends State<RouteMapScreen>
           ),
         // 지도 칸 안의 아래쪽 (화면 맨 아래가 아니라서 시스템 바·화면 탭 여백은 안 씀)
         Positioned(left: 8, bottom: 8, child: _camButtons()),
-        Positioned(right: 8 + 112 + 6, bottom: 8, child: _zoomButtons()), // 미니맵 왼쪽
-        if (open && cam.pick != null)
+        Positioned(
+          right: 8 + 112 + 6,
+          bottom: 8,
+          child: _zoomButtons(),
+        ), // 미니맵 왼쪽
+        if (open && cam.pick != null && g.pendingEvt == null)
           Positioned(left: 8, top: 40, child: _unitInfo()),
+        if (open && g.pendingEvt != null && g.pendingEvt!.region == sel)
+          Positioned(
+            left: 8,
+            right: 8,
+            top: 40,
+            child: RouteEvtChoice(g, g.pendingEvt!),
+          ),
         Positioned(right: 8, bottom: 8, child: _miniMap()),
         if (!open)
           Positioned.fill(
@@ -736,6 +762,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     return ListView(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
       children: [
+        RoutePanelExtras(g, sel),
         CardBox(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1013,8 +1040,11 @@ class _MapPainter extends CustomPainter {
       _crosswalks(c);
     }
 
-    // 2) 세워진 것들을 아래쪽 순서대로 그림 (앞에 있는 게 위에 오도록). 화면 밖은 건너뜀
+    // 1-2) 구역: 배달 집 앞 바닥에 구역 색 동그라미 (고른 차량이 맡은 구역은 진하게)
     final cull = view.inflate(3);
+    if (open) _zoneRings(c, cull);
+
+    // 2) 세워진 것들을 아래쪽 순서대로 그림 (앞에 있는 게 위에 오도록). 화면 밖은 건너뜀
     final items = <_Item>[];
     for (final d in l.decor) {
       if (cull.contains(Offset(d.x, d.y)))
@@ -1045,11 +1075,115 @@ class _MapPainter extends CustomPainter {
     for (final it in items) {
       it.draw(c);
     }
+    if (open) _hearts(c, cull);
+    if (open) _facMarks(c);
     if (open) _effects(c);
     c.restore();
 
-    // 3) 화면 효과 (비)
+    // 3) 화면 효과 (날씨·폭우 사건)
     if (open) _rain(c, s);
+  }
+
+  /// 배달 번호 → 집 번호 (deliver 의 역)
+  Map<int, int> get _houseToK => {
+    for (var k = 0; k < l.deliver.length; k++) l.deliver[k]: k,
+  };
+
+  void _zoneRings(Canvas c, Rect cull) {
+    FleetUnit? pick;
+    for (final u in g.fleet) {
+      if (u.id == cam.pick && u.region == sel && !u.isTrunk) pick = u;
+    }
+    for (final e in _houseToK.entries) {
+      final h = l.houses[e.key];
+      if (!cull.contains(Offset(h.x, h.y))) continue;
+      final z = g.zoneOf(sel, e.value);
+      final strong = pick != null && pick.zone == z;
+      final dim = pick != null && pick.zone >= 0 && pick.zone != z;
+      c.drawOval(
+        Rect.fromCenter(
+          center: _px(Offset(h.x, h.y + 0.15)),
+          width: t * 1.9,
+          height: t * 0.7,
+        ),
+        Paint()
+          ..color = Color(Cfg.zoneColor[z])
+              .withValues(alpha: strong ? 0.85 : (dim ? 0.12 : 0.5)),
+      );
+    }
+  }
+
+  /// 단골 집: 지붕 위 하트 (단골 Lv만큼)
+  void _hearts(Canvas c, Rect cull) {
+    for (final e in _houseToK.entries) {
+      final h = l.houses[e.key];
+      if (!cull.contains(Offset(h.x, h.y))) continue;
+      final lv = g.regularLv(sel, e.value);
+      final hearts = g.heartsOf(sel, e.value);
+      if (hearts == 0) continue;
+      final top = _px(Offset(h.x, h.y - 2.6));
+      final bob = sin(g.clock * 3 + e.key) * t * 0.05;
+      if (lv == 0) {
+        // 아직 단골 전: 작은 하트 + 다음 단계까지 진행
+        final p = hearts / Cfg.heartNeed[0];
+        _label(c, '♡', top.translate(0, bob), t * 0.4, const Color(0xCCFFFFFF));
+        c.drawRect(
+          Rect.fromLTWH(top.dx - t * 0.3, top.dy + t * 0.25, t * 0.6, t * 0.08),
+          Paint()..color = const Color(0x88000000),
+        );
+        c.drawRect(
+          Rect.fromLTWH(
+            top.dx - t * 0.3,
+            top.dy + t * 0.25,
+            t * 0.6 * p.clamp(0.0, 1.0),
+            t * 0.08,
+          ),
+          Paint()..color = const Color(0xFFFF7EB6),
+        );
+        continue;
+      }
+      final txt = '♥' * lv;
+      final tp = TextPainter(
+        text: TextSpan(
+          text: txt,
+          style: TextStyle(
+            color: const Color(0xFFFF4F8B),
+            fontSize: t * 0.5,
+            fontWeight: FontWeight.w900,
+            shadows: const [Shadow(color: Colors.white, blurRadius: 2)],
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      tp.paint(c, Offset(top.dx - tp.width / 2, top.dy - tp.height / 2 + bob));
+    }
+  }
+
+  /// 지은 지도 시설: 센터 옆 깃발 표지 (이름)
+  void _facMarks(Canvas c) {
+    final fs = g.rs.fac[sel].toList()..sort();
+    for (var i = 0; i < fs.length; i++) {
+      final p = _px(Offset(l.cx0 - 1.2 - i * 1.5, l.cFoot + 0.9));
+      c.drawLine(
+        p,
+        p.translate(0, -t * 1.0),
+        Paint()
+          ..color = const Color(0xFF5B3A1F)
+          ..strokeWidth = 2,
+      );
+      final r = Rect.fromLTWH(p.dx, p.dy - t * 1.0, t * 1.4, t * 0.45);
+      c.drawRRect(
+        RRect.fromRectAndRadius(r, Radius.circular(t * 0.08)),
+        Paint()..color = const Color(0xFF8E5BD0),
+      );
+      _label(
+        c,
+        Cfg.facName[fs[i]].substring(0, 2),
+        r.center,
+        t * 0.28,
+        Colors.white,
+      );
+    }
   }
 
   static final Paint _tp = Paint()
@@ -1535,6 +1669,15 @@ class _MapPainter extends CustomPainter {
       ),
       Paint()..color = const Color(0x44000000),
     );
+    // 단속 중: 경광등 빨강·파랑 번쩍
+    if (u.evtT > 0 && u.evtKind == 4) {
+      final on = (g.clock * 6).floor().isEven;
+      c.drawCircle(
+        foot.translate(right ? -w * 0.6 : w * 0.6, -t * 0.9),
+        t * 0.22,
+        Paint()..color = on ? const Color(0xFFE5484D) : const Color(0xFF3B82D6),
+      );
+    }
     if (img == null) {
       c.drawCircle(
         foot.translate(0, -t * 0.4),
@@ -1554,6 +1697,12 @@ class _MapPainter extends CustomPainter {
         final k = min(1.0, age / 0.3);
         c.translate(foot.dx, foot.dy);
         c.rotate((right ? 1 : -1) * 0.09 * k);
+        c.translate(-foot.dx, -foot.dy);
+      }
+      if (u.overloaded && u.state == 1 && u.cargo > 0) {
+        // 과적: 뒤가 내려앉음 (많이 실을수록)
+        c.translate(foot.dx, foot.dy);
+        c.rotate((right ? 1 : -1) * (u.loadIdx == 3 ? 0.07 : 0.04));
         c.translate(-foot.dx, -foot.dy);
       }
       if (!right) {
@@ -1607,6 +1756,19 @@ class _MapPainter extends CustomPainter {
         Paint()..color = const Color(0xCC1E1B2E),
       );
       _label(c, '${u.cargo}', tag.center, t * 0.36, Colors.white);
+      if (u.overloaded) {
+        final ot = Rect.fromLTWH(
+          tag.right + t * 0.05,
+          tag.top,
+          t * 0.8,
+          tag.height,
+        );
+        c.drawRRect(
+          RRect.fromRectAndRadius(ot, Radius.circular(t * 0.15)),
+          Paint()..color = const Color(0xEEE5484D),
+        );
+        _label(c, '과적', ot.center, t * 0.28, Colors.white);
+      }
     }
     if (u.evtT > 0) _evtFx(c, u, foot, top, w, right);
     // 정체·펑크는 라바콘
@@ -1850,9 +2012,31 @@ class _MapPainter extends CustomPainter {
 
   /// 폭우 이벤트가 진행 중이면 지도에 비가 내림
   void _rain(Canvas c, Size s) {
-    var rain = false;
+    var rain = g.rs.weather == 1;
     for (final u in g.fleet) {
       if (u.region == sel && u.evtT > 0 && u.evtKind == 1) rain = true;
+    }
+    if (g.rs.weather == 2) {
+      // 눈: 천천히 흔들리며 내림
+      final p = Paint()..color = const Color(0xDDFFFFFF);
+      for (var i = 0; i < 60; i++) {
+        final x = (i * 61 + sin(g.clock + i) * 12 + g.clock * 10) % s.width;
+        final y = (i * 89 + g.clock * 40) % s.height;
+        c.drawCircle(Offset(x, y), 1.8 + (i % 3) * 0.6, p);
+      }
+      return;
+    }
+    if (g.rs.weather == 3) {
+      // 안개: 하얗게 흐림 + 천천히 흐르는 띠
+      c.drawRect(Offset.zero & s, Paint()..color = const Color(0x55E8ECEF));
+      for (var i = 0; i < 4; i++) {
+        final y = (i * s.height / 4 + g.clock * 8) % s.height;
+        c.drawRect(
+          Rect.fromLTWH(0, y, s.width, s.height / 8),
+          Paint()..color = const Color(0x22FFFFFF),
+        );
+      }
+      return;
     }
     if (!rain) return;
     c.drawRect(Offset.zero & s, Paint()..color = const Color(0x331E2A44));

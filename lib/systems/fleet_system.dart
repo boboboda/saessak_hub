@@ -4,6 +4,7 @@ import '../game/config.dart';
 import '../game/hub_game.dart';
 import '../game/region_map.dart';
 import '../models/models.dart';
+import 'route_system.dart';
 
 /// 내 차량(플릿)의 운행: 허브 → 지역센터(대형 트럭) → 동네 배달(소형 트럭·오토바이)
 extension FleetSystem on HubGame {
@@ -26,6 +27,7 @@ extension FleetSystem on HubGame {
     final name = Cfg.driverFirst[rnd.nextInt(Cfg.driverFirst.length)] +
         Cfg.driverLast[rnd.nextInt(Cfg.driverLast.length)];
     final u = FleetUnit(nextUnitId++, type, name, 1 + rnd.nextInt(3), region);
+    u.trait = this.rollTrait();
     fleet.add(u);
     return u;
   }
@@ -44,7 +46,7 @@ extension FleetSystem on HubGame {
     }
     money -= cost;
     final u = makeUnit(type, region);
-    showToast('${u.name} 구입! 기사 ${u.driver}(${Cfg.skillName[u.skill]})');
+    showToast('${u.name} 구입! 기사 ${u.driver}(${Cfg.skillName[u.skill]}${u.trait > 0 ? ' · ${Cfg.traitName[u.trait]}' : ''})');
     ui();
     return true;
   }
@@ -62,9 +64,12 @@ extension FleetSystem on HubGame {
     ui();
   }
 
+  /// 기사 훈련비 (길치는 30% 쌈)
+  int trainCostOf(FleetUnit u) => (Cfg.trainCost(u.skill) * (u.trait == 6 ? 0.7 : 1.0)).round();
+
   void trainDriver(FleetUnit u) {
     if (u.skill >= 5) return;
-    final cost = Cfg.trainCost(u.skill);
+    final cost = trainCostOf(u);
     if (money < cost) {
       showToast('돈이 부족해요');
       return;
@@ -105,15 +110,18 @@ extension FleetSystem on HubGame {
   void _planEvent(FleetUnit u) {
     u.evtDone = false;
     u.delay = 0;
-    u.willEvt = rnd.nextDouble() < Cfg.evtChance(u.isTrunk, u.region);
+    u.willEvt = rnd.nextDouble() < this.evtChanceOf(u);
+    u.evtChoice = -1;
+    u.evtWaitT = 0;
     u.evtAt = 0.25 + rnd.nextDouble() * 0.5;
   }
 
   void startTrunkTrip(FleetUnit u) {
     u.state = 1;
     u.t = 0;
-    u.dur = RegionMap.of(u.region).tripSec * (u.isTrunk ? 1.0 : this.resDrone);
+    u.dur = RegionMap.of(u.region).tripSec * (u.isTrunk ? 1.0 : this.resDrone) * this.tripMul(u.region);
     _planEvent(u);
+    this.checkPolice(u);
   }
 
   void _startCourier(FleetUnit u, int n) {
@@ -128,16 +136,35 @@ extension FleetSystem on HubGame {
     u.state = 1;
     u.t = 0;
     final m = RegionMap.of(u.region);
-    u.house = rnd.nextInt(m.courier.length);
-    u.dur = m.deliverSec(u.house) * this.resDrone; // 드론 배송
+    u.house = this.pickHouse(u); // 맡은 구역 안에서
+    u.dur = m.deliverSec(u.house) * this.resDrone * this.tripMul(u.region); // 드론 배송·지름길
     _planEvent(u);
+    this.checkPolice(u);
   }
 
   /// 이벤트 발생: 기사 능력으로 성공/실패가 갈림
-  void _runEvent(FleetUnit u) {
+  void _runEvent(FleetUnit u, [int? kind]) {
     u.evtDone = true;
-    final k = rnd.nextInt(Cfg.evtName.length);
-    final ok = rnd.nextDouble() < Cfg.evtSuccess(u.skill);
+    // 과적으로 무리한 차는 펑크가 잦음
+    final k = kind ?? (u.wear > 5 && rnd.nextDouble() < 0.5 ? 2 : rnd.nextInt(Cfg.evtName.length));
+    final c = u.evtChoice; // -1·0 맡기기, 1 우회, 2 서둘러
+    var chance = Cfg.evtSuccess(u.skill);
+    if (c == 2) chance += 0.25;
+    final ok = c == 1 || rnd.nextDouble() < chance;
+    // 지연 배수: 길눈 밝음 절반, 길치 1.3배, 우회는 성공이지만 늘 조금 늦음, 서둘렀다 실패하면 더 늦음
+    var dl = u.trait == 2 ? 0.5 : (u.trait == 6 ? 1.3 : 1.0);
+    if (c == 2 && !ok) dl *= 1.5;
+    if (c == 1) {
+      u.delay += Cfg.evtDelay[k] * 0.5 * dl;
+      final fuel = 60 * (u.region + 1);
+      money = max(0, money - fuel);
+      u.evtKind = k;
+      u.evtOk = true;
+      u.evtT = Cfg.evtShow;
+      u.evtText = '${Cfg.evtName[k]}! 우회로로 (기름값 -$fuel원)';
+      note('${u.driver} ${Cfg.evtName[k]} → 우회로 · 조금 늦음 · 기름값 -$fuel원', 0xFFFFD166);
+      return;
+    }
     u.evtKind = k;
     u.evtOk = ok;
     u.evtT = Cfg.evtShow;
@@ -147,7 +174,7 @@ extension FleetSystem on HubGame {
       u.evtText = '${Cfg.evtName[k]}! 대응 성공';
       note('$who ${Cfg.evtName[k]} 대응 성공 +명성1', 0xFF3FB27F);
     } else {
-      u.delay += Cfg.evtDelay[k];
+      u.delay += Cfg.evtDelay[k] * dl;
       var extra = '';
       if (k == 2) {
         final fee = 150 * (u.region + 1);
@@ -200,12 +227,36 @@ extension FleetSystem on HubGame {
           if (!onDock) u.state = 0;
           break;
         case 1:
-          u.t += d * u.speed;
-          if (u.willEvt && !u.evtDone && u.t >= u.dur * u.evtAt) _runEvent(u);
+          // 사건 선택을 기다리는 동안은 멈춰 섬 (실제 시간으로 셈)
+          if (u.evtWaitT > 0) {
+            u.evtWaitT -= d / speedMul;
+            if (u.evtWaitT <= 0) {
+              u.evtWaitT = 0;
+              if (u.evtChoice < 0) u.evtChoice = 0;
+              _runEvent(u, u.evtPendKind);
+            }
+            break;
+          }
+          if (u.evtChoice >= 0 && !u.evtDone && u.willEvt) {
+            _runEvent(u, u.evtPendKind); // 고른 직후
+            break;
+          }
+          u.t += d * this.unitSpeed(u);
+          if (u.willEvt && !u.evtDone && u.t >= u.dur * u.evtAt) {
+            if (this.watching(u) && this.pendingEvt == null) {
+              // 지도를 보고 있으면 대응을 고를 수 있음 (안 고르면 기사가 알아서)
+              u.evtPendKind = u.wear > 5 && rnd.nextDouble() < 0.5 ? 2 : rnd.nextInt(Cfg.evtName.length);
+              u.evtWaitT = Cfg.evtChooseSec;
+              u.evtChoice = -1;
+              ui();
+            } else {
+              _runEvent(u);
+            }
+          }
           if (u.t >= u.dur + u.delay) _arrive(u);
           break;
         case 2:
-          u.t += d * u.speed;
+          u.t += d * this.unitSpeed(u);
           if (u.t >= u.dur) {
             u.state = 0;
             u.t = 0;
@@ -243,7 +294,7 @@ extension FleetSystem on HubGame {
           (fever > 0 ? Cfg.feverPay : 1.0) *
           (u.full ? Cfg.fullBonus : 1.0);
       // 택배마다 기한 확인: 정시면 정상 + 연속 보너스, 늦으면 수익 감소·명성 하락
-      final limit = Cfg.deadline(u.region);
+      final limit = this.deadlineOf(u.region); // 지역 개성·센터 냉장고
       var payD = 0.0, ok = 0, late = 0, fameD = 0;
       for (var i = 0; i < n; i++) {
         final born = i < u.load.length ? u.load[i] : gt; // 불러온 저장 등 시각을 모르면 정시로
@@ -265,7 +316,9 @@ extension FleetSystem on HubGame {
         }
       }
       u.load.clear();
-      final pay = (payD * this.perkMul).round(); // 업적 영구 수익 보너스
+      // 지역 개성·구역·우대 차량·평판·단골 팁·과적 파손
+      final (mul, tip, broke) = this.deliveryExtras(u, n, ok);
+      final pay = (payD * mul * (n - broke) / max(1, n) * this.perkMul).round() + tip; // 업적 영구 수익 보너스
       money += pay;
       dayEarn += pay;
             delivered += n;

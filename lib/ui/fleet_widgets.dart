@@ -6,6 +6,7 @@ import '../game/config.dart';
 import '../game/hub_game.dart';
 import '../game/sprites.dart';
 import '../models/models.dart';
+import 'route_widgets.dart';
 import 'theme.dart';
 
 /// 노선 지도·차고에서 같이 쓰는 차량 표시
@@ -80,6 +81,8 @@ class UnitCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
+          UnitRouteControls(g, u),
+          const SizedBox(height: 6),
           Wrap(
             spacing: 8,
             runSpacing: 6,
@@ -88,10 +91,10 @@ class UnitCard extends StatelessWidget {
                   small: true,
                   color: C.blue,
                   onTap: (u.level >= Cfg.maxLevel || g.money < upCost) ? null : () => g.upgradeUnit(u)),
-              AppButton(u.skill >= 5 ? '기사 달인' : '기사 훈련 ${g.fmt(Cfg.trainCost(u.skill))}원',
+              AppButton(u.skill >= 5 ? '기사 달인' : '기사 훈련 ${g.fmt(g.trainCostOf(u))}원',
                   small: true,
                   color: C.good,
-                  onTap: (u.skill >= 5 || g.money < Cfg.trainCost(u.skill)) ? null : () => g.trainDriver(u)),
+                  onTap: (u.skill >= 5 || g.money < g.trainCostOf(u)) ? null : () => g.trainDriver(u)),
               AppButton('지도에서 보기', small: true, color: C.line, icon: Icons.my_location, onTap: () {
                 g.mapSel = u.region;
                 g.mapFollow = u.id;

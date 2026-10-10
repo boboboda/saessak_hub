@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../game/config.dart';
 
 /// 내 차량 한 대 (간선 대형 트럭 / 지역 배달 소형 트럭·오토바이)
@@ -28,12 +30,24 @@ class FleetUnit {
   bool evtOk = true;
   double evtT = 0; // 말풍선 남은 시간
 
+  // ---- 노선 재미 ----
+  int zone = -1; // 맡은 구역 (-1 자동: 아무 집이나, 0 가까운 · 1 중간 · 2 먼 구역). 배달 차량만
+  int loadIdx = 1; // 적재 한도 Cfg.loadPct 번호 (0 70% · 1 100% · 2 120% · 3 150%)
+  int trait = 0; // 기사 개성 Cfg.traitName 번호 (0 없음)
+  int wear = 0; // 과적으로 쌓인 차량 무리 (높을수록 펑크 잦음, 쉬면 줄어듦)
+  int evtChoice = -1; // 플레이어가 고른 사건 대응 (-1 아직, 0 맡기기 · 1 우회 · 2 서둘러)
+  double evtWaitT = 0; // 사건 선택을 기다리는 남은 시간 (실제 초)
+  int evtPendKind = 0;
+
   FleetUnit(this.id, this.type, this.driver, this.skill, this.region);
 
   bool get isTrunk => type == 0;
   String get name => Cfg.vehicles[type].name;
-  int get cap => (Cfg.vehicles[type].cap * (1 + 0.15 * (level - 1))).round();
-  double get speed => 1 + 0.12 * (level - 1);
+  int get baseCap => (Cfg.vehicles[type].cap * (1 + 0.15 * (level - 1))).round();
+  /// 적재 한도를 반영한 이번에 싣는 양
+  int get cap => max(1, (baseCap * Cfg.loadPct[loadIdx]).round());
+  bool get overloaded => Cfg.loadPct[loadIdx] > 1.0;
+  double get speed => (1 + 0.12 * (level - 1)) * Cfg.loadSpeed[loadIdx];
   bool get busy => state != 0;
 }
 

@@ -43,6 +43,10 @@ extension SaveSystem on HubGame {
             'sk': u.skill,
             'lv': u.level,
             'rg': u.region,
+            'zn': u.zone,
+            'ld': u.loadIdx,
+            'tr': u.trait,
+            'wr': u.wear,
             // 운행 중 상태는 저장하지 않고 불러오면 대기로 돌아감. 싣고 가던 택배는 지역센터에 도착한 것으로 처리
             'cg': u.state == 1 ? u.cargo : _dockLoaded(u),
           }
@@ -56,6 +60,7 @@ extension SaveSystem on HubGame {
       'wins': awardWins,
       'endless': endless,
       'res': researched.toList(),
+      'route': rs.toJson(),
       'resNow': resNow,
       'resLeft': resLeft,
       'evts': [for (final e in evts) e.toJson()],
@@ -238,6 +243,11 @@ extension SaveSystem on HubGame {
           final u = FleetUnit(m['id'] as int, m['ty'] as int, m['dr'] as String,
               m['sk'] as int, m['rg'] as int);
           u.level = (m['lv'] as int?) ?? 1;
+          u.zone = ((m['zn'] as int?) ?? -1).clamp(-1, 2);
+          u.loadIdx = ((m['ld'] as int?) ?? 1).clamp(0, Cfg.loadPct.length - 1);
+          // 예전 저장의 기사는 개성이 없었으니 새로 뽑아 줌
+          u.trait = m['tr'] == null ? this.rollTrait() : (m['tr'] as int).clamp(0, Cfg.traitName.length - 1);
+          u.wear = (m['wr'] as int?) ?? 0;
           final cg = (m['cg'] as int?) ?? 0;
           if (cg > 0) centerStock[u.region] += cg; // 가던 택배는 센터에 도착한 것으로 처리
           fleet.add(u);
@@ -271,6 +281,13 @@ extension SaveSystem on HubGame {
         ..addAll(((j['res'] as List?) ?? const []).map((e) => (e as num).toInt()));
       resNow = (j['resNow'] as num?)?.toInt();
       resLeft = ((j['resLeft'] as num?) ?? 0).toDouble();
+      // 노선 재미 (예전 저장엔 없음, 읽다 실패해도 새로 시작)
+      try {
+        final ro = j['route'];
+        if (ro is Map<String, dynamic>) rs.load(ro);
+      } catch (e) {
+        debugPrint('노선 기록 불러오기 실패: $e');
+      }
       // 훈련 중이던 직원 (교육실 번호로 다시 연결)
       final trs = (j['staff'] as List);
       for (var i = 0; i < trs.length && i < loadedStaff.length; i++) {

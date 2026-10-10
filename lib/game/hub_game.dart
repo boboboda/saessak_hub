@@ -19,6 +19,7 @@ import '../systems/ops_system.dart';
 import '../systems/path_system.dart';
 import '../systems/rating_system.dart';
 import '../systems/research_system.dart';
+import '../systems/route_system.dart';
 import '../systems/save_system.dart';
 import '../systems/set_system.dart';
 import '../systems/story_system.dart';
@@ -42,6 +43,7 @@ export '../systems/ops_system.dart';
 export '../systems/path_system.dart';
 export '../systems/rating_system.dart';
 export '../systems/research_system.dart';
+export '../systems/route_system.dart';
 export '../systems/save_system.dart';
 export '../systems/set_system.dart';
 export '../systems/story_system.dart';
@@ -79,6 +81,7 @@ class HubGame extends FlameGame {
     (_) => DeliveryRoute(),
   ); // 지역별 노선 설정
   final List<FleetUnit> fleet = []; // 내 차량들
+  final RouteState rs = RouteState(); // 노선 재미 (단골·의뢰·평판·시설·날씨)
   final List<int> centerStock = List.filled(5, 0); // 지역센터에 내려진 택배
   final List<MapNote> notes = []; // 노선 지도 소식
   final List<MapFx> mapFx = []; // 지도 위 떠오르는 효과
@@ -359,6 +362,7 @@ class HubGame extends FlameGame {
     }
           this.planEvents();
       this.finishTraining();
+    this.fillRequests();
     this.genCandidates();
   }
 
@@ -390,6 +394,7 @@ class HubGame extends FlameGame {
         ..addAll(this.researchDayEnd());
       this.endOfDay(day);
       day++;
+      this.routeNewDay();
       this.payroll();
       this.planEvents();
       final h = holiday;

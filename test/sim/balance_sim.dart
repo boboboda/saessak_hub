@@ -251,6 +251,16 @@ void main() {
           g.buyUnit(0, r);
         }
       }
+      // 지도 시설 (돈이 넉넉하면 싼 것부터)
+      for (var r = 0; r < 5; r++) {
+        if (!g.regionOpen[r]) continue;
+        for (var f = 0; f < Cfg.facName.length; f++) {
+          if (!g.hasFac(r, f) && g.money - reserve > g.facCost(r, f) * 3) {
+            g.buyFac(r, f);
+            log.mile(g, '지도 시설 처음');
+          }
+        }
+      }
       // 차량 업그레이드 (돈이 많이 남을 때)
       if (g.money - reserve > 30000) {
         final u = (g.fleet.where((u) => u.level < Cfg.maxLevel).toList()..sort((a, b) => a.level.compareTo(b.level))).firstOrNull;

@@ -194,6 +194,79 @@ class Cfg {
   // ---- 배송 지역: 같은 급의 서로 다른 지역 (이름·분위기만 다름). 명성으로 열고, 뒤에 열수록 지도가 크다 ----
   // 지역 수를 바꾸려면 아래 목록들과 regionColor·regionFame 의 길이를 같이 맞춘다.
   static const List<String> regionName = ['주택가', '상가', '항구', '산업단지', '신도시'];
+  // ---- 지역 개성: 택배 성격 · 수익 · 기한 · 잘 맞는 차량(우대) · 과적 단속 ----
+  static const List<String> regionCargo = ['생활 택배', '급송 상품', '냉동 수산물', '대량 부품', '새벽 배송'];
+  static const List<String> regionTip = [
+    '골목이 많아 오토바이가 빨라요',
+    '급한 물건이 많아 기한이 짧지만 수익이 높아요',
+    '냉동품이라 기한이 아주 짧고 수익이 커요 · 소형 트럭이 잘 맞아요',
+    '물량이 많고 기한이 넉넉해요 · 과적 단속이 드물어요',
+    '새벽 배송이라 기한이 짧아요 · 날씨 영향이 커요',
+  ];
+  static const List<double> regionPayMul = [1.0, 1.15, 1.35, 1.1, 1.25];
+  static const List<double> regionDeadlineMul = [1.0, 0.75, 0.6, 1.35, 0.8];
+  static const List<int> regionFavor = [2, 2, 1, 1, 2]; // 우대 차량 (Cfg.vehicles 번호): 이 차로 배달하면 수익 +25%
+  static const double favorPay = 1.15;
+  static const List<double> regionPolice = [1.0, 1.2, 1.0, 0.4, 1.3]; // 과적 단속 배수
+  static const List<double> regionWeather = [1.0, 1.0, 1.2, 0.8, 1.5]; // 날씨 영향 배수
+
+  // ---- 구역: 지역마다 배달 길을 거리순으로 가까운·중간·먼 셋으로 나눔. 멀수록 단가 높음 ----
+  static const List<String> zoneNameR = ['가까운 동네', '중간 동네', '먼 동네'];
+  static const List<double> zonePay = [0.9, 1.05, 1.25];
+  static const List<int> zoneColor = [0xFF7BD389, 0xFFFFD166, 0xFFF0963A];
+
+  // ---- 적재 한도: 적게 실으면 빠르고, 과적하면 많이 싣지만 느리고 위험 ----
+  static const List<String> loadName = ['가볍게 70%', '정량 100%', '과적 120%', '과적 150%'];
+  static const List<double> loadPct = [0.7, 1.0, 1.2, 1.5];
+  static const List<double> loadSpeed = [1.12, 1.0, 0.9, 0.75];
+  static const List<double> loadEvt = [-0.05, 0, 0.1, 0.25]; // 사건 확률 더하기
+  static const List<double> loadPolice = [0, 0, 0.08, 0.22]; // 출발 때 단속 확률
+  static const List<double> loadBreak = [0, 0, 0.03, 0.07]; // 배달할 때 택배 하나가 파손될 확률
+  static const int policeFinePer = 40; // 단속 벌금: 실은 택배 1건당
+
+  // ---- 단골 집: 같은 집에 배달할수록 하트, 단계마다 팁 ----
+  static const List<int> heartNeed = [8, 30, 80]; // 단골 Lv1·2·3
+  static const List<int> heartTip = [0, 6, 14, 28]; // 단골 Lv별 택배 1건당 팁
+  static const List<String> regularName = ['', '단골', '찐단골', 'VIP 단골'];
+
+  // ---- 지역 평판: 그 지역 정시 배달 수로 오름. 단계마다 수익 +5% · 의뢰 보상 증가 ----
+  static const List<int> repNeed = [0, 40, 150, 400, 900];
+  static const List<String> repName = ['낯선 동네', '알려진 택배', '믿음직한 택배', '동네 자랑', '동네의 상징'];
+  static const double repPay = 0.05;
+
+  // ---- 지도 시설 투자 (지역마다 하나씩, 레벨 없음) ----
+  static const List<String> facName = ['지름길 개통', '신호 정비', '센터 냉장고', '동네 광고판'];
+  static const List<String> facDesc = ['간선·배달 시간 −15%', '노선 사건 −30%', '배송 기한 +30%', '단골 하트 ×1.5 · 의뢰 보상 +30%'];
+  static const List<int> facCost = [8000, 6000, 7000, 5000];
+  static const List<double> facRegionCost = [1.0, 1.3, 1.6, 2.0, 2.5]; // 지역별 값 배수
+
+  // ---- 날씨 (하루마다, 내일 예보가 보임) ----
+  static const List<String> weatherName = ['맑음', '비', '눈', '안개'];
+  static const List<double> weatherChance = [0.55, 0.22, 0.0, 0.23]; // 겨울엔 비 대신 눈
+  // 오토바이·트럭 속도 배수, 사건 확률 더하기
+  static const List<double> weatherMoto = [1.0, 0.8, 0.7, 0.9];
+  static const List<double> weatherTruck = [1.0, 0.92, 0.85, 0.9];
+  static const List<double> weatherEvt = [0, 0.1, 0.15, 0.12];
+
+  // ---- 기사 개성 ----
+  static const List<String> traitName = ['', '비에 강함', '길눈 밝음', '친절왕', '힘장사', '새벽형', '길치'];
+  static const List<String> traitDesc = [
+    '',
+    '날씨 영향 없음',
+    '사건 지연 −50%',
+    '단골 하트 ×2',
+    '과적 위험 절반',
+    '기한 짧은 지역(상가·항구·신도시) 수익 +15%',
+    '가끔 길을 헤매요 (지연) · 대신 월급이 싸서 기사 훈련비 −30%',
+  ];
+
+  // ---- 사건 대응 선택 (지도에서 보고 있을 때) ----
+  static const double evtChooseSec = 4; // 고를 시간 (실제 초). 안 고르면 기사가 알아서
+  static const List<String> evtChoiceName = ['기사에게 맡기기', '우회로', '서둘러!'];
+
+  // ---- 의뢰 게시판 ----
+  static const int reqMax = 3; // 동시에 걸리는 의뢰 수
+  static const int reqDays = 2; // 의뢰 기한 (일)
   static const List<String> regionStyle = ['residential', 'commercial', 'harbor', 'industrial', 'newtown'];
   static const List<double> regionPay = [1.0, 1.0, 1.0, 1.0, 1.0]; // 같은 급이라 수익 배수 같음
   // 지도 규격 (칸). 첫 지역 대비 마지막 지역 면적 약 3.4배
