@@ -33,7 +33,7 @@ class StoryCard extends StatelessWidget {
     final k = cu.story;
     final d = Cfg.storyDefs[k];
     final met = g.storyNeedMet(k);
-    final need = Cfg.types.firstWhere((t) => t.id == d.need).name;
+    final need = g.storyNeedText(k);
     final again = g.rt.storyLocked.contains(k);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -78,7 +78,7 @@ class StoryCard extends StatelessWidget {
                 Icon(met ? Icons.check_circle : Icons.info_outline, size: 16, color: met ? C.good : C.accent),
                 const SizedBox(width: 6),
                 Text(
-                  met ? '$need Lv${d.needLv} 이상 있음 · 숙련 포장 가능' : '$need Lv${d.needLv}이 필요해요',
+                  met ? '$need 있음 · 숙련 포장 가능' : '숙련 포장에는 $need 필요',
                   style: TextStyle(color: met ? C.good : C.accent, fontSize: 12, fontWeight: FontWeight.w700),
                 ),
               ],

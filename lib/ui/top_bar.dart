@@ -63,7 +63,23 @@ class TopBar extends StatelessWidget {
                       }
                       break;
                     case 4:
-                      g.resetSave();
+                      // 실수로 누르지 않게 한 번 더 물음
+                      showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: C.panel,
+                          title: const Text('저장을 지울까요?', style: Tx.h2),
+                          content: const Text('지금까지 한 게임이 모두 사라지고 되돌릴 수 없어요.', style: Tx.body),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+                            TextButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: const Text('지우기', style: TextStyle(color: C.bad))),
+                          ],
+                        ),
+                      ).then((ok) {
+                        if (ok == true) g.resetSave();
+                      });
                       break;
                     case 5:
                       g.fame += 500;

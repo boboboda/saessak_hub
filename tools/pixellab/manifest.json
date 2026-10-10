@@ -1749,5 +1749,70 @@
         }
       ]
     }
+  },
+  "story_fish": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 생선 아이스박스",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, white styrofoam ice box with a fresh blue fish and ice cubes on top",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "story_docs": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 계약 서류",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, brown document envelope with a red URGENT-style stripe and a paper clip, papers sticking out",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "story_flower": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 카네이션",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, small bouquet of red carnations wrapped in pink paper with a ribbon",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "story_guitar": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 통기타",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, old wooden acoustic guitar standing upright, warm brown body",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
+  },
+  "story_medicine": {
+    "endpoint": "/create-1-direction-object",
+    "note": "사연 물건: 약 봉투",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game icon, single object, centered, front view, no background, no text, white pharmacy paper medicine bag with a green cross and a small pill bottle beside it",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEk0lEQVR4nM1Xe2xTVRz+zu2laffINrZulI5Z92CpiBphIWyETB5BM40mGyEm+AINcy7+tUQSpgaEf8yUhABRiTMCcZM5A8QRIsgWJwwzl2aJY2FiLXU6Zd3YLd1626095p5b+rq3LyHRLzn5ted3zvl+z3NaghhwhCBtcKBMBpB0c4DSmK33Cg60qa3+Hrb/38AREh4aQkMjcj5C39azM75eZSj4kAR72reDhfhunmNgtdrQfOjZuPpkIGoRiDGRMgIAh988Ey40DrS1swF0TocDO04qCzDWoKA+/SIMgEjEM855PL+3NurgI+99B9vv43hw3QPheUkGCzNUnAm6gySNQIRHtY2PwmjMQ8e7fSw1I2PjTKXXAx1v9xGaQemJ3j34+swVZGkzcHLfOQX5fWvD/U0nGLE0hq7+Bon8jf0N6PyyDz7Rp0qu7lc8BEMZGgC8IjA64kDn6eNYainG+VPD8HiAV1/fiEWZPOzjE2xrz0eXUyKXoJ6CYA7Ny3PY3C3nFKYEEe17z6Pu5RqIs8DoTzexZksF039zrB/LLMWwrDYxciKqcMcpQqIwQEMU7fTKwS1M5ufo8OkH34OHHlWbzRi8YEd5lQELAs/014dvQJieQeuHLyj473ZKcgOIivUc6CPPWLBqQwlElxcXT42FVJIBNwYn2edtu6qYnLotoOtQP+ZnF0LRkIpWMiLgpyR1Azg591RHUVhmgmmFDubSElZkkve8Vl674KOMfNYvYuiSAwEvh5+/HYmug+BZqRvAgb5/dgcEp499vT3tQddnA1iAB2s3W6IMqH1OroWez61w2YToA5O0IVE1IOKFO9rSzeSG16qhy5TXDFwYRfnyUozb/8KTLz4clZbapyzgs/0oXVYMwX0n+vZMtQib2upxpPUrOX/S5ohU1DXWsHWTN73MAMn7vtO/sDSsrDYz3aVjV5jc2rIRhiW5shNxukABxeunIbT9pfW00JgXehm3vbWJmlYXh0bNzsfopsYaNiS9ITeDftH8dGh988GG0Jmx4BUzKhdIIfzI0+hgrCiH6Haj9/gQlq4xYnLcJS/wcvB4PRjosGLdikrwgjPqvKMt3XHd5pEC9JlaUK8bHq8b+vwlMCILE8FiKzLlYeRHG7RuwshHHQ6szMlI6lRaBkj4ZJd8GW09fI7JgNvD5B/X/oTopxABjEzOoHt3PfLJPPoHf4U2QOFLciPzSAE2pwt6hxPGkgJcPaC85ULwuDAnzGHYaoOuaDF8HCvihCCxE2qFogWl+9ZX4iFzATRz8r0w5ZF8DsO1QFFSJL8d1+xO7P5hTDX0sV3AI0X4dHr0DtnxxCq51XIztFE1YpQCMOtD1+UxVJSZUj0WKRtQlKOBedFiRpAIdWvLMHYrOjqJQNL5RXR2ezXzNhKS146/BRQYspAt+llq7PMavHNx+P6mQMJcwA89oiEZVFlqYJ99opvJeORq4JAGBO98Qv0dnYZ5nw74dBZr9Jm4bptk4c7PDsdiwiHffOmSS0i9BphSfpQ+rn8c+mA7Su03Tflw6CUkCP+/+0UEdUOUp6f/7/g/xz/IcgPouSjFqwAAAABJRU5ErkJggg=="
+        }
+      ]
+    }
   }
 }

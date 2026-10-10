@@ -454,5 +454,20 @@
   },
   "decor_locker": {
     "object_id": "8d4687ea-9e1d-4da2-9717-365d30de38ea"
+  },
+  "story_fish": {
+    "object_id": "4800f5d1-500e-4215-87d7-82184e2603d2"
+  },
+  "story_docs": {
+    "object_id": "7e1af6f3-856b-47bb-9b35-ca8fbbb79883"
+  },
+  "story_flower": {
+    "object_id": "8052513a-7e50-40f6-bc12-515b52ce5c97"
+  },
+  "story_guitar": {
+    "object_id": "73c58630-fa24-48c5-b020-e506b122d2da"
+  },
+  "story_medicine": {
+    "object_id": "aaf8123b-ac86-48f4-b10e-3836ed0b8b17"
   }
 }

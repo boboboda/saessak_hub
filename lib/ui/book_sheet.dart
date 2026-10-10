@@ -86,7 +86,7 @@ class BookSheet extends StatelessWidget {
               rt.storyDone.contains(k)
                   ? '엽서: ${Cfg.storyDefs[k].thanks}'
                   : rt.storyLocked.contains(k)
-                      ? '잠김 · ${Cfg.types.firstWhere((t) => t.id == Cfg.storyDefs[k].need).name} Lv${Cfg.storyDefs[k].needLv}이 되면 다시 찾아와요'
+                      ? '잠김 · ${g.storyNeedText(k)} 준비되면 다시 찾아와요'
                       : rt.storyTried.contains(k)
                           ? '아쉬웠던 사연 · 다시 오면 숙련 포장에 도전해요'
                           : '사연 손님을 기다려요',

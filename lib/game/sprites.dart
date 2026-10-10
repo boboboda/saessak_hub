@@ -163,7 +163,7 @@ class Sprites {
       if (im != null) roadCars.add(im);
     }
     grass = await _img('assets/sprites/tiles/grass.png');
-    for (final n in const ['letter', 'teddy', 'kimchi', 'cake', 'vase']) {
+    for (final n in const ['letter', 'teddy', 'kimchi', 'cake', 'vase', 'fish', 'docs', 'flower', 'guitar', 'medicine']) {
       final im = await _img('assets/sprites/props/story_$n.png');
       if (im != null) storyItems[n] = im;
     }

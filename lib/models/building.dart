@@ -57,8 +57,9 @@ class Building {
   // ---- 업그레이드 ----
   int level = 1;
   static const int maxLevel = 3;
+  static const Set<String> levelled = {'counter', 'pack', 'shelf', 'dock'}; // 레벨이 있는 시설
   bool get upgradable =>
-      const ['counter', 'pack', 'shelf', 'dock'].contains(type.id) &&
+      levelled.contains(type.id) &&
       level < maxLevel;
   int get upgradeCost => (type.cost * (level == 1 ? 1.5 : 3)).round();
 

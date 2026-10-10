@@ -124,4 +124,30 @@ void main() {
     expect(g2.rt.storyLocked, {4});
     expect(g2.rt.storySeen, {1, 4});
   });
+
+  test('다른 시설 요구: 에어컨이 있어야 생선 숙련 포장, 포장은 포장대에서', () {
+    final g = _game();
+    _ask(g, 5); // 갓 잡은 생선: 에어컨
+    expect(g.storyNeedText(5), '에어컨');
+    expect(g.storyChoices(5).map((e) => e.$1), [1, 2, 3]);
+    g.buildings.add(Building(_t('aircon'), 2, 2));
+    expect(g.storyChoices(5).first.$1, 0);
+    g.chooseStory(0);
+    expect(g.storyJob!.table.type.id, 'pack');
+  });
+
+  test('요구 시설 글: 레벨 있는 시설만 Lv 붙임, 거절 안내 조사', () {
+    final g = _game();
+    expect(g.storyNeedText(6), '도크 Lv2');
+    expect(g.storyNeedText(7), '화분');
+    final ch = g.storyChoices(7);
+    expect(ch.last.$3, '화분이 준비되면 다시 찾아와요');
+    expect(g.storyChoices(6).last.$3, '도크 Lv2가 준비되면 다시 찾아와요');
+  });
+
+  test('포장대가 없으면 일반·임시 포장 못 함', () {
+    final g = HubGame();
+    final ch = g.storyChoices(0);
+    expect(ch.where((e) => e.$1 != 3).every((e) => !e.$4), isTrue);
+  });
 }

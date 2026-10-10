@@ -52,12 +52,10 @@ extension StorySystem on HubGame {
   /// 사연 손님이 서서 기다리는 자리: 손님 입구 바로 안쪽 칸 (건물을 못 놓는 칸)
   Offset get storySpot => Offset(door.left + 0.55, door.center.dy + 0.45);
 
-  /// 이 사연의 요구 시설을 채운 시설 중 가장 레벨 높은 것 (없으면 null)
-  Building? storyTable(int k, {bool needMet = true}) {
-    final d = storyOf(k);
+  /// 사연 택배를 포장할 포장대: 가장 레벨 높고 일하는 직원이 많은 곳 (없으면 null)
+  Building? packTable() {
     Building? best;
-    for (final b in ofType(d.need)) {
-      if (needMet && b.level < d.needLv) continue;
+    for (final b in ofType('pack')) {
       if (best == null || b.level > best.level || (b.level == best.level && b.active.length > best.active.length)) {
         best = b;
       }
@@ -65,7 +63,18 @@ extension StorySystem on HubGame {
     return best;
   }
 
-  bool storyNeedMet(int k) => storyTable(k) != null;
+  /// 요구 시설을 채웠는지: 레벨이 있는 시설(창구·포장대·선반·도크)은 그 레벨 이상, 나머지는 하나라도 있으면
+  bool storyNeedMet(int k) {
+    final d = storyOf(k);
+    return ofType(d.need).any((b) => b.level >= d.needLv);
+  }
+
+  /// 요구 시설 글 ("포장대 Lv2", "에어컨")
+  String storyNeedText(int k) {
+    final d = storyOf(k);
+    final name = Cfg.types.firstWhere((x) => x.id == d.need).name;
+    return Building.levelled.contains(d.need) ? '$name Lv${d.needLv}' : name;
+  }
 
   /// 지금 진행 중인 사연이 있는지 (문 앞 손님 · 선택 카드 · 포장 중 · 엽서)
   bool get storyBusy =>
@@ -129,22 +138,28 @@ extension StorySystem on HubGame {
   /// 선택지 (글, 설명, 고를 수 있는지). 카드에서 씀
   List<(int, String, String, bool)> storyChoices(int k) {
     final d = storyOf(k);
-    final t = storyTable(k);
-    final any = storyTable(k, needMet: false);
-    final name = Cfg.types.firstWhere((x) => x.id == d.need).name;
-    if (t != null) {
+    final has = packTable() != null;
+    final need = storyNeedText(k);
+    if (storyNeedMet(k) && has) {
       return [
-        (0, '숙련 포장!', '$name Lv${t.level} · 꼭 성공 · ${fmt(d.pay + Cfg.storySkillBonus)}원 · 명성 +${d.fame}', true),
+        (0, '숙련 포장!', '$need 있음 · 꼭 성공 · ${fmt(d.pay + Cfg.storySkillBonus)}원 · 명성 +${d.fame}', true),
         (3, '정중히 거절', '다음에 다시 와 달라고 해요', true),
       ];
     }
-    final has = any != null;
     return [
-      (1, '일반 포장', has ? '성공 ${(Cfg.storyNormalOk * 100).round()}% · ${fmt(d.pay ~/ 2)}원' : '$name이 없어요', has),
+      (1, '일반 포장', has ? '성공 ${(Cfg.storyNormalOk * 100).round()}% · ${fmt(d.pay ~/ 2)}원' : '포장대가 없어요', has),
       (2, '임시 포장 (${fmt(Cfg.storyTempCost)}원)',
-          has ? '성공 ${(Cfg.storyTempOk * 100).round()}% · ${fmt(d.pay ~/ 2)}원' : '$name이 없어요', has),
-      (3, '정중히 거절', '$name Lv${d.needLv}이 되면 다시 찾아와요', true),
+          has ? '성공 ${(Cfg.storyTempOk * 100).round()}% · ${fmt(d.pay ~/ 2)}원' : '포장대가 없어요', has),
+      (3, '정중히 거절', '$need${_ga(need)} 준비되면 다시 찾아와요', true),
     ];
+  }
+
+  /// 받침에 맞는 조사 (이/가)
+  String _ga(String w) {
+    final c = w.codeUnitAt(w.length - 1);
+    if (c >= 0x30 && c <= 0x39) return const ['이', '이', '가', '이', '가', '가', '이', '이', '이', '가'][c - 0x30]; // 영·일·이·삼·사·오·육·칠·팔·구
+    if (c < 0xAC00 || c > 0xD7A3) return '이';
+    return (c - 0xAC00) % 28 == 0 ? '가' : '이';
   }
 
   /// 선택 카드에서 고름
@@ -156,8 +171,8 @@ extension StorySystem on HubGame {
       if (!rt.storyDone.contains(k)) rt.storyLocked.add(k);
       showToast('정중히 돌려보냈어요. 준비가 되면 다시 찾아와요');
     } else {
-      final t = mode == 0 ? storyTable(k) : storyTable(k, needMet: false);
-      if (t == null) return;
+      final t = packTable();
+      if (t == null || (mode == 0 && !storyNeedMet(k))) return;
       if (mode == 2) {
         if (money < Cfg.storyTempCost) {
           showToast('돈이 모자라요');
