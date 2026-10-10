@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../game/config.dart';
 import '../game/hub_game.dart';
 import '../game/region_map.dart';
+import 'research_panel.dart';
 import 'theme.dart';
 
 /// 운영 창들: 하나에 몰아넣지 않고 메뉴마다 따로 연다.
@@ -20,14 +21,14 @@ class OpsSheet extends StatelessWidget {
     return SheetFrame(
       title: titles[page] ?? '운영',
       titleColor: colors[page] ?? C.accent,
-      heightFactor: 0.72,
+      heightFactor: page == 'research' ? 0.82 : 0.72,
       onClose: g.closeAll,
       trailing: Pill(Icons.paid, g.fmt(g.money), color: C.gold),
       child: ListView(
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
         children: switch (page) {
           'goals' => _goalsPage(),
-          'research' => [_research()],
+          'research' => [ResearchPanel(g)],
           'region' => _regionPage(),
           _ => _statsPage(),
         },

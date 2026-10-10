@@ -8,7 +8,7 @@ import '../game/sprites.dart';
 import 'draw_utils.dart';
 
 /// 창고 바닥: 구역마다 재질이 다름 (① 접수 밝은 타일, ② 포장 콘크리트 + 노란 안전선, ③ 보관 공장 바닥),
-/// 유저가 깐 통로(진회색 보행 차선 + 노란 안전선 + 흰 점선), 바닥에 칠한 구역 글씨.
+/// 유저가 깐 통로(진회색 보행 차선 + 진한 테두리 + 흰 점선), 바닥에 칠한 구역 글씨.
 extension FloorView on HubGame {
   /// 칸 (x, y)의 구역: 0 접수, 1 포장, 2 보관·출고
   int zoneOfX(int x) => x < Cfg.zoneX1 ? 0 : (x < Cfg.zoneX2 ? 1 : 2);
@@ -81,15 +81,6 @@ extension FloorView on HubGame {
       }
     }
 
-    // 2) 포장 구역 양쪽 경계의 노란 안전선
-    final safe = Paint()..color = const Color(0xFFF2C230);
-    for (final zx in [Cfg.zoneX1, Cfg.zoneX2]) {
-      c.drawRect(
-        Rect.fromLTRB(zx * t - 3, a.top * t, zx * t + 3, a.bottom * t),
-        safe,
-      );
-    }
-
     // 2-2) 바닥 마킹: 시설 자리 모서리 테이프(ㄱ자), 도크 앞 비움 구역(빗금)
     final tape = Paint()..color = const Color(0xCCF2C230);
     for (final b in buildings) {
@@ -146,7 +137,7 @@ extension FloorView on HubGame {
       labelIn(c, names[z], r, size: 15, color: Color(ink[z]));
     }
 
-    // 4) 유저가 깐 통로: 진회색 보행 차선 + 바깥 테두리만 노란 안전선(이어진 칸끼리는 선 없음) + 가운데 흰 점선
+    // 4) 유저가 깐 통로: 진회색 보행 차선 + 바깥 테두리만 진한 선(이어진 칸끼리는 선 없음) + 가운데 흰 점선
     bool on(int x, int y) =>
         a.contains(Offset(x + 0.5, y + 0.5)) && isAisle(x, y);
     for (var j = ay0; j < ay1; j++) {
@@ -178,7 +169,7 @@ extension FloorView on HubGame {
         0xFF7D8692,
       );
     }
-    const edge = 0xFFF2C230, sh = 0xFF4E5560;
+    const edge = 0xFF555D68, sh = 0xFF8A939E; // 바깥 테두리는 진한 회색, 안쪽에 밝은 선 (노란색 안 씀)
     if (!l) {
       box(c, x, y, 4, t, edge);
       box(c, x + 4, y, 1, t, sh);

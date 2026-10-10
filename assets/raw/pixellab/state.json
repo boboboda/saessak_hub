@@ -499,5 +499,8 @@
   },
   "ui_aisle": {
     "object_id": "13591ff1-f353-400c-b14d-cce39365b4d9"
+  },
+  "ui_aisle2": {
+    "object_id": "34105cb0-71a5-4e14-a902-339e37ff8e61"
   }
 }
