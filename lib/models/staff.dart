@@ -47,6 +47,13 @@ class Staff {
   Building? lounge; // 쉬고 있는 휴게실 (null이면 창고 밖 휴식 자리)
   int seat = 0; // 휴게실 안 자리 번호
 
+  // ---- 대기 중 어슬렁 (저장 안 함, 보기용) ----
+  Offset idleOff = Offset.zero; // 벤치 앞 제자리에서 벗어난 만큼 (타일)
+  Offset? idleGoal; // 걸어가는 곳 (제자리 기준). null이면 아직 안 정함
+  double idleWait = 0; // 멈춰 서 있을 남은 시간 (실제 초)
+  String idleSay = ''; // 혼잣말 말풍선
+  double idleSayT = 0; // 말풍선 남은 시간
+
   Staff(this.id, this.name, this.speed, this.walk, this.kind, this.stamina,
       this.care, this.hireCost, this.wage)
       : energy = 60.0 + 20.0 * stamina;

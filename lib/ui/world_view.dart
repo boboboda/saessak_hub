@@ -1253,8 +1253,17 @@ extension WorldView on HubGame {
     // 대기 직원: 휴식 벤치 둘레에 서 있음 (탭해서 고른 뒤 시설을 탭하면 배치)
     for (final s in staff) {
       if (!s.idle) continue;
-      final fp = this.benchSpot(s);
+      final fp = this.idleSpot(s);
       final p = Offset(fp.dx * t, fp.dy * t);
+      if (s.idleSayT > 0) {
+        final say = s.idleSay;
+        _tag(() {
+          final w = 14.0 + say.length * 10.0;
+          final r = Rect.fromCenter(center: Offset(p.dx, p.dy - t * 1.15), width: w, height: 15);
+          c.drawRRect(RRect.fromRectAndRadius(r, const Radius.circular(7)), Paint()..color = const Color(0xEEFFFFFF));
+          labelIn(c, say, r, size: 10, color: const Color(0xFF2A2438));
+        });
+      }
       _at(p.dy + t * 0.35, () {
         if (picking == s) {
           c.drawOval(

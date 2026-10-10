@@ -417,6 +417,7 @@ class HubGame extends FlameGame {
     this.updateWorkers(d);
     this.updateDocks(d);
     this.updateFleet(d);
+    this.updateIdle(dt); // 대기 직원 어슬렁 (보기용이라 실제 시간)
 
     saveTimer += dt;
     if (saveTimer >= Cfg.autosaveSec) {

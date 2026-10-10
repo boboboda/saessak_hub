@@ -132,6 +132,13 @@ class Cfg {
     Offset(0.41, 2.34),
     Offset(2.56, 2.34),
   ];
+  // 대기 직원 어슬렁: 제자리에서 이만큼(칸) 안에서 천천히 걷다 멈춰 둘러봄. 시간은 실제 초 (배속과 상관없음)
+  static const double idleRoamX = 0.35, idleRoamUp = 0.2, idleRoamDown = 0.45;
+  static const double idleWalkSpeed = 0.55; // 칸/초
+  static const double idleGap = 0.65; // 다른 사람과 이만큼(칸)은 떨어져 섬
+  static const double idleWaitMin = 1.5, idleWaitMax = 5.0;
+  static const double idleSayChance = 0.2; // 멈출 때 혼잣말할 확률
+  static const List<String> idleSays = ['하암~', '♪', '일 주세요!', '…', '오늘 바쁠까?', '커피 한 잔…'];
   // 휴게실이 없을 때 창고 밖 벤치 옆에 서서 쉬는 자리 (breakSpot 기준, 칸 단위). 벤치 앞 줄은 대기 직원 자리
   static const List<Offset> benchRestSlots = [
     Offset(-1.2, 0.05),

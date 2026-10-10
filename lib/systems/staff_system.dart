@@ -166,13 +166,86 @@ extension StaffSystem on HubGame {
     return breakSpot + o;
   }
 
+  /// 대기 직원이 지금 서 있는 곳: 벤치 앞 제자리 + 어슬렁거린 만큼
+  Offset idleSpot(Staff s) => benchSpot(s) + s.idleOff;
+
+  /// 대기 직원 어슬렁 (매 프레임, 실제 시간 dt): 제자리 둘레를 천천히 걷다 멈춰 둘러보고, 가끔 혼잣말.
+  /// 고른 직원(배치할 시설을 기다리는 중)은 멈춰 있음
+  void updateIdle(double dt) {
+    for (final s in staff) {
+      if (s.idleSayT > 0) s.idleSayT -= dt;
+      if (!s.idle) {
+        s.idleOff = Offset.zero;
+        s.idleGoal = null;
+        s.idleSayT = 0;
+        continue;
+      }
+      if (picking == s) continue;
+      final goal = s.idleGoal;
+      if (goal == null) {
+        // 처음엔 다 같이 움직이지 않게 기다리는 시간을 흩어 둠
+        s.idleGoal = s.idleOff;
+        s.idleWait = rnd.nextDouble() * Cfg.idleWaitMax;
+        continue;
+      }
+      if (s.idleWait > 0) {
+        s.idleWait -= dt;
+        continue;
+      }
+      s.idleOff = stepToward(s.idleOff, goal, Cfg.idleWalkSpeed, dt);
+      if (s.idleOff != goal) continue;
+      // 도착: 잠깐 서 있다가 다음 곳으로. 가끔은 제자리로 돌아오고, 가끔은 한 발짝만 떼서 고개를 돌림
+      s.idleWait = Cfg.idleWaitMin + rnd.nextDouble() * (Cfg.idleWaitMax - Cfg.idleWaitMin);
+      // 다른 사람(대기 직원·벤치에서 쉬는 직원)과 몸이 겹치지 않는 곳만 고름. 몇 번 해 봐도 없으면 제자리에서 고개만 돌림
+      final home = benchSpot(s);
+      Offset? next;
+      for (var k = 0; k < 6 && next == null; k++) {
+        final r = rnd.nextDouble();
+        final o = r < 0.3
+            ? Offset.zero
+            : r < 0.5
+                ? _clampRoam(s.idleOff + Offset((rnd.nextBool() ? 1 : -1) * 0.12, 0))
+                : Offset(
+                    (rnd.nextDouble() * 2 - 1) * Cfg.idleRoamX,
+                    -Cfg.idleRoamUp + rnd.nextDouble() * (Cfg.idleRoamUp + Cfg.idleRoamDown),
+                  );
+        if (_roomAt(s, home + o)) next = o;
+      }
+      s.idleGoal = next ?? s.idleOff;
+      if (rnd.nextDouble() < Cfg.idleSayChance) {
+        s.idleSay = Cfg.idleSays[rnd.nextInt(Cfg.idleSays.length)];
+        s.idleSayT = 2.2;
+      }
+    }
+  }
+
+  /// 이 자리에 서도 다른 사람과 안 겹치는지 (지금 선 곳과 가는 곳 둘 다 피함)
+  bool _roomAt(Staff s, Offset p) {
+    for (final o in staff) {
+      if (o == s) continue;
+      if (o.idle) {
+        final g = o.idleGoal;
+        if ((idleSpot(o) - p).distance < Cfg.idleGap) return false;
+        if (g != null && (benchSpot(o) + g - p).distance < Cfg.idleGap) return false;
+      } else if (o.rest != 0 && (o.pos - p).distance < Cfg.idleGap) {
+        return false; // 쉬러 오가는 직원·벤치 옆에서 쉬는 직원
+      }
+    }
+    return true;
+  }
+
+  Offset _clampRoam(Offset o) => Offset(
+        o.dx.clamp(-Cfg.idleRoamX, Cfg.idleRoamX).toDouble(),
+        o.dy.clamp(-Cfg.idleRoamUp, Cfg.idleRoamDown).toDouble(),
+      );
+
   /// 화면을 탭한 곳에 있는 직원 (대기 직원·운반 직원). 없으면 null
   Staff? staffAt(Offset world) {
     final tp = Offset(world.dx / Cfg.tile, world.dy / Cfg.tile);
     bool hit(Offset feet) =>
         (tp - (feet - const Offset(0, 0.45))).distance < 0.6;
     for (final s in staff) {
-      if (s.idle && hit(benchSpot(s))) return s;
+      if (s.idle && hit(idleSpot(s))) return s;
     }
     for (final c in carriers) {
       if (!c.staff.away && hit(c.pos)) return c.staff;
