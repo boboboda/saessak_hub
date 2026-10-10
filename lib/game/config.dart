@@ -288,11 +288,11 @@ class Cfg {
     Mission('3일차 도달', 3, 3, 2000),
     Mission('배송 지역 2곳 열기', 4, 2, 3000, perk: 1),
     Mission('중형 창고로 확장', 5, 1, 5000, perk: 1),
-    Mission('택배 500건 배송', 0, 500, 12000, perk: 1),
-    Mission('배송 지역 4곳 열기', 4, 4, 15000, perk: 1),
-    Mission('대형 창고로 확장', 5, 2, 20000, perk: 1),
-    Mission('택배 2,000건 배송', 0, 2000, 50000, perk: 1),
-    Mission('모든 배송 지역 열기', 4, 5, 60000, ticket: 1, perk: 1),
+    Mission('택배 500건 배송', 0, 500, 8000, perk: 1),
+    Mission('배송 지역 4곳 열기', 4, 4, 10000, perk: 1),
+    Mission('대형 창고로 확장', 5, 2, 12000, perk: 1),
+    Mission('택배 2,000건 배송', 0, 2000, 25000, perk: 1),
+    Mission('모든 배송 지역 열기', 4, 5, 30000, ticket: 1, perk: 1),
     Mission('직원 레벨 3 달성', 6, 3, 3000),
     Mission('건물 업그레이드 3번', 7, 3, 5000),
     Mission('급송 택배 5건 성공', 8, 5, 4000),
@@ -306,11 +306,11 @@ class Cfg {
     Mission('별 5점 손님 50명', 11, 50, 5000),
     Mission('별 5점 손님 500명', 11, 500, 30000, perk: 1),
     Mission('올해 목표를 모두 달성', 12, 1, 10000, perk: 1),
-    Mission('3년 연속 목표 모두 달성', 12, 3, 40000, ticket: 1, perk: 1),
+    Mission('3년 연속 목표 모두 달성', 12, 3, 25000, ticket: 1, perk: 1),
     Mission('첫 전직', 13, 1, 5000),
     Mission('전직 5번', 13, 5, 25000, perk: 1),
     Mission('세트 3개 발견', 14, 3, 6000),
-    Mission('세트 10개 모두 발견', 14, 10, 50000, ticket: 1, perk: 1),
+    Mission('세트 10개 모두 발견', 14, 10, 30000, ticket: 1, perk: 1),
     Mission('누적 접수 10,000건', 15, 10000, 80000, perk: 1),
   ];
   static const int perkCap = 15; // 업적 영구 수익 보너스 상한(%)
@@ -323,6 +323,7 @@ class Cfg {
   static const List<double> gradeMiss = [0.05, 0.12, 1, 1]; // 놓친 비율 상한 (S·A)
   // 등급별 명성. 제안서 예시(+30/−10)는 접수량 구간(25·60·120…)에 비해 커서 줄임
   static const List<int> gradeFame = [8, 4, 1, 0, -4];
+  static const int lostFameEvery = 3; // 하루에 놓친 손님 3명마다 명성 −1
   static const List<int> gradeColor = [0xFFFFD166, 0xFF7BD389, 0xFF8EC5FF, 0xFFF0963A, 0xFFE5484D];
 
   // ---- 직업 (8개) ----
@@ -407,7 +408,7 @@ class Cfg {
   static const double evtRookieWage = 2.0;
 
     // ---- 연구 (RP: 배송 1건 = 1, 연구실 1개당 하루 +30). 한 번에 하나, 같은 갈래는 앞 단계부터 ----
-  static const List<String> resBranch = ['작업', '물류', '서비스'];
+  static const List<String> resBranch = ['작업', '물류', '서비스', '장비'];
   static const List<ResearchDef> research = [
     ResearchDef('바코드 접수', 0, 0, 200, 1000, 120, '접수 +10%'),
     ResearchDef('자동 테이프', 0, 1, 500, 3000, 240, '포장 +15%'),
@@ -419,7 +420,45 @@ class Cfg {
     // 단골 카드: 제안서 '재방문 +'을 손님 수 +8%로 정함
     ResearchDef('단골 카드', 2, 1, 700, 4000, 270, '단골이 다시 와서 손님 +8%'),
     ResearchDef('프리미엄 배송', 2, 2, 1500, 9000, 420, '급송 보너스 ×2'),
+    // ---- 장비 갈래 + 각 갈래 뒤 단계 (9번부터, 앞 번호는 저장과 맞물려 바꾸지 않음) ----
+    ResearchDef('테이프 디스펜서', 3, 0, 250, 1500, 120, '장비: 포장대에 달면 포장 +20%', equip: 'tape'),
+    ResearchDef('라벨 프린터', 3, 1, 500, 3000, 200, '장비: 접수 창구에 달면 접수 +25%', grade: 1, equip: 'label'),
+    ResearchDef('에어캡 롤러', 3, 2, 900, 5000, 260, '장비: 포장대에 달면 포장 실수 −60%', grade: 1, equip: 'bubble'),
+    ResearchDef('지게차', 3, 3, 1800, 12000, 400, '장비: 도크에 두면 싣기 ×1.8 (지게차가 선반을 오감)', grade: 2, equip: 'forklift'),
+    ResearchDef('포장 로봇팔', 3, 4, 4000, 30000, 600, '장비: 포장대에 달면 포장 +60%', grade: 3, equip: 'robot'),
+    ResearchDef('손수레', 0, 3, 1600, 9000, 360, '운반 직원 걸음 +20%', grade: 2),
+    ResearchDef('스트레칭 체조', 0, 4, 3500, 20000, 520, '모든 직원 체력 소모 −20%', grade: 3),
+    ResearchDef('높은 선반 사다리', 1, 3, 2500, 14000, 420, '장비: 선반에 달면 보관 +12칸', grade: 2, equip: 'ladder'),
+    ResearchDef('롤러 컨베이어', 1, 4, 4500, 30000, 600, '장비: 도크에 두면 싣기 ×1.4', grade: 3, equip: 'roller'),
+    ResearchDef('번호표 발권기', 2, 3, 2200, 12000, 400, '장비: 접수 창구에 달면 기다리는 손님 인내심 소모 −35%', grade: 2, equip: 'ticket'),
+    ResearchDef('카드 단말기', 2, 4, 4000, 25000, 560, '장비: 접수 창구에 달면 접수 1건마다 +40원', grade: 3, equip: 'card'),
+    ResearchDef('드론 배송', 1, 5, 8000, 60000, 900, '배달 차량 왕복 시간 −25%', grade: 4),
+    ResearchDef('스마트 태그', 3, 5, 7000, 50000, 800, '장비: 선반에 달면 보관 +20칸 · 꺼낼 때 빠름', grade: 4, equip: 'tag'),
   ];
+
+  // ---- 장비: 연구로 열고, 시설 하나에 하나씩 달아 씀 (바꾸면 앞 장비는 사라짐) ----
+  static const List<EquipDef> equips = [
+    EquipDef('tape', '테이프 디스펜서', 'pack', 1200, '포장 +20%', speed: 1.2),
+    EquipDef('bubble', '에어캡 롤러', 'pack', 2500, '포장 실수 −60%', slip: 0.4),
+    EquipDef('robot', '포장 로봇팔', 'pack', 15000, '포장 +60%', speed: 1.6),
+    EquipDef('label', '라벨 프린터', 'counter', 2500, '접수 +25%', speed: 1.25),
+    EquipDef('ticket', '번호표 발권기', 'counter', 4000, '손님 인내심 소모 −35%', calm: 0.65),
+    EquipDef('card', '카드 단말기', 'counter', 6000, '접수 1건마다 +40원', tip: 40),
+    EquipDef('ladder', '높은 선반 사다리', 'shelf', 3000, '보관 +12칸', cap: 12),
+    EquipDef('tag', '스마트 태그', 'shelf', 9000, '보관 +20칸 · 꺼낼 때 빠름', cap: 20, load: 1.3),
+    EquipDef('forklift', '지게차', 'dock', 9000, '싣기 ×1.8', load: 1.8),
+    EquipDef('roller', '롤러 컨베이어', 'dock', 6000, '싣기 ×1.4', load: 1.4),
+  ];
+  static EquipDef? equipOf(String? id) {
+    for (final e in equips) {
+      if (e.id == id) return e;
+    }
+    return null;
+  }
+
+  // ---- 같은 시설을 더 지을수록 비싸짐 (하나 더마다 +30%) ----
+  static const Set<String> costGrow = {'counter', 'pack', 'shelf', 'dock', 'lounge', 'lab', 'classroom', 'vending'};
+  static const double costGrowStep = 0.3;
   static const int rpPerParcel = 1, labRpDay = 30, nightShip = 10;
   // ---- 훈련 (교육실에서 하루, 능력치 하나 +1, 비용 1,000 × 지금 능력치) ----
   static const List<String> statName = ['손속도', '걸음', '친절', '체력', '꼼꼼'];
@@ -427,8 +466,8 @@ class Cfg {
 
     // ---- 연말 '택배 대상' 시상식: 올해 점수 = 올해 접수 + 평균 별 × 60 + 명성 × 0.5 ----
   static const List<String> rivalName = ['번개택배', '한빛로지스', '다람쥐배송', '큰곰물류', '하늘특송'];
-  static const List<int> rivalBase = [350, 550, 800, 1100, 1500]; // 1년차 점수
-  static const double rivalGrowth = 1.45; // 해마다 ×1.45
+  static const List<int> rivalBase = [900, 1300, 1700, 2600, 3950]; // 1년차 점수: 첫해 3위 안은 할 만, 1위는 4년차쯤
+  static const double rivalGrowth = 1.2; // 해마다 ×1.2
   static const double endlessBoost = 1.3; // 무한 모드(전국 네트워크 뒤) 경쟁사 강화
   static const double awardStarW = 60, awardFameW = 0.5;
   static const int awardFirstFame = 300, awardTop3Fame = 100;
@@ -437,13 +476,16 @@ class Cfg {
   static const List<String> corpName = ['동네 영업소', '지점', '거점 허브', '광역 물류센터', '전국 네트워크'];
   static const List<String> gradeUnlockText = [
     '기본 시설',
-    '연구실 · 대기 의자 · 화분',
-    '교육실 · 컨베이어 · 상위 직업(전직)',
-    '야간 출고 연구',
-    '엔딩 + 무한 모드(경쟁사 강화)',
+    '연구실 · 대기 의자 · 화분 · 라벨 프린터·에어캡 롤러 연구',
+    '교육실 · 컨베이어 · 상위 직업(전직) · 지게차·손수레·사다리·번호표 발권기 연구',
+    '야간 출고 · 포장 로봇팔·롤러 컨베이어·카드 단말기·스트레칭 체조 연구',
+    '엔딩 + 무한 모드(경쟁사 강화) · 드론 배송·스마트 태그 연구',
   ];
   // 지점 조건 '하루 처리 40건'은 명성 100 근처 접수량(하루 약 13건)으로 어려워 20건으로 낮춤
   static const int grade1Day = 20;
+  // 승급에 필요한 명성 (등급 번호 순). 정시 배송 1건 ≈ 명성 1이라, 엔딩(전국 네트워크)이 4~5년차에 오게 맞춤
+  static const List<int> gradeFameNeed = [0, 150, 1000, 4000, 10000];
+  static const int grade3Staff = 16;
   static const Map<String, int> gradeUnlock = {
     'lab': 1, 'chair': 1, 'plant': 1, 'classroom': 2, 'conveyor': 2,
   };
@@ -531,4 +573,15 @@ class Cfg {
   static const double sootheCooldown = 20; // 달래기 재사용 대기(게임 초)
   static const int snackCost = 200; // 간식 비용(원)
   static const double snackRestore = 0.4; // 간식으로 회복하는 체력 비율
+}
+
+/// 장비 하나 (시설에 다는 용품)
+class EquipDef {
+  final String id, name, forType; // forType: 달 수 있는 시설 id
+  final int cost;
+  final String desc;
+  final double speed, calm, slip, load; // 배수
+  final int cap, tip;
+  const EquipDef(this.id, this.name, this.forType, this.cost, this.desc,
+      {this.speed = 1, this.calm = 1, this.slip = 1, this.load = 1, this.cap = 0, this.tip = 0});
 }

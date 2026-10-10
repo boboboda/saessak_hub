@@ -22,7 +22,7 @@ BuildingType ty(String id) => Cfg.types.firstWhere((t) => t.id == id);
 /// 놓을 자리 찾기: 같은 종류 아래 → 앞 단계 오른쪽 → 구역 안 아무 데나 (통로 한 칸 띄움은 게임 규칙이 검사)
 bool place(HubGame g, String id) {
   final t = ty(id);
-  if (!g.gradeAllows(id) || g.money < t.cost) return false;
+  if (!g.gradeAllows(id) || g.money < g.costOf(t)) return false;
   if (id == 'conveyor' && !g.conveyorOpen) return false;
   g.placing = t;
   g.mode = 2;
@@ -81,7 +81,7 @@ class Log {
   final miles = <String>[];
   final seen = <String>{};
   void mile(HubGame g, String k, [String extra = '']) {
-    if (!seen.add(k)) return;
+    if (!seen.add(k + (k.contains('시상식') ? extra : ''))) return;
     final realMin = g.gt / 60; // 1배속 기준 실제 분
     miles.add('${g.day}일차(${g.year}년차 ${g.dayOfYear}일) · 1배속 ${realMin.toStringAsFixed(0)}분 · $k $extra');
   }
@@ -115,6 +115,10 @@ void main() {
         dayDeliv0 = g.delivered;
         dayMoney0 = g.money;
         g.report = null;
+      }
+      if (g.award != null) {
+        final a = g.award!;
+        log.mile(g, '${a.year}년 시상식 ${a.rank}위', a.rows.map((r) => '${r.$3 ? '나' : r.$1.substring(0, 2)} ${r.$2}').join(' · '));
       }
       g.award = null;
       if (g.gradeUp != null) {
@@ -190,7 +194,7 @@ void main() {
           max(1, g.ofType('shelf').fold(0, (a, b) => a + b.cap));
       final spare = g.money - reserve;
       bool tryBuild(String id) {
-        if (spare < ty(id).cost) return false;
+        if (spare < g.costOf(ty(id))) return false;
         if (place(g, id)) {
           log.mile(g, '${ty(id).name} ${g.ofType(id).length}개째', '');
           staffUp();
@@ -220,6 +224,22 @@ void main() {
         if (up.isNotEmpty && spare > up.first.upgradeCost * 2) {
           g.upgradeBuilding(up.first);
           built = true;
+        }
+      }
+      // 장비: 열린 것 중 그 시설에 맞는 가장 좋은(비싼) 것을 달거나 바꿈
+      for (final b in g.buildings) {
+        final opts = Cfg.equips.where((e) => e.forType == b.type.id && g.equipOpen(e.id)).toList()
+          ..sort((a, c) => c.cost.compareTo(a.cost));
+        if (opts.isEmpty) continue;
+        final e = opts.first;
+        final cur = b.equipDef;
+        if (cur != null && cur.cost >= e.cost) {
+          if (!b.equipMax && g.money - reserve > b.equipUpCost * 3) g.upgradeEquip(b);
+          continue;
+        }
+        if (g.money - reserve > e.cost * (cur == null ? 2 : 4)) {
+          g.buyEquip(b, e);
+          log.mile(g, '장비 처음: ${e.name}');
         }
       }
       // 차량: 지역마다 센터에 쌓이면 배달 차, 허브 선반에 그 지역 택배가 많으면 간선

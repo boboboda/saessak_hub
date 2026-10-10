@@ -95,7 +95,7 @@ extension BuildSystem on HubGame {
                 if (!Cfg.propIds.contains(t.id) && frontRow(r).overlaps(b.rect)) return '이 건물 앞줄이 막혀요';
       }
     }
-    if (money < t.cost) return '돈이 부족해요';
+    if (money < costOf(t)) return '돈이 부족해요';
     return null;
   }
 
@@ -218,7 +218,7 @@ extension BuildSystem on HubGame {
       showToast(problem);
       return;
     }
-    money -= t.cost;
+    money -= costOf(t);
     final nb = Building(t, ghostX, ghostY);
     if (t.id == 'counter' && !ofType('counter').any((b) => b.mine)) {
       nb.mine = true; // 첫 접수 창구는 내 자리
@@ -337,6 +337,42 @@ extension BuildSystem on HubGame {
     }
     selected = null;
     showToast('${b.type.name} 철거 (+${fmt(refund)}원)');
+  }
+
+  /// 지금 지을 때 값: 같은 시설이 많을수록 비싸짐 (하나 더마다 +30%)
+  int costOf(BuildingType t) {
+    if (!Cfg.costGrow.contains(t.id)) return t.cost;
+    final n = ofType(t.id).length;
+    return (t.cost * (1 + Cfg.costGrowStep * n) / 100).round() * 100;
+  }
+
+  /// 시설에 장비 달기 (앞 장비는 사라짐)
+  void buyEquip(Building b, EquipDef e) {
+    if (e.forType != b.type.id || !this.equipOpen(e.id) || b.equip == e.id) return;
+    if (money < e.cost) {
+      showToast('돈이 부족해요');
+      return;
+    }
+    money -= e.cost;
+    b.equip = e.id;
+    b.equipLv = 1;
+    showToast('${b.type.name}에 ${e.name} 설치! ${e.desc}');
+    ui();
+  }
+
+  /// 장비 강화 (Lv3까지, 값 ×2 → ×4)
+  void upgradeEquip(Building b) {
+    final e = b.equipDef;
+    if (e == null || b.equipMax) return;
+    final cost = b.equipUpCost;
+    if (money < cost) {
+      showToast('돈이 부족해요');
+      return;
+    }
+    money -= cost;
+    b.equipLv++;
+    showToast('${e.name} Lv.${b.equipLv} 강화! 효과 +${(50 * (b.equipLv - 1))}%');
+    ui();
   }
 
   void upgradeBuilding(Building b) {

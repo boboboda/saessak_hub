@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/sprites.dart';
 import '../models/models.dart';
 import 'dialogs.dart';
 import 'staff_widgets.dart';
@@ -22,8 +23,8 @@ class BuildingSheet extends StatelessWidget {
     return SheetFrame(
       title: '${t.name} #${g.typeIndex(b)}',
       heightFactor: hasSlots
-          ? 0.62
-          : (t.id == 'shelf' || t.id == 'dock' ? 0.55 : 0.34),
+          ? 0.7
+          : (t.id == 'shelf' || t.id == 'dock' ? 0.66 : 0.34),
       onClose: g.closeAll,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
@@ -48,6 +49,10 @@ class BuildingSheet extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 8),
+          ],
+          if (Cfg.equips.any((e) => e.forType == t.id)) ...[
+            EquipSection(g, b),
             const SizedBox(height: 8),
           ],
           if (t.id == 'counter')
@@ -386,5 +391,83 @@ class BuildingSheet extends StatelessWidget {
       ));
     }
     return rows;
+  }
+}
+
+/// 장비 칸: 이 시설에 달 수 있는 장비 (연구로 열림). 하나만 달 수 있고, 바꾸면 앞 장비는 사라짐
+class EquipSection extends StatelessWidget {
+  final HubGame g;
+  final Building b;
+  const EquipSection(this.g, this.b, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final list = Cfg.equips.where((e) => e.forType == b.type.id).toList();
+    final cur = b.equipDef;
+    return CardBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.handyman, size: 18, color: C.accent),
+              const SizedBox(width: 6),
+              const Text('장비 칸', style: Tx.h2),
+              const Spacer(),
+              Text(cur == null ? '비어 있음 · 하나만 달 수 있어요' : '사용 중: ${cur.name}', style: Tx.sub),
+            ],
+          ),
+          const SizedBox(height: 8),
+          for (final e in list) ...[
+            _row(e),
+            const SizedBox(height: 6),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _row(EquipDef e) {
+    final open = g.equipOpen(e.id);
+    final on = b.equip == e.id;
+    final ri = Cfg.research.indexWhere((r) => r.equip == e.id);
+    return Opacity(
+      opacity: open ? 1 : 0.55,
+      child: Row(
+        children: [
+          ItemFrame(
+            image: Sprites.equips[e.id],
+            fallback: const Icon(Icons.handyman, color: C.sub),
+            size: 46,
+            tag: on ? 'Lv${b.equipLv}' : null,
+            tagColor: C.good,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(e.name, style: Tx.h2.copyWith(fontSize: 13)),
+                Text(open ? e.desc : '연구 「${Cfg.research[ri].name}」로 열려요', style: Tx.sub),
+              ],
+            ),
+          ),
+          const SizedBox(width: 6),
+          on
+              ? AppButton(
+                  b.equipMax ? 'Lv.3 최고' : 'Lv.${b.equipLv + 1} ${g.fmt(b.equipUpCost)}원',
+                  small: true,
+                  color: C.good,
+                  onTap: !b.equipMax && g.money >= b.equipUpCost ? () => g.upgradeEquip(b) : null,
+                )
+              : AppButton(
+                  open ? '${g.fmt(e.cost)}원' : '잠김',
+                  small: true,
+                  color: b.equip == null ? C.accent : C.blue,
+                  onTap: open && g.money >= e.cost ? () => g.buyEquip(b, e) : null,
+                ),
+        ],
+      ),
+    );
   }
 }

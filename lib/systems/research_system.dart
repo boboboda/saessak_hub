@@ -21,6 +21,7 @@ extension ResearchSystem on HubGame {
     if (resDone(i)) return '완료';
     if (resNow != null) return '다른 연구 중';
         if (!resOpen(i)) return '앞 연구 먼저';
+    if (companyGrade < Cfg.research[i].grade) return '${Cfg.corpName[Cfg.research[i].grade]} 필요';
     if (i == 5 && companyGrade < Cfg.nightShipGrade) return '${Cfg.corpName[Cfg.nightShipGrade]} 필요';
     final d = Cfg.research[i];
     if (rp < d.rp) return 'RP 부족';
@@ -68,6 +69,17 @@ extension ResearchSystem on HubGame {
   double get resCalm => resDone(6) ? 0.9 : 1.0; // 번호표
   double get resIntake => resDone(7) ? 1.08 : 1.0; // 단골 카드
   int get resUrgent => resDone(8) ? 2 : 1; // 프리미엄 배송
+  double get resCart => resDone(14) ? 1.2 : 1.0; // 손수레: 운반 걸음
+  double get resStretch => resDone(15) ? 0.8 : 1.0; // 스트레칭 체조: 체력 소모
+  double get resDrone => resDone(20) ? 0.75 : 1.0; // 드론 배송: 배달 차량 왕복 시간
+
+  /// 연구로 열린 장비인지
+  bool equipOpen(String id) {
+    for (var i = 0; i < Cfg.research.length; i++) {
+      if (Cfg.research[i].equip == id) return resDone(i);
+    }
+    return false;
+  }
 
   /// 하루 끝: 연구실 RP, 야간 출고(선반 택배 일부를 지역센터로), 훈련 끝난 직원 능력치 +1
   List<String> researchDayEnd() {
@@ -167,5 +179,7 @@ class ResearchDef {
   final int rp, cost;
   final double time; // 게임 초
   final String effect;
-  const ResearchDef(this.name, this.branch, this.tier, this.rp, this.cost, this.time, this.effect);
+  final int grade; // 시작하려면 필요한 회사 등급 (0 동네 영업소)
+  final String? equip; // 열리는 장비 id (Cfg.equips)
+  const ResearchDef(this.name, this.branch, this.tier, this.rp, this.cost, this.time, this.effect, {this.grade = 0, this.equip});
 }

@@ -3,6 +3,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
 
+import 'config.dart';
+
 /// 도트 스프라이트 모음. 로딩에 실패하면 null → 화면은 기존 도형으로 그려짐.
 class Sprites {
   static ui.Image? staffWalk;
@@ -91,6 +93,8 @@ class Sprites {
   static final Map<String, ui.Image> decor = {};
   /// 메뉴 도트 아이콘 (assets/sprites/ui/<이름>.png)
   static final Map<String, ui.Image> menuIcons = {};
+  /// 장비 그림 (assets/sprites/props/eq_<id>.png)
+  static final Map<String, ui.Image> equips = {};
   static const List<String> uiNames = [
     'build', 'staff', 'goal', 'research', 'menu', 'stats', 'region', 'book', 'expand', 'aisle',
   ];
@@ -213,6 +217,10 @@ class Sprites {
       if (im != null) menuIcons[n] = im;
     }
     if (van != null) menuIcons['truck'] = van!; // 차고 칸은 택배 차 그림
+    for (final e in Cfg.equips) {
+      final im = await _img('assets/sprites/props/eq_${e.id}.png');
+      if (im != null) equips[e.id] = im;
+    }
     if (menuIcons['region'] != null) menuIcons['map'] = menuIcons['region']!;
   }
 

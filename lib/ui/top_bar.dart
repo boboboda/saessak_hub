@@ -183,6 +183,14 @@ class TopBar extends StatelessWidget {
                     case 11:
                       g.rp += 1000;
                       break;
+                    case 18:
+                      // 장비 연구 모두 열기 + 돈 (장비 확인용)
+                      for (var i = 0; i < Cfg.research.length; i++) {
+                        if (Cfg.research[i].equip != null) g.researched.add(i);
+                      }
+                      g.money += 100000;
+                      g.showToast('장비 연구를 모두 열었어요 · 시설을 눌러 장비 칸을 보세요');
+                      break;
                     case 17:
                       if (!g.debugRouteEvent(g.debugStory++))
                         g.showToast('달리는 차량이 없어요');
@@ -291,6 +299,10 @@ class TopBar extends StatelessWidget {
                   PopupMenuItem(
                     value: 17,
                     child: Text('노선 사건 일으키기 (차례로)', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 18,
+                    child: Text('장비 연구 모두 열기 + 돈', style: Tx.body),
                   ),
                   PopupMenuItem(
                     value: 16,

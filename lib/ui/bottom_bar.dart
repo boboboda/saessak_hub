@@ -95,7 +95,7 @@ class ActionBar extends StatelessWidget {
       infoColor = okEnabled ? C.good : C.bad;
       final (near, sets) = g.previewSets(t, g.ghostX, g.ghostY);
       info =
-          '${t.name} ${t.w}×${t.h}칸 · ${t.cost}원 — '
+          '${t.name} ${t.w}×${t.h}칸 · ${g.fmt(g.costOf(t))}원 — '
           '${okEnabled ? '놓을 수 있어요' : problem}'
           '${near.isEmpty ? '' : '\n맞닿음 ${near.length}곳'}'
           '${sets.isEmpty ? '' : ' · 세트 발동: ${sets.join(', ')}'}';

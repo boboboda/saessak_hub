@@ -368,7 +368,7 @@ extension StaffSystem on HubGame {
   /// 체력 계산: 일한 직원은 줄고, 쉰 직원은 찬다. (매 프레임, 일 처리 뒤에 호출)
   void updateStaffEnergy(double dt) {
     final n = loungeBonus;
-    final drain = Cfg.drainPerSec * (1.0 - Cfg.loungeDrain * n) * this.jobDrain * this.evtDrain; // 현장 반장·폭염
+    final drain = Cfg.drainPerSec * (1.0 - Cfg.loungeDrain * n) * this.jobDrain * this.evtDrain * this.resStretch; // 현장 반장·폭염·스트레칭 체조
     for (final s in staff) {
       // 회복 속도: 대기·휴식 자리 > 휴게실(×3) > 자리에서 서서 쉬기(아주 느림)
       double gain;

@@ -66,7 +66,7 @@ extension RatingSystem on HubGame {
     if (avg != null) {
       final n = rt.served + rt.lost;
       grade = gradeOf(avg, n == 0 ? 0 : rt.lost / n);
-      fameD = Cfg.gradeFame[grade];
+      fameD = Cfg.gradeFame[grade] - rt.lost ~/ Cfg.lostFameEvery; // 놓친 손님이 많으면 명성이 깎임
       fame = max(0, fame + fameD);
             rt.grades[grade]++;
       if (grade <= 2) rt.yGood++;

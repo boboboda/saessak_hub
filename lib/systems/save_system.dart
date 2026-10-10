@@ -93,6 +93,8 @@ extension SaveSystem on HubGame {
             'y': b.ty,
             'mine': b.mine,
             'lv': b.level,
+            if (b.equip != null) 'eq': b.equip,
+            if (b.equip != null) 'eql': b.equipLv,
             'regions': b.regions,
             'crew': [for (final s in b.crew) s.id],
           }
@@ -167,6 +169,8 @@ extension SaveSystem on HubGame {
         final b = Building(type, m['x'] as int, m['y'] as int);
         b.mine = m['mine'] as bool;
         b.level = (m['lv'] as int?) ?? 1;
+        b.equip = m['eq'] as String?; // 예전 저장엔 없음
+        b.equipLv = ((m['eql'] as int?) ?? 1).clamp(1, 3);
         final rg = (m['regions'] as List).map((e) => e as int).toList();
         for (var i = 0; i < b.regions.length && i < rg.length; i++) {
           b.regions[i] = rg[i];

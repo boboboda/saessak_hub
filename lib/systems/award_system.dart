@@ -57,13 +57,13 @@ extension AwardSystem on HubGame {
   List<(String, int, int)> gradeNeeds(int g) {
     switch (g) {
       case 1:
-        return [('명성', fame, 100), ('하루 최고 접수', rt.bestEver, Cfg.grade1Day)];
+        return [('명성', fame, Cfg.gradeFameNeed[1]), ('하루 최고 접수', rt.bestEver, Cfg.grade1Day)];
       case 2:
-        return [('명성', fame, 400), ('연말 시상식 3위 안', bestRank == 0 ? 0 : (bestRank <= 3 ? 1 : 0), 1)];
+        return [('명성', fame, Cfg.gradeFameNeed[2]), ('연말 시상식 3위 안', bestRank == 0 ? 0 : (bestRank <= 3 ? 1 : 0), 1)];
       case 3:
-        return [('명성', fame, 1200), ('직원 수', staff.length, 10)];
+        return [('명성', fame, Cfg.gradeFameNeed[3]), ('직원 수', staff.length, Cfg.grade3Staff)];
       case 4:
-        return [('명성', fame, 2500), ('택배 대상 1위', awardWins > 0 ? 1 : 0, 1)];
+        return [('명성', fame, Cfg.gradeFameNeed[4]), ('택배 대상 1위', awardWins > 0 ? 1 : 0, 1)];
     }
     return const [];
   }

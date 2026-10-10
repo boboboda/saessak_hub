@@ -112,7 +112,7 @@ extension FleetSystem on HubGame {
   void startTrunkTrip(FleetUnit u) {
     u.state = 1;
     u.t = 0;
-    u.dur = RegionMap.of(u.region).tripSec;
+    u.dur = RegionMap.of(u.region).tripSec * (u.isTrunk ? 1.0 : this.resDrone);
     _planEvent(u);
   }
 
@@ -129,7 +129,7 @@ extension FleetSystem on HubGame {
     u.t = 0;
     final m = RegionMap.of(u.region);
     u.house = rnd.nextInt(m.courier.length);
-    u.dur = m.deliverSec(u.house);
+    u.dur = m.deliverSec(u.house) * this.resDrone; // 드론 배송
     _planEvent(u);
   }
 
@@ -282,7 +282,7 @@ extension FleetSystem on HubGame {
       u.cargo = 0;
       u.state = 2;
       u.t = 0;
-      u.dur = RegionMap.of(u.region).deliverSec(u.house) * 0.7;
+      u.dur = RegionMap.of(u.region).deliverSec(u.house) * 0.7 * this.resDrone;
     }
   }
 }

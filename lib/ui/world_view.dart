@@ -187,6 +187,7 @@ extension WorldView on HubGame {
     _drawWarehouse(c);
     _drawDecor(c);
     _drawBuildings(c);
+    _drawEquips(c);
     _drawPeople(c);
     _q.sort((a, b) => a.$1.compareTo(b.$1));
     for (final e in _q) {
@@ -472,6 +473,74 @@ extension WorldView on HubGame {
   }
 
   // ---------------- 건물 ----------------
+  /// 시설에 단 장비 그림. 지게차는 도크와 가장 가까운 선반 사이를 천천히 오감
+  void _drawEquips(Canvas c) {
+    const t = Cfg.tile;
+    for (final b in buildings) {
+      final id = b.equip;
+      if (id == null) continue;
+      final img = Sprites.equips[id];
+      if (img == null) continue;
+      final r = Rect.fromLTWH(b.tx * t, b.ty * t, b.type.w * t, b.type.h * t);
+      switch (b.type.id) {
+        case 'counter': // 책상 왼쪽 끝에 올려 둠 (오른쪽 칸은 상자 적재대). 번호표 발권기는 창구 왼쪽 바닥에 세움
+          final d = id == 'ticket'
+              ? Rect.fromLTWH(r.left - t * 0.45, r.bottom - 34, 18, 34)
+              : Rect.fromCenter(center: Offset(r.left + t * 0.22, r.top + t * 0.95), width: 20, height: 20);
+          _at(r.bottom + 1, () => Sprites.drawContain(c, img, d));
+          break;
+        case 'pack': // 포장대 앞 오른쪽 모서리
+          final big = id == 'robot' || id == 'bubble';
+          final d = Rect.fromCenter(
+              center: Offset(r.right - t * 0.2, r.top + t * (big ? 1.25 : 1.45)), width: big ? 26 : 20, height: big ? 28 : 20);
+          _at(r.bottom + 1, () => Sprites.drawContain(c, img, d));
+          break;
+        case 'shelf': // 사다리는 선반 옆에 기대 두고, 스마트 태그 스캐너는 옆에 걸어 둠
+          final d = id == 'ladder' ? Rect.fromLTWH(r.right - 8, r.bottom - 36, 22, 36) : Rect.fromLTWH(r.right - 4, r.bottom - 30, 14, 20);
+          _at(r.bottom + 1, () => Sprites.drawContain(c, img, d));
+          break;
+        case 'dock':
+          final dockP = pickOf(b);
+          if (id == 'forklift') {
+            // 가장 가까운 선반 앞 ↔ 도크 앞을 오감 (보이기용, 실제 싣기는 loadMul)
+            Offset? shelfP;
+            var best = double.infinity;
+            for (final sh in ofType('shelf')) {
+              final q = pickOf(sh);
+              final dd = (q - dockP).distanceSquared;
+              if (dd < best) {
+                best = dd;
+                shelfP = q;
+              }
+            }
+            final from = shelfP ?? dockP - const Offset(3, 0);
+            final ph = (clock * 0.25 + b.ty * 0.13) % 1.0;
+            final k = ph < 0.5 ? ph * 2 : 2 - ph * 2; // 0→1→0
+            final e = Curves.easeInOut.transform(k);
+            final p = Offset.lerp(from, dockP - const Offset(0.8, 0), e)!;
+            final goingRight = ph < 0.5 ? (dockP.dx > from.dx) : (dockP.dx < from.dx);
+            final px = Offset(p.dx * t, p.dy * t);
+            final d = Rect.fromCenter(center: px - const Offset(0, 14), width: 44, height: 36);
+            _at(px.dy + 2, () {
+              shadowAt(c, px, 30);
+              c.save();
+              if (!goingRight) { // 가는 쪽으로 포크가 보이게 뒤집음
+                c.translate(px.dx * 2, 0);
+                c.scale(-1, 1);
+              }
+              Sprites.drawContain(c, img, d);
+              c.restore();
+            });
+          } else {
+            final px = Offset((dockP.dx - 0.5) * t, (b.ty + b.type.h - 0.2) * t);
+            final d = Rect.fromCenter(center: px - const Offset(0, 10), width: 34, height: 22);
+            _at(px.dy, () => Sprites.drawContain(c, img, d));
+          }
+          break;
+      }
+    }
+  }
+
   void _drawBuildings(Canvas c) {
     for (final b in buildings) {
       final r = _px(b.rect).deflate(1);

@@ -244,7 +244,9 @@ extension WorkerSystem on HubGame {
     c.staff.working = true; // 걷는 동안 체력 소모
     final target = c.carrying ? pickOf(c.dst!) : pickOf(c.src!);
     var slow = (c.carrying && c.job!.kind == 3) ? Cfg.bulkySlow : 1.0;
-    if (c.job!.stage == 4) slow *= c.dst!.loadMul; // 도크 업그레이드: 싣는 속도
+    if (c.job!.stage == 4) slow *= c.dst!.loadMul; // 도크 업그레이드·지게차: 싣는 속도
+    if (!c.carrying && c.src!.equip == 'tag') slow *= c.src!.equipLoad; // 스마트 태그: 선반에서 빨리 찾음
+    slow *= this.resCart; // 손수레
     // 통로를 따라 걷는 길찾기 (통로 위 1.5배, 밖 0.7배)
     this.walkCarrier(c, target, Cfg.carrierSpeed * c.staff.walkMul * this.jobWalk(c.staff) * slow, dt);
     if ((c.pos - target).distance > 0.05) return;

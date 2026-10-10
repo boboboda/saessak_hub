@@ -54,6 +54,22 @@ class Building {
   double flash = 0; // 포장 실수 표시 남은 시간(초)
   bool mine = false; // 접수 창구: 내가 직접 앉는 자리 (손님을 탭해서 접수)
 
+  // ---- 장비 (연구로 연 용품 하나) ----
+  String? equip;
+  int equipLv = 1; // 장비 강화 (1~3): 효과가 Lv마다 +50%
+  EquipDef? get equipDef => Cfg.equipOf(equip);
+  double get _ek => 1 + 0.5 * (equipLv - 1);
+  double _up(double v) => 1 + (v - 1) * _ek; // 1보다 큰 배수 키우기
+  double _down(double v) => 1 - (1 - v) * (1 + 0.25 * (equipLv - 1)); // 1보다 작은 배수 (덜 줄임)
+  double get equipSpeed => _up(equipDef?.speed ?? 1);
+  double get equipCalm => _down(equipDef?.calm ?? 1);
+  double get equipSlip => _down(equipDef?.slip ?? 1);
+  double get equipLoad => _up(equipDef?.load ?? 1);
+  int get equipCap => ((equipDef?.cap ?? 0) * _ek).round();
+  int get equipTip => ((equipDef?.tip ?? 0) * _ek).round();
+  int get equipUpCost => (equipDef?.cost ?? 0) * (equipLv == 1 ? 2 : 4);
+  bool get equipMax => equipLv >= 3;
+
   // ---- 업그레이드 ----
   int level = 1;
   static const int maxLevel = 3;
@@ -69,7 +85,7 @@ class Building {
       : 1.0;
 
   /// 선반 용량
-  int get cap => Cfg.shelfCap + 10 * (level - 1) + capPlus;
+  int get cap => Cfg.shelfCap + 10 * (level - 1) + capPlus + equipCap;
     int capPlus = 0; // 직업(분류사)·세트로 늘어난 선반 용량 (매 프레임 다시 계산)
   // 세트 효과 (SetSystem.updateSets 가 0.5초마다 다시 계산)
   double setSpeed = 1, setCalm = 1, setRest = 1, setLoad = 1, setDrain = 1;
@@ -82,7 +98,7 @@ class Building {
       min(Cfg.outboxCap + 2 * (level - 1), Cfg.stackCols * Cfg.stackLayers);
 
   /// 도크 싣는 속도 배수
-  double get loadMul => type.id == 'dock' ? (1 + 0.5 * (level - 1)) * loadPlus : 1.0;
+  double get loadMul => type.id == 'dock' ? (1 + 0.5 * (level - 1)) * loadPlus * equipLoad : 1.0;
 
   /// 배치할 수 있는 직원 수: 기본 자리 + 선반·도크의 보조 자리 1칸 (분류사·정비사)
   int get seats => type.slots + ((type.id == 'shelf' || type.id == 'dock') ? 1 : 0);

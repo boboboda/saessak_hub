@@ -502,5 +502,35 @@
   },
   "ui_aisle2": {
     "object_id": "34105cb0-71a5-4e14-a902-339e37ff8e61"
+  },
+  "eq_tape": {
+    "object_id": "2fec980f-113a-49d6-aa7c-594cfbf2e973"
+  },
+  "eq_label": {
+    "object_id": "85f53076-87d0-4abe-9a6b-1c8e08b7f713"
+  },
+  "eq_bubble": {
+    "object_id": "a4505b83-88ba-45d2-942e-6bfb38535d82"
+  },
+  "eq_robot": {
+    "object_id": "acbaf620-febd-448f-b42d-5f1d7f6485cd"
+  },
+  "eq_ladder": {
+    "object_id": "e9f78fa7-5fd4-4e8b-a6cd-4fce72ccea94"
+  },
+  "eq_tag": {
+    "object_id": "319cb557-8abf-41f3-89b0-cad909e1e979"
+  },
+  "eq_forklift": {
+    "object_id": "fc59dbd7-30f7-4c52-8eca-b2dfb1bd5870"
+  },
+  "eq_roller": {
+    "object_id": "03cf38a3-4bcf-43aa-b2d5-0e9f1d27bb20"
+  },
+  "eq_ticket": {
+    "object_id": "4971c7b2-4a48-4333-bb47-4e7c13c2fc06"
+  },
+  "eq_card": {
+    "object_id": "f253410b-368c-46d4-bc34-cf496f776d13"
   }
 }

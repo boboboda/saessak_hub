@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../game/config.dart';
 import '../game/hub_game.dart';
 import '../game/sprites.dart';
+import '../models/models.dart';
 import 'theme.dart';
 
 /// 건설 메뉴: 건물 목록. '건설'을 누르면 시트가 닫히고 지도에서 목업(고스트)을 옮겨 놓는다.
@@ -37,7 +38,8 @@ class _TypeCard extends StatelessWidget {
   Widget build(BuildContext context) {
             final gradeLock = !g.gradeAllows(t.id as String);
     final locked = gradeLock || (t.id == 'conveyor' && !g.conveyorOpen);
-    final can = g.money >= t.cost && !locked;
+    final cost = g.costOf(t as BuildingType);
+    final can = g.money >= cost && !locked;
     final zone = t.zone >= 0 ? Cfg.zoneName[t.zone as int] : '창고 어디든';
     final swatch = Color(t.color as int);
 
@@ -78,7 +80,7 @@ class _TypeCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${g.fmt(t.cost as int)}원',
+                '${g.fmt(cost)}원',
                 style: TextStyle(
                   color: can ? C.gold : C.bad,
                   fontSize: 13,

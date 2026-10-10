@@ -4,14 +4,14 @@ import 'package:saessak_hub/game/hub_game.dart';
 
 void main() {
   test('시상식: 점수로 순위, 1위면 명성 +300·특별 후보, 3위 안이면 +100', () {
-    final g = HubGame()..rt.yServed = 5000;
+    final g = HubGame()..rt.yServed = 5000; // 1년차 1위 경쟁사(3950)보다 많음
     g.runAward(1);
     expect(g.award!.rank, 1);
     expect(g.fame, Cfg.awardFirstFame);
     expect(g.awardWins, 1);
     expect(g.candidates.first.name, startsWith('★'));
 
-    final m = HubGame()..rt.yServed = 900; // 800 < 900 < 1100 → 3위
+    final m = HubGame()..rt.yServed = 2000; // 1700 < 2000 < 2600 → 3위
     m.runAward(1);
     expect(m.award!.rank, 3);
     expect(m.fame, Cfg.awardTop3Fame);
@@ -31,14 +31,14 @@ void main() {
   });
 
   test('회사 등급: 조건을 다 채우면 승급, 하나라도 모자라면 그대로', () {
-    final g = HubGame()..fame = 150;
+    final g = HubGame()..fame = Cfg.gradeFameNeed[1];
     g.checkGrade();
     expect(g.companyGrade, 0); // 하루 최고 접수 0
     g.rt.bestEver = Cfg.grade1Day;
     g.checkGrade();
     expect(g.companyGrade, 1);
     expect(g.gradeUp, 1);
-    g.fame = 500;
+    g.fame = Cfg.gradeFameNeed[2];
     g.checkGrade();
     expect(g.companyGrade, 1); // 시상식 3위 안이 아직
     g.bestRank = 2;

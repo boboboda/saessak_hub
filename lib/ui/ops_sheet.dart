@@ -13,8 +13,18 @@ class OpsSheet extends StatelessWidget {
   final String page;
   const OpsSheet(this.g, this.page, {super.key});
 
-  static const titles = {'goals': '목표·업적', 'research': '연구', 'stats': '경영 현황', 'region': '배송 지역'};
-  static const colors = {'goals': C.accent, 'research': C.blue, 'stats': C.good, 'region': Color(0xFF8E5BD0)};
+  static const titles = {
+    'goals': '목표·업적',
+    'research': '연구',
+    'stats': '경영 현황',
+    'region': '배송 지역',
+  };
+  static const colors = {
+    'goals': C.accent,
+    'research': C.blue,
+    'stats': C.good,
+    'region': Color(0xFF8E5BD0),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -24,62 +34,69 @@ class OpsSheet extends StatelessWidget {
       heightFactor: page == 'research' ? 0.82 : 0.72,
       onClose: g.closeAll,
       trailing: Pill(Icons.paid, g.fmt(g.money), color: C.gold),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
-        children: switch (page) {
-          'goals' => _goalsPage(),
-          'research' => [ResearchPanel(g)],
-          'region' => _regionPage(),
-          _ => _statsPage(),
-        },
-      ),
+      child: page == 'research'
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+              child: ResearchPanel(g),
+            )
+          : ListView(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
+              children: switch (page) {
+                'goals' => _goalsPage(),
+                'region' => _regionPage(),
+                _ => _statsPage(),
+              },
+            ),
     );
   }
 
   List<Widget> _statsPage() => [
-        _intake(),
-        const SizedBox(height: 10),
-        _fever(),
-        const SizedBox(height: 10),
-        _grade(),
-      ];
+    _intake(),
+    const SizedBox(height: 10),
+    _fever(),
+    const SizedBox(height: 10),
+    _grade(),
+  ];
 
   List<Widget> _regionPage() => [
-        const Text('명성이 쌓이면 새 지역이 열려요. 뒤에 여는 지역일수록 지도가 넓고 집이 많아요', style: Tx.sub),
-        const SizedBox(height: 8),
-        for (var i = 0; i < Cfg.regionName.length; i++) ...[
-          _region(i),
-          const SizedBox(height: 8),
-        ],
-        AppButton('노선 지도 열기', color: C.blue, icon: Icons.map, expand: true, onTap: () => g.goScreen(1)),
-      ];
+    const Text('명성이 쌓이면 새 지역이 열려요. 뒤에 여는 지역일수록 지도가 넓고 집이 많아요', style: Tx.sub),
+    const SizedBox(height: 8),
+    for (var i = 0; i < Cfg.regionName.length; i++) ...[
+      _region(i),
+      const SizedBox(height: 8),
+    ],
+    AppButton(
+      '노선 지도 열기',
+      color: C.blue,
+      icon: Icons.map,
+      expand: true,
+      onTap: () => g.goScreen(1),
+    ),
+  ];
 
   List<Widget> _goalsPage() => [
-        _goals(),
-        const SizedBox(height: 14),
-        Row(
-          children: [
-            const Text('업적', style: Tx.h2),
-            const Spacer(),
-            Pill(Icons.trending_up, '수익 +${g.perkPct}%', color: C.good),
-            const SizedBox(width: 6),
-            Pill(Icons.description, '전직서 ${g.tickets}', color: C.blue),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text('업적마다 돈, 일부는 전직서·영구 수익 보너스(최대 +${Cfg.perkCap}%)', style: Tx.sub),
-        const SizedBox(height: 8),
-        // 받을 보상이 있는 업적을 위로
-        for (final i in [
-          for (var i = 0; i < Cfg.missions.length; i++)
-            if (!g.claimed.contains(i) && g.missionDone(i)) i,
-          for (var i = 0; i < Cfg.missions.length; i++)
-            if (!(!g.claimed.contains(i) && g.missionDone(i))) i,
-        ]) ...[
-          _mission(i),
-          const SizedBox(height: 8),
-        ],
-      ];
+    _goals(),
+    const SizedBox(height: 14),
+    Row(
+      children: [
+        const Text('업적', style: Tx.h2),
+        const Spacer(),
+        Pill(Icons.trending_up, '수익 +${g.perkPct}%', color: C.good),
+        const SizedBox(width: 6),
+        Pill(Icons.description, '전직서 ${g.tickets}', color: C.blue),
+      ],
+    ),
+    const SizedBox(height: 4),
+    Text('업적마다 돈, 일부는 전직서·영구 수익 보너스(최대 +${Cfg.perkCap}%)', style: Tx.sub),
+    const SizedBox(height: 8),
+    // 받을 보상이 있는 업적을 위로
+    for (final i in [
+      for (var i = 0; i < Cfg.missions.length; i++)
+        if (!g.claimed.contains(i) && g.missionDone(i)) i,
+      for (var i = 0; i < Cfg.missions.length; i++)
+        if (!(!g.claimed.contains(i) && g.missionDone(i))) i,
+    ]) ...[_mission(i), const SizedBox(height: 8)],
+  ];
 
   /// 접수량: 명성 구간 × 성수기. 다음 구간과 다음 성수기 안내
   Widget _intake() {
@@ -93,25 +110,39 @@ class OpsSheet extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            const Icon(Icons.inbox, color: C.accent, size: 22),
-            const SizedBox(width: 8),
-            Expanded(
-                child: Text('접수량 분당 ${g.intakeNow.toStringAsFixed(1)}건', style: Tx.h2)),
-            Text('${g.year}년차 ${g.dayOfYear}/${Cfg.yearDays}일', style: Tx.sub),
-          ]),
+          Row(
+            children: [
+              const Icon(Icons.inbox, color: C.accent, size: 22),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '접수량 분당 ${g.intakeNow.toStringAsFixed(1)}건',
+                  style: Tx.h2,
+                ),
+              ),
+              Text(
+                '${g.year}년차 ${g.dayOfYear}/${Cfg.yearDays}일',
+                style: Tx.sub,
+              ),
+            ],
+          ),
           const SizedBox(height: 4),
           Text(
-              next < 0
-                  ? '명성 구간 최고 단계'
-                  : '명성 ${g.fame}/${Cfg.intakeFame[next]} → 분당 ${Cfg.intakePerMin[next]}건',
-              style: Tx.sub),
+            next < 0
+                ? '명성 구간 최고 단계'
+                : '명성 ${g.fame}/${Cfg.intakeFame[next]} → 분당 ${Cfg.intakePerMin[next]}건',
+            style: Tx.sub,
+          ),
           Text(
-              h != null
-                  ? '오늘은 ${h.$1}! 접수 ×${h.$4}'
-                  : '다음 성수기: ${nh.$1} ($nd일 후, 접수 ×${nh.$4})',
-              style: TextStyle(color: h != null ? C.gold : C.sub, fontSize: 12)),
-          Text('정시 배송 $rate% · 연속 ${g.streak}건 (최고 ${g.bestStreak})', style: Tx.sub),
+            h != null
+                ? '오늘은 ${h.$1}! 접수 ×${h.$4}'
+                : '다음 성수기: ${nh.$1} ($nd일 후, 접수 ×${nh.$4})',
+            style: TextStyle(color: h != null ? C.gold : C.sub, fontSize: 12),
+          ),
+          Text(
+            '정시 배송 $rate% · 연속 ${g.streak}건 (최고 ${g.bestStreak})',
+            style: Tx.sub,
+          ),
         ],
       ),
     );
@@ -123,16 +154,24 @@ class OpsSheet extends StatelessWidget {
     return CardBox(
       child: Row(
         children: [
-          Icon(Icons.local_fire_department,
-              size: 28, color: on ? C.bad : C.sub),
+          Icon(
+            Icons.local_fire_department,
+            size: 28,
+            color: on ? C.bad : C.sub,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(on ? '수익 부스트 ${g.fever.ceil()}초 남음' : '수익 부스트', style: Tx.h2),
-                Text('${Cfg.feverLen.round()}초 동안 배송 수익 ×${Cfg.feverPay} (손님 수는 그대로)',
-                    style: Tx.sub),
+                Text(
+                  on ? '수익 부스트 ${g.fever.ceil()}초 남음' : '수익 부스트',
+                  style: Tx.h2,
+                ),
+                Text(
+                  '${Cfg.feverLen.round()}초 동안 배송 수익 ×${Cfg.feverPay} (손님 수는 그대로)',
+                  style: Tx.sub,
+                ),
               ],
             ),
           ),
@@ -156,10 +195,13 @@ class OpsSheet extends StatelessWidget {
       child: Row(
         children: [
           Container(
-              width: 18,
-              height: 18,
-              decoration: BoxDecoration(
-                  color: color, borderRadius: BorderRadius.circular(4))),
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -167,24 +209,27 @@ class OpsSheet extends StatelessWidget {
               children: [
                 Text(Cfg.regionName[i], style: Tx.h2),
                 Text(
-                    '지도 ${Cfg.regionSize[i].$1}×${Cfg.regionSize[i].$2} · 동네 ${Cfg.regionTowns[i]}곳 · 집 ${RegionMap.of(i).houses.length}채',
-                    style: Tx.sub),
+                  '지도 ${Cfg.regionSize[i].$1}×${Cfg.regionSize[i].$2} · 동네 ${Cfg.regionTowns[i]}곳 · 집 ${RegionMap.of(i).houses.length}채',
+                  style: Tx.sub,
+                ),
               ],
             ),
           ),
           if (open)
             const Pill(Icons.check, '운영 중', color: C.good)
           else
-            AppButton('명성 ${Cfg.regionFame[i]}',
-                small: true,
-                color: C.good,
-                onTap: can ? () => g.unlockRegion(i) : null),
+            AppButton(
+              '명성 ${Cfg.regionFame[i]}',
+              small: true,
+              color: C.good,
+              onTap: can ? () => g.unlockRegion(i) : null,
+            ),
         ],
       ),
     );
   }
 
-      /// 회사 등급: 지금 등급, 다음 등급 조건, 열리는 것, 연말 시상식 기록
+  /// 회사 등급: 지금 등급, 다음 등급 조건, 열리는 것, 연말 시상식 기록
   Widget _grade() {
     final k = g.companyGrade;
     final next = k + 1 < Cfg.corpName.length ? k + 1 : -1;
@@ -198,30 +243,52 @@ class OpsSheet extends StatelessWidget {
               const SizedBox(width: 6),
               Text('회사 등급: ${Cfg.corpName[k]}', style: Tx.h2),
               const Spacer(),
-              Text(g.bestRank == 0 ? '시상식 기록 없음' : '시상식 최고 ${g.bestRank}위', style: Tx.sub),
+              Text(
+                g.bestRank == 0 ? '시상식 기록 없음' : '시상식 최고 ${g.bestRank}위',
+                style: Tx.sub,
+              ),
             ],
           ),
           if (g.endless)
-            const Text('무한 모드: 경쟁사가 더 빨리 커져요', style: TextStyle(color: C.accent, fontSize: 12)),
+            const Text(
+              '무한 모드: 경쟁사가 더 빨리 커져요',
+              style: TextStyle(color: C.accent, fontSize: 12),
+            ),
           if (next >= 0) ...[
             const SizedBox(height: 6),
-            Text('다음: ${Cfg.corpName[next]} → ${Cfg.gradeUnlockText[next]}', style: Tx.sub),
+            Text(
+              '다음: ${Cfg.corpName[next]} → ${Cfg.gradeUnlockText[next]}',
+              style: Tx.sub,
+            ),
             for (final n in g.gradeNeeds(next))
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Row(
                   children: [
-                    Icon(n.$2 >= n.$3 ? Icons.check_circle : Icons.radio_button_unchecked,
-                        size: 16, color: n.$2 >= n.$3 ? C.good : C.sub),
+                    Icon(
+                      n.$2 >= n.$3
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      size: 16,
+                      color: n.$2 >= n.$3 ? C.good : C.sub,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(child: Text(n.$1, style: Tx.body)),
-                    Text(n.$3 == 1 ? (n.$2 >= 1 ? '달성' : '아직') : '${n.$2.clamp(0, n.$3)}/${n.$3}', style: Tx.sub),
+                    Text(
+                      n.$3 == 1
+                          ? (n.$2 >= 1 ? '달성' : '아직')
+                          : '${n.$2.clamp(0, n.$3)}/${n.$3}',
+                      style: Tx.sub,
+                    ),
                   ],
                 ),
               ),
           ],
           const SizedBox(height: 6),
-          Text('연말(28일차) 택배 대상: 올해 점수 ${g.fmt(g.yearScore)} · 경쟁사 ${Cfg.rivalName.length}곳', style: Tx.sub),
+          Text(
+            '연말(28일차) 택배 대상: 올해 점수 ${g.fmt(g.yearScore)} · 경쟁사 ${Cfg.rivalName.length}곳',
+            style: Tx.sub,
+          ),
         ],
       ),
     );
@@ -243,26 +310,40 @@ class OpsSheet extends StatelessWidget {
                 st == null
                     ? '오늘 만족도 -'
                     : '오늘 ★${st.toStringAsFixed(1)} · 예상 ${Cfg.gradeName[g.gradeOf(st, g.rt.served + g.rt.lost == 0 ? 0 : g.rt.lost / (g.rt.served + g.rt.lost))]}',
-                style: const TextStyle(color: C.gold, fontWeight: FontWeight.w800),
+                style: const TextStyle(
+                  color: C.gold,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 2),
-          Text('셋 다 달성하면 명성 +${Cfg.yearAllFame} · 전직서 +${Cfg.yearAllTicket} (해가 바뀌면 새 목표)', style: Tx.sub),
+          Text(
+            '셋 다 달성하면 명성 +${Cfg.yearAllFame} · 전직서 +${Cfg.yearAllTicket} (해가 바뀌면 새 목표)',
+            style: Tx.sub,
+          ),
           for (var i = 0; i < gs.length; i++) ...[
             const SizedBox(height: 8),
             Row(
               children: [
                 Icon(
-                  g.rt.yearDone.contains(i) ? Icons.check_circle : Icons.radio_button_unchecked,
+                  g.rt.yearDone.contains(i)
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
                   color: g.rt.yearDone.contains(i) ? C.good : C.sub,
                   size: 18,
                 ),
                 const SizedBox(width: 6),
                 Expanded(child: Text(gs[i].text, style: Tx.body)),
-                Text('${g.goalProgress(gs[i]).clamp(0, gs[i].target)}/${gs[i].target}', style: Tx.sub),
+                Text(
+                  '${g.goalProgress(gs[i]).clamp(0, gs[i].target)}/${gs[i].target}',
+                  style: Tx.sub,
+                ),
                 const SizedBox(width: 8),
-                Text('+${g.fmt(gs[i].reward)}원', style: const TextStyle(color: C.gold, fontSize: 12)),
+                Text(
+                  '+${g.fmt(gs[i].reward)}원',
+                  style: const TextStyle(color: C.gold, fontSize: 12),
+                ),
               ],
             ),
           ],
@@ -271,7 +352,7 @@ class OpsSheet extends StatelessWidget {
     );
   }
 
-      /// 연구 트리: 3갈래 × 3단계. RP + 돈 + 시간, 한 번에 하나
+  /// 연구 트리: 3갈래 × 3단계. RP + 돈 + 시간, 한 번에 하나
   Widget _research() {
     final now = g.resNow;
     return CardBox(
@@ -286,15 +367,26 @@ class OpsSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 2),
-          Text('택배 1건 배송 = RP ${Cfg.rpPerParcel}, 연구실 1곳당 하루 +${Cfg.labRpDay} RP', style: Tx.sub),
+          Text(
+            '택배 1건 배송 = RP ${Cfg.rpPerParcel}, 연구실 1곳당 하루 +${Cfg.labRpDay} RP',
+            style: Tx.sub,
+          ),
           if (now != null) ...[
             const SizedBox(height: 8),
-            Text('연구 중: ${Cfg.research[now].name} · ${g.resLeft.ceil()}초 남음', style: const TextStyle(color: C.gold, fontWeight: FontWeight.w800)),
+            Text(
+              '연구 중: ${Cfg.research[now].name} · ${g.resLeft.ceil()}초 남음',
+              style: const TextStyle(
+                color: C.gold,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
             const SizedBox(height: 4),
             ClipRRect(
               borderRadius: BorderRadius.circular(2),
               child: LinearProgressIndicator(
-                value: (1 - g.resLeft / Cfg.research[now].time).clamp(0.0, 1.0).toDouble(),
+                value: (1 - g.resLeft / Cfg.research[now].time)
+                    .clamp(0.0, 1.0)
+                    .toDouble(),
                 minHeight: 5,
                 backgroundColor: C.line,
                 valueColor: const AlwaysStoppedAnimation<Color>(C.gold),
@@ -320,21 +412,33 @@ class OpsSheet extends StatelessWidget {
       padding: const EdgeInsets.only(top: 6),
       child: Row(
         children: [
-          Icon(done ? Icons.check_circle : (g.resOpen(i) ? Icons.science_outlined : Icons.lock_outline),
-              size: 18, color: done ? C.good : C.sub),
+          Icon(
+            done
+                ? Icons.check_circle
+                : (g.resOpen(i) ? Icons.science_outlined : Icons.lock_outline),
+            size: 18,
+            color: done ? C.good : C.sub,
+          ),
           const SizedBox(width: 6),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(d.name, style: Tx.body),
-                Text('${d.effect} · RP ${d.rp} · ${g.fmt(d.cost)}원 · ${d.time.round()}초', style: Tx.sub),
+                Text(
+                  '${d.effect} · RP ${d.rp} · ${g.fmt(d.cost)}원 · ${d.time.round()}초',
+                  style: Tx.sub,
+                ),
               ],
             ),
           ),
           if (!done)
-            AppButton(why == null ? '연구' : (g.resNow == i ? '진행 중' : why),
-                small: true, color: C.blue, onTap: why == null ? () => g.startResearch(i) : null),
+            AppButton(
+              why == null ? '연구' : (g.resNow == i ? '진행 중' : why),
+              small: true,
+              color: C.blue,
+              onTap: why == null ? () => g.startResearch(i) : null,
+            ),
         ],
       ),
     );
@@ -352,10 +456,13 @@ class OpsSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(m.text,
-                    style: Tx.body.copyWith(
-                        color: got ? C.sub : C.text,
-                        decoration: got ? TextDecoration.lineThrough : null)),
+                Text(
+                  m.text,
+                  style: Tx.body.copyWith(
+                    color: got ? C.sub : C.text,
+                    decoration: got ? TextDecoration.lineThrough : null,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2),
@@ -364,7 +471,8 @@ class OpsSheet extends StatelessWidget {
                     minHeight: 4,
                     backgroundColor: C.line,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                        done ? C.good : C.accent),
+                      done ? C.good : C.accent,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -376,10 +484,12 @@ class OpsSheet extends StatelessWidget {
           if (got)
             const Pill(Icons.check, '완료', color: C.good)
           else
-                        AppButton('+${g.fmt(m.reward)}원${m.ticket > 0 ? ' · 전직서' : ''}${m.perk > 0 ? ' · +${m.perk}%' : ''}',
-                small: true,
-                color: C.gold.withOpacity(0.9),
-                onTap: done ? () => g.claimMission(i) : null),
+            AppButton(
+              '+${g.fmt(m.reward)}원${m.ticket > 0 ? ' · 전직서' : ''}${m.perk > 0 ? ' · +${m.perk}%' : ''}',
+              small: true,
+              color: C.gold.withOpacity(0.9),
+              onTap: done ? () => g.claimMission(i) : null,
+            ),
         ],
       ),
     );
