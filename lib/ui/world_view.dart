@@ -547,7 +547,9 @@ extension WorldView on HubGame {
       final sp = Sprites.forBuilding(b.type.id);
       _tag(() => _buildingTags(c, b, r));
       // 발끝 = 건물 아래 끝. 그 뒤(위)에 선 직원은 먼저 그려져 책상에 가려짐
-      _at((b.ty + b.type.h) * Cfg.tile, () {
+      // 휴게실(그림)은 바닥 깔개라 소파 줄 기준으로 먼저 그림 → 소파에 앉은 직원이 위에 보이고, 앞면만 다시 덮음
+      final key = b.type.id == 'lounge' && sp != null ? (b.ty + 1.2) * Cfg.tile : (b.ty + b.type.h) * Cfg.tile;
+      _at(key, () {
         if (sp != null) {
           final dr = _px(_deskRect(b)).deflate(1);
           if (b.type.id != 'dock' && b.type.id != 'lounge') {
@@ -1590,7 +1592,7 @@ extension WorldView on HubGame {
           final x = (l.tx + o.dx) * t;
           _at(sitKey, () {
             c.save();
-            c.clipRect(Rect.fromLTWH(x - 12, d.top + 31, 24, 12));
+            c.clipRect(Rect.fromLTWH(x - 13, d.top + 41, 26, 14)); // 방석 앞면·팔걸이 아래 (다리를 가림)
             Sprites.drawFitBottom(c, sp, r);
             c.restore();
           });

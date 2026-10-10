@@ -324,42 +324,91 @@ class TopBar extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          // 상태 알약은 한 줄 가로 스크롤 (줄이 늘어 아래 경고와 겹치지 않게)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Wrap(
-              spacing: 6,
+          const SizedBox(height: 5),
+          // 상태는 꼭 필요한 것만 한 줄 (오늘 접수·놓침·보관) + 진행 중 이벤트는 하나로 묶음. 높이 고정이라 아래 알림과 안 겹침
+          SizedBox(
+            height: Cfg.topStatusH,
+            child: Row(
               children: [
-                for (final l in g.evtLabels)
-                  Pill(Icons.campaign, l, color: C.accent),
-                Pill(Icons.inbox, '접수 ${g.done}'),
-                Pill(Icons.inventory_2, '보관 ${g.totalStored}'),
-                Pill(Icons.local_shipping, '배송 ${g.delivered}'),
-                Pill(
-                  Icons.sentiment_dissatisfied,
-                  '놓침 ${g.lost}',
-                  color: g.lost > 0 ? C.bad : C.sub,
-                ),
-                Pill(Icons.groups, '직원 ${g.staff.length}'),
-                if (g.holiday != null)
-                  Pill(
-                    Icons.celebration,
-                    '${g.holiday!.$1} ×${g.holiday!.$4}',
-                    color: C.gold,
-                  ),
-                if (g.streak >= 5)
-                  Pill(Icons.bolt, '연속 정시 ${g.streak}', color: C.good),
-                if (g.fever > 0)
-                  Pill(
-                    Icons.local_fire_department,
-                    '부스트 ${g.fever.ceil()}초',
-                    color: C.bad,
-                  ),
+                _Stat(Icons.inbox, '오늘 ${g.rt.served}'),
+                const SizedBox(width: 5),
+                _Stat(Icons.sentiment_dissatisfied, '놓침 ${g.rt.lost}', bad: g.rt.lost > 0),
+                const SizedBox(width: 5),
+                _Stat(Icons.inventory_2, '보관 ${g.totalStored}'),
+                const SizedBox(width: 5),
+                if (_events().isNotEmpty) Flexible(child: _EventChip(_events())),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// 진행 중인 이벤트 (사건·성수기·연속 정시·부스트)
+  List<String> _events() => [
+        ...g.evtLabels,
+        if (g.holiday != null) '${g.holiday!.$1} ×${g.holiday!.$4}',
+        if (g.fever > 0) '부스트 ${g.fever.ceil()}초',
+        if (g.streak >= 25) '연속 정시 ${g.streak}',
+      ];
+}
+
+/// 작은 상태 칸
+class _Stat extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final bool bad;
+  const _Stat(this.icon, this.text, {this.bad = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xF2FFF6DE),
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(color: C.frame, width: 1.5),
+      ),
+      alignment: Alignment.center,
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 12, color: bad ? C.bad : C.sub),
+        const SizedBox(width: 3),
+        Text(text, style: TextStyle(fontFamily: kFont, fontSize: 11, fontWeight: FontWeight.w700, color: bad ? C.bad : C.text)),
+      ]),
+    );
+  }
+}
+
+/// 진행 중 이벤트: 첫 번째만 보이고 나머지는 +n. 누르면 전부 알림으로
+class _EventChip extends StatelessWidget {
+  final List<String> list;
+  const _EventChip(this.list);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+        SnackBar(content: Text(list.join('  ·  '), style: toastText), backgroundColor: const Color(0xF04A2F1A), duration: const Duration(seconds: 3)),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        decoration: BoxDecoration(
+          color: C.accent,
+          borderRadius: BorderRadius.circular(7),
+          border: Border.all(color: C.frame, width: 1.5),
+        ),
+        alignment: Alignment.center,
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.campaign, size: 12, color: Colors.white),
+          const SizedBox(width: 3),
+          Flexible(
+            child: Text(list.first, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontFamily: kFont, fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+          ),
+          if (list.length > 1)
+            Text(' +${list.length - 1}', style: const TextStyle(fontFamily: kFont, fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+        ]),
       ),
     );
   }

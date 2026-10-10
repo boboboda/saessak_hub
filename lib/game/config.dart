@@ -127,10 +127,12 @@ class Cfg {
   // 휴게실(3×3) 안 쉬는 자리 (건물 왼쪽 위 기준, 칸 단위). hub_lounge 그림에 맞춤:
   // 앞의 둘은 소파 방석 위(소파 앞면이 다리를 가림), 뒤의 둘은 탁자 양옆 바닥 (탁자·정수기 위에 서지 않게)
   static const List<Offset> loungeSeats = [
-    Offset(1.13, 1.28),
-    Offset(1.87, 1.28),
-    Offset(0.41, 2.34),
-    Offset(2.56, 2.34),
+    // 소파 두 자리: 그림의 왼쪽·오른쪽 방석 앞 (발이 방석 앞끝에 오게)
+    Offset(1.2, 1.62),
+    Offset(1.86, 1.62),
+    // 서서 쉬는 두 자리: 깔개 아래 모서리 (탁자·정수기와 안 겹치게)
+    Offset(0.3, 2.5),
+    Offset(2.7, 2.5),
   ];
   // 대기 직원 어슬렁: 제자리에서 이만큼(칸) 안에서 천천히 걷다 멈춰 둘러봄. 시간은 실제 초 (배속과 상관없음)
   static const double idleRoamX = 0.35, idleRoamUp = 0.2, idleRoamDown = 0.45;
@@ -483,6 +485,8 @@ class Cfg {
   ];
   // 지점 조건 '하루 처리 40건'은 명성 100 근처 접수량(하루 약 13건)으로 어려워 20건으로 낮춤
   static const int grade1Day = 20;
+  // 상단 상태 줄 높이와, 그 아래 알림·안내가 시작하는 위치 (화면 위 여백 기준)
+  static const double topStatusH = 24, topUiH = 116;
   // 승급에 필요한 명성 (등급 번호 순). 정시 배송 1건 ≈ 명성 1이라, 엔딩(전국 네트워크)이 4~5년차에 오게 맞춤
   static const List<int> gradeFameNeed = [0, 150, 1000, 4000, 10000];
   static const int grade3Staff = 16;

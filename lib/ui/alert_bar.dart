@@ -33,7 +33,8 @@ class AlertBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final list = List<Alert>.from(g.alerts);
+    final all = List<Alert>.from(g.alerts);
+    final list = all.take(2).toList(); // 알림은 두 개까지만 (나머지는 +n)
     if (list.isEmpty) return const SizedBox.shrink();
     return Wrap(
       spacing: 6,
@@ -51,16 +52,16 @@ class AlertBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               onTap: () => g.runAlert(a),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(_icon(a), size: 16, color: Colors.white),
+                    Icon(_icon(a), size: 14, color: Colors.white),
                     const SizedBox(width: 5),
                     Text(a.text,
                         style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.w700)),
                     const SizedBox(width: 8),
                     Container(
@@ -81,6 +82,12 @@ class AlertBar extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        if (all.length > 2)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            decoration: BoxDecoration(color: C.frame, borderRadius: BorderRadius.circular(20)),
+            child: Text('+${all.length - 2}', style: const TextStyle(fontFamily: kFont, color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
           ),
       ],
     );

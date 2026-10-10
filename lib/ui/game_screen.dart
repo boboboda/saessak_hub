@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/game.dart' show GameWidget;
 import 'package:flutter/material.dart';
 
+import '../game/config.dart';
 import '../game/hub_game.dart';
 import '../game/sprites.dart';
 import 'garage_screen.dart';
@@ -71,7 +72,7 @@ class _GameScreenState extends State<GameScreen> {
       padding: mq.padding.copyWith(bottom: nav + tabH),
       viewPadding: mq.viewPadding.copyWith(bottom: nav + tabH),
     );
-    game.insetTop = mq.padding.top + 92;
+    game.insetTop = mq.padding.top + Cfg.topUiH;
     game.insetBottom = nav + tabH + 88;
     if (game.camInit) game.clampCam();
 

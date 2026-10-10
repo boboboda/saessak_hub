@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../game/config.dart';
 import '../game/hub_game.dart';
 import 'alert_bar.dart';
 import 'award_card.dart';
@@ -46,7 +47,7 @@ class OverlayUi extends StatelessWidget {
         Positioned(top: 0, left: 0, right: 0, child: TopBar(g)),
         if (g.mode == 0 && sheet == null && g.alerts.isEmpty && g.hint != null)
           Positioned(
-            top: mq.padding.top + 98,
+            top: mq.padding.top + Cfg.topUiH,
             left: 12,
             right: 12,
             child: Container(
@@ -68,7 +69,7 @@ class OverlayUi extends StatelessWidget {
           ),
         if (g.mode == 0 && sheet == null && g.alerts.isNotEmpty)
           Positioned(
-            top: mq.padding.top + 98,
+            top: mq.padding.top + Cfg.topUiH,
             left: 8,
             right: 8,
             child: AlertBar(g),
