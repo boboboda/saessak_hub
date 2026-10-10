@@ -40,7 +40,19 @@ class UnitRouteControls extends StatelessWidget {
                 style: Tx.sub.copyWith(color: const Color(0xFF8E5BD0), fontWeight: FontWeight.w700)),
           ),
         if (!u.isTrunk) ...[
-          Text('맡을 구역', style: Tx.sub.copyWith(fontSize: 10)),
+          Row(children: [
+            Expanded(
+              child: Text(
+                u.homes.isEmpty
+                    ? '집 직접 지정: 지도에서 이 차량을 고른 채 집을 누르세요 (최대 ${Cfg.homesMax}채)'
+                    : '지정한 집 ${u.homes.length}채: ${(u.homes.toList()..sort()).map((k) => '${k + 1}번').join(', ')} · 이 집들만 배달해요',
+                style: Tx.sub.copyWith(fontSize: 10, color: u.homes.isEmpty ? C.sub : C.accent, fontWeight: FontWeight.w700),
+              ),
+            ),
+            if (u.homes.isNotEmpty) routeChip('해제', false, () => g.clearHomes(u)),
+          ]),
+          const SizedBox(height: 4),
+          Text(u.homes.isEmpty ? '맡을 구역' : '맡을 구역 (집을 지정하면 구역보다 먼저)', style: Tx.sub.copyWith(fontSize: 10)),
           const SizedBox(height: 2),
           Wrap(spacing: 4, runSpacing: 4, children: [
             routeChip('자동', u.zone < 0, () => g.setZone(u, -1)),
@@ -259,7 +271,7 @@ class RouteEvtChoice extends StatelessWidget {
     final opts = [
       (0, '맡기기', '성공 ${(base * 100).round()}%', C.blue),
       (1, '우회로', '확실 · 조금 늦음 · 기름값', C.good),
-      (2, '서둘러!', '성공 ${((base + 0.25).clamp(0, 1) * 100).round()}% · 실패하면 더 늦음', C.bad),
+      (2, '서둘러!', '성공 ${((base + Cfg.evtHurry).clamp(0, 0.8) * 100).round()}% · 실패하면 더 늦음', C.bad),
     ];
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),

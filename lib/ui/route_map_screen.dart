@@ -102,6 +102,30 @@ class _RouteMapScreenState extends State<RouteMapScreen>
   void _tapMap(Offset local) {
     const T = _MapPainter.T;
     final tile = (local / cam.zoom + cam.pos) / T;
+    // 배달 차량을 고른 상태에서 집을 누르면 그 차량의 배달 집으로 지정·해제
+    FleetUnit? pk;
+    for (final u in g.fleet) {
+      if (u.id == cam.pick && u.region == sel && !u.isTrunk) pk = u;
+    }
+    if (pk != null) {
+      final l = _MapPainter.layout(sel);
+      int? hk;
+      var hd = 1.4;
+      for (var k = 0; k < l.deliver.length; k++) {
+        final h = l.houses[l.deliver[k]];
+        final d = (tile - Offset(h.x, h.y - 0.9)).distance; // 집 그림 가운데쯤
+        if (d < hd) {
+          hd = d;
+          hk = k;
+        }
+      }
+      if (hk != null) {
+        cam.follow = null; // 집을 고르는 동안 화면이 따라 움직이지 않게
+        g.toggleHome(pk, hk);
+        setState(() {});
+        return;
+      }
+    }
     int? best;
     var bd = 1.3;
     for (final (u, pos) in _MapPainter.units(g, sel)) {
@@ -198,14 +222,32 @@ class _RouteMapScreenState extends State<RouteMapScreen>
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          UnitRouteControls(g, unit),
+          // 설정은 접어 둠 (펼치면 지도의 집이 가려서). 접힌 상태에서 집을 눌러 지정
+          GestureDetector(
+            onTap: () => setState(() => _cardOpen = !_cardOpen),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Row(children: [
+                Expanded(
+                  child: Text(
+                    unit.isTrunk
+                        ? '적재 ${Cfg.loadName[unit.loadIdx]}'
+                        : '${unit.homes.isNotEmpty ? '지정 집 ${unit.homes.length}채' : (unit.zone < 0 ? '구역 자동' : Cfg.zoneNameR[unit.zone])} · ${Cfg.loadName[unit.loadIdx]} · 집을 눌러 지정',
+                    style: Tx.sub.copyWith(fontSize: 10, color: C.text, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                Icon(_cardOpen ? Icons.expand_less : Icons.tune, size: 16, color: C.frame),
+              ]),
+            ),
+          ),
+          if (_cardOpen) UnitRouteControls(g, unit),
         ],
       ),
     );
   }
 
   double _z0 = 1;
+  bool _cardOpen = false; // 지도 위 차량 카드의 노선 설정 펼침
 
   /// 화면의 한 점(focal)을 기준으로 확대 배율을 바꿈 (그 점 아래 지도가 그대로 있게)
   void _zoomAt(Offset focal, double z) {
@@ -1076,6 +1118,7 @@ class _MapPainter extends CustomPainter {
       it.draw(c);
     }
     if (open) _hearts(c, cull);
+    if (open) _homeFlags(c);
     if (open) _facMarks(c);
     if (open) _effects(c);
     c.restore();
@@ -1110,6 +1153,36 @@ class _MapPainter extends CustomPainter {
           ..color = Color(Cfg.zoneColor[z])
               .withValues(alpha: strong ? 0.85 : (dim ? 0.12 : 0.5)),
       );
+    }
+  }
+
+  /// 고른 배달 차량이 직접 지정한 집: 집 앞에 차량 번호 깃발
+  void _homeFlags(Canvas c) {
+    for (final u in g.fleet) {
+      if (u.id != cam.pick || u.region != sel || u.isTrunk) continue;
+      // 배달 차량을 고르면 집마다 번호표 (눌러서 지정할 수 있다는 표시)
+      for (var k = 0; k < l.deliver.length; k++) {
+        final h = l.houses[l.deliver[k]];
+        final on = u.homes.contains(k);
+        final r = Rect.fromCenter(center: _px(Offset(h.x, h.y + 0.55)), width: t * 0.9, height: t * 0.42);
+        c.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(t * 0.1)), Paint()..color = on ? const Color(0xFFF08A24) : const Color(0xDDFFF6DE));
+        c.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(t * 0.1)),
+            Paint()..color = const Color(0xFF5B3A1F)..style = PaintingStyle.stroke..strokeWidth = 1.2);
+        _label(c, '${k + 1}', r.center, t * 0.3, on ? Colors.white : const Color(0xFF4A2F1A));
+      }
+      for (final k in u.homes) {
+        if (k >= l.deliver.length) continue;
+        final h = l.houses[l.deliver[k]];
+        final p = _px(Offset(h.x + 0.7, h.y + 0.1));
+        c.drawLine(p, p.translate(0, -t * 1.1), Paint()..color = const Color(0xFF5B3A1F)..strokeWidth = 2);
+        final flag = Path()
+          ..moveTo(p.dx, p.dy - t * 1.1)
+          ..lineTo(p.dx + t * 0.6, p.dy - t * 0.9)
+          ..lineTo(p.dx, p.dy - t * 0.7)
+          ..close();
+        c.drawPath(flag, Paint()..color = const Color(0xFFF08A24));
+        c.drawPath(flag, Paint()..color = const Color(0xFF5B3A1F)..style = PaintingStyle.stroke..strokeWidth = 1.2);
+      }
     }
   }
 
@@ -1316,13 +1389,14 @@ class _MapPainter extends CustomPainter {
       if (!vis.contains(Offset(x + 0.5, y + 0.5))) continue;
       bool lane(int xx, int yy) =>
           l.at(xx, yy) == 2 || l.cross.contains(yy * l.gw + xx);
+      // vertical: 사람이 위아래로 건넘(차도는 가로) → 가로로 긴 줄을 위아래로 쌓음. 반대도 같음
       final vertical = lane(x, y - 1) || lane(x, y + 1);
       for (var i = 0; i < 3; i++) {
-        final f = 0.12 + i * 0.3;
+        final f = 0.06 + i * 0.33;
         c.drawRect(
           vertical
-              ? Rect.fromLTWH((x + f) * t, y * t, t * 0.17, t)
-              : Rect.fromLTWH(x * t, (y + f) * t, t, t * 0.17),
+              ? Rect.fromLTWH((x + 0.12) * t, (y + f) * t, t * 0.76, t * 0.2)
+              : Rect.fromLTWH((x + f) * t, (y + 0.12) * t, t * 0.2, t * 0.76),
           p,
         );
       }

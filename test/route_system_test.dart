@@ -112,4 +112,30 @@ void main() {
     expect(h.rs.reqs.single.got, 3);
     expect(h.rs.tomorrow, 2);
   });
+
+  test('집 직접 지정: 지정한 집에만 배달하고, 최대 개수까지만', () {
+    final g = HubGame();
+    final u = g.makeUnit(2, 0)..zone = 0;
+    g.toggleHome(u, 5);
+    g.toggleHome(u, 6);
+    for (var i = 0; i < 30; i++) {
+      expect({5, 6}, contains(g.pickHouse(u)));
+    }
+    for (var k = 0; k < 10; k++) {
+      g.toggleHome(u, k);
+    }
+    expect(u.homes.length, lessThanOrEqualTo(Cfg.homesMax));
+    g.clearHomes(u);
+    expect(u.homes, isEmpty);
+    final t = g.makeUnit(0, 0);
+    g.toggleHome(t, 1);
+    expect(t.homes, isEmpty); // 대형 트럭은 집 배달을 안 함
+  });
+
+  test('사건 성공률: 기사 능력별로 25~65%, 서둘러도 80%까지', () {
+    expect(Cfg.evtSuccess(1), closeTo(0.25, 1e-9));
+    expect(Cfg.evtSuccess(5), closeTo(0.65, 1e-9));
+    final g = HubGame();
+    expect(g.tvChance, lessThanOrEqualTo(0.7));
+  });
 }

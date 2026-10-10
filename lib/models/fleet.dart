@@ -31,6 +31,7 @@ class FleetUnit {
   double evtT = 0; // 말풍선 남은 시간
 
   // ---- 노선 재미 ----
+  final Set<int> homes = {}; // 직접 지정한 집 (배달 번호). 있으면 구역보다 먼저 씀
   int zone = -1; // 맡은 구역 (-1 자동: 아무 집이나, 0 가까운 · 1 중간 · 2 먼 구역). 배달 차량만
   int loadIdx = 1; // 적재 한도 Cfg.loadPct 번호 (0 70% · 1 100% · 2 120% · 3 150%)
   int trait = 0; // 기사 개성 Cfg.traitName 번호 (0 없음)

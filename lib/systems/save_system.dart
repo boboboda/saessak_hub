@@ -44,6 +44,7 @@ extension SaveSystem on HubGame {
             'lv': u.level,
             'rg': u.region,
             'zn': u.zone,
+            'hm': u.homes.toList(),
             'ld': u.loadIdx,
             'tr': u.trait,
             'wr': u.wear,
@@ -244,6 +245,7 @@ extension SaveSystem on HubGame {
               m['sk'] as int, m['rg'] as int);
           u.level = (m['lv'] as int?) ?? 1;
           u.zone = ((m['zn'] as int?) ?? -1).clamp(-1, 2);
+          u.homes.addAll(((m['hm'] as List?) ?? const []).map((e) => (e as num).toInt()));
           u.loadIdx = ((m['ld'] as int?) ?? 1).clamp(0, Cfg.loadPct.length - 1);
           // 예전 저장의 기사는 개성이 없었으니 새로 뽑아 줌
           u.trait = m['tr'] == null ? this.rollTrait() : (m['tr'] as int).clamp(0, Cfg.traitName.length - 1);

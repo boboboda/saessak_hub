@@ -149,7 +149,7 @@ extension FleetSystem on HubGame {
     final k = kind ?? (u.wear > 5 && rnd.nextDouble() < 0.5 ? 2 : rnd.nextInt(Cfg.evtName.length));
     final c = u.evtChoice; // -1·0 맡기기, 1 우회, 2 서둘러
     var chance = Cfg.evtSuccess(u.skill);
-    if (c == 2) chance += 0.25;
+    if (c == 2) chance = min(0.8, chance + Cfg.evtHurry);
     final ok = c == 1 || rnd.nextDouble() < chance;
     // 지연 배수: 길눈 밝음 절반, 길치 1.3배, 우회는 성공이지만 늘 조금 늦음, 서둘렀다 실패하면 더 늦음
     var dl = u.trait == 2 ? 0.5 : (u.trait == 6 ? 1.3 : 1.0);

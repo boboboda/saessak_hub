@@ -91,7 +91,7 @@ extension EventSystem on HubGame {
     for (final s in staff) {
       if (s.job == 4) lv = max(lv, s.jobLv);
     }
-    return (Cfg.evtTvBase + counters * 0.15 + lv * 0.1).clamp(0.05, 0.95).toDouble();
+    return (Cfg.evtTvBase + counters * 0.06 + lv * 0.06).clamp(0.05, 0.7).toDouble(); // 창구·상담원으로 오르지만 70%까지
   }
 
   /// 팝업에 보여 줄 선택지 (글, 예상 결과)

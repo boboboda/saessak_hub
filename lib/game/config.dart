@@ -214,6 +214,7 @@ class Cfg {
   static const List<String> zoneNameR = ['가까운 동네', '중간 동네', '먼 동네'];
   static const List<double> zonePay = [0.9, 1.05, 1.25];
   static const List<int> zoneColor = [0xFF7BD389, 0xFFFFD166, 0xFFF0963A];
+  static const int homesMax = 4; // 한 차량에 직접 지정할 수 있는 집 수
 
   // ---- 적재 한도: 적게 실으면 빠르고, 과적하면 많이 싣지만 느리고 위험 ----
   static const List<String> loadName = ['가볍게 70%', '정량 100%', '과적 120%', '과적 150%'];
@@ -298,7 +299,8 @@ class Cfg {
   /// 이벤트 확률: 간선이 길수록 조금 높음
   static double evtChance(bool trunk, int region) =>
       trunk ? 0.2 + RegionMap.of(region).trunkLen / 400 : 0.2;
-  static double evtSuccess(int skill) => 0.3 + 0.12 * skill;
+  static double evtSuccess(int skill) => 0.15 + 0.1 * skill; // 초보 25% · 보통 35% · 숙련 45% · 베테랑 55% · 달인 65%
+  static const double evtHurry = 0.15; // '서둘러!'를 고르면 성공률 더하기 (최대 80%)
 
   static const List<double> waitOptions = [5, 15, 30];
 
@@ -469,7 +471,7 @@ class Cfg {
   static const int popupTapGuard = 300; // 팝업이 뜬 직후 이만큼(ms)은 탭 무시
   static const List<double> evtWindow = [40, 260]; // 하루(300초) 중 사건이 뜨는 구간(초)
   static const int evtCooldownDays = 7;
-  static const double evtTvBase = 0.25, evtTvIntake = 1.5;
+  static const double evtTvBase = 0.15, evtTvIntake = 1.5;
   static const int evtTvFame = 50, evtTvFail = 10;
   static const int evtRushDays = 3, evtRushFame = 10;
   static const double evtRushIntake = 1.5, evtRushWage = 1.3;

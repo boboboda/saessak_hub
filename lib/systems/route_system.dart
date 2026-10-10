@@ -94,9 +94,32 @@ extension RouteSystem on HubGame {
   int pickHouse(FleetUnit u) {
     final m = RegionMap.of(u.region);
     final n = m.courier.length;
+    final hs = u.homes.where((k) => k < n).toList();
+    if (hs.isNotEmpty) return hs[rnd.nextInt(hs.length)]; // 직접 지정한 집
     if (u.zone < 0 || n < 3) return rnd.nextInt(n);
     final ks = [for (var k = 0; k < n; k++) if (zoneOf(u.region, k) == u.zone) k];
     return ks.isEmpty ? rnd.nextInt(n) : ks[rnd.nextInt(ks.length)];
+  }
+
+  /// 지도에서 집을 눌러 이 차량의 배달 집으로 지정·해제
+  void toggleHome(FleetUnit u, int k) {
+    if (u.isTrunk) return;
+    if (!u.homes.remove(k)) {
+      if (u.homes.length >= Cfg.homesMax) {
+        showToast('한 차량에 집은 ${Cfg.homesMax}채까지 지정할 수 있어요');
+        return;
+      }
+      u.homes.add(k);
+      showToast('${u.driver} 기사 배달 집: ${k + 1}번 집 추가 (${u.homes.length}채)');
+    } else {
+      showToast('${k + 1}번 집 지정 해제 (${u.homes.length}채)');
+    }
+    ui();
+  }
+
+  void clearHomes(FleetUnit u) {
+    u.homes.clear();
+    ui();
   }
 
   void setZone(FleetUnit u, int z) {
