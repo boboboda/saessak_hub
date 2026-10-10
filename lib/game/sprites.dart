@@ -89,6 +89,11 @@ class Sprites {
 
   /// 배경 장식 도트 (assets/sprites/decor/<이름>.png). 없는 건 null.
   static final Map<String, ui.Image> decor = {};
+  /// 메뉴 도트 아이콘 (assets/sprites/ui/<이름>.png)
+  static final Map<String, ui.Image> menuIcons = {};
+  static const List<String> uiNames = [
+    'build', 'staff', 'goal', 'research', 'menu', 'stats', 'region', 'book', 'expand', 'aisle',
+  ];
   static const List<String> decorNames = [
     'tree',
     'tree2',
@@ -203,6 +208,12 @@ class Sprites {
       final im = await _img('assets/sprites/decor/$n.png');
       if (im != null) decor[n] = im;
     }
+    for (final n in uiNames) {
+      final im = await _img('assets/sprites/ui/$n.png');
+      if (im != null) menuIcons[n] = im;
+    }
+    if (van != null) menuIcons['truck'] = van!; // 차고 칸은 택배 차 그림
+    if (menuIcons['region'] != null) menuIcons['map'] = menuIcons['region']!;
   }
 
   static Future<ui.Image?> _img(String path) async {

@@ -1814,5 +1814,135 @@
         }
       ]
     }
+  },
+  "ui_build": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_build",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, crossed wooden hammer and steel wrench",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_staff": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_staff",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, two cheerful delivery workers faces side by side wearing navy caps and orange vests",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_goal": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_goal",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, shiny gold trophy cup with a star",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_research": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_research",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, round glass flask with bubbling green liquid and a small yellow light bulb",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_menu": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_menu",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, brown clipboard with a white checklist paper and red check marks",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_stats": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_stats",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, small green chalkboard on a wooden frame showing a rising bar chart",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_region": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_region",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, folded paper town map with a red location pin",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_book": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_book",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, thick green hardcover encyclopedia book with gold corners",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_expand": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_expand",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, rolled blue blueprint paper with white lines and a pencil",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
+  },
+  "ui_aisle": {
+    "endpoint": "/create-1-direction-object",
+    "note": "menu icon ui_aisle",
+    "body": {
+      "description": "pixel art, black outline, same style and palette as reference, game menu icon, single object, centered, front view, no background, no text, paint roller with bright yellow paint",
+      "style_images": [
+        {
+          "type": "base64",
+          "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEKElEQVR4nO2ZXWwUVRTH/zO7Ld0yrDalDVCNQBRaSI2V1lbwwRg/WtHEBlEjqEg0TZRUH5paUIwRrWWzfqEm1gfCR6IJMeFB+wLEIEEwbTShTaVpjFZjqynd1O5uu7Zl55pzunfcXYTCOtPdxftLbu+5M3fOnHPmnLl3toBCoVAoFAqFQqFQKBQKhSI1dE1PqR2rWyNSuc4udKSRI7UVoqpiDN/VVop02aAjzczf7EMA0bTdX7NLUappmQtTTEG/YjtMYeJqyADxy7ft3KfLAB1p5txvP6X1/u45vJdI4bxtJZruDBDvLluOkXc+4kHUjHIjSsuqE47lwsTJyioshjknpaE7rJ8cEAUwUVVYiNMfvM/OuXSXNeH3gV5L9ugafthSz/Iny0o5GE4Hwe2gbjEVHGbB8C7EaGCM5e5IUDpm9fEc6erj/noAU9BBOnK9xWIuyuE/kbRTE/1dHeJ8aIQbkaeBG52TkCyPyblyHjV5jBrNybqdoMso5D4aDiAcHOFGT5TGW2vKuM4p5eMzQc6jNhe4nVKc7/FeMiifdfbhvdVlOPv1WXxVWc1lEjEFB4fmUC8Zm5wpn6xcBVwxhy/GkpVedAUCXO8S6TxdSy3yx1D2ZcBEJIgzx/Zi4eIVKFl9h+WYdI6eNr31EVsEombiy15mwUDPUeR5r8vKbwFR4NFwpvM4DxbdUDZrNsQz2HvSkm9fV4fB4ESCvXZ9C2hOBqDxrnJ0/ziIAx2HU9L55Pp6jI9P4p6alWjt+N6RALjhAC6PR0QjESA0jXtrbmJH/i0Izz+0yZJD0xPWnFzXFB6rfRQ331gCp9EcyACrmAM/n8Db215k+VTPAPcLcvJx29pydJ7qQXlpcYKOnr5hDgSxtnwp9+HINLbtasGKdZsSbM7UEhBv+Pfgz9Ew/G/uAJWA79BBvP7U1pR0rlq6CHc3bMZLz7yG/Z39IN2vNDWy3ZlYAoIMTKbh/kewe9/MRxDOn8Oe7f5ZFTV/7LPkFzY8h2uMedY4FgTbtsZuO5RcoDRvRq3hyeH27INP8/jg8X1ofKvpEhcWWeLjdQ0oynehpMhwwsR/bgkHMDx5aNnlQ+vOZuxYf6tV60/cueWyddwS936gFYD0UWldW2Bkx0bISAoCkfzSM+bnIDw+fVEdsaWP9TiFZvdL8NP9H6L71wkOQDjyF59r29lszZPBIOclFIT4YEjHm15uTSip6orlqH/gYbY7U1cBQhz+8nNIevuGOHVDk0Eet/vbMBvScek8OU5I5+lPJgeAEBWr1uBV33bE883pfutpzoZ0Wl5Hy2rWbYVBy2BTC4aGBZYUa9hYf99l6QqNBrD3UBfLdF0saxJszcR9QDJscLu/7Yp/01swz4svDuy+QNfV8J8hYZdtdmWAQqFQKBQKhUKhUCgUCgX+b/wNPi6yz+eqXE8AAAAASUVORK5CYII="
+        }
+      ]
+    }
   }
 }

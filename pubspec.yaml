@@ -67,6 +67,14 @@ flutter:
     - assets/sprites/tiles/
     - assets/sprites/decor/
     - assets/sprites/map/
+    - assets/sprites/ui/
+  # 한글 도트 폰트 Galmuri (SIL OFL 1.1, assets/fonts/Galmuri-OFL.txt)
+  fonts:
+    - family: Galmuri
+      fonts:
+        - asset: assets/fonts/Galmuri11.ttf
+        - asset: assets/fonts/Galmuri11-Bold.ttf
+          weight: 700
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

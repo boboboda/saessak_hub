@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../game/hub_game.dart';
 import '../game/sprites.dart';
 import 'garage_screen.dart';
+import 'menu_sheet.dart';
 import 'overlay_ui.dart';
 import 'route_map_screen.dart';
 import 'theme.dart';
@@ -118,8 +119,8 @@ class _GameScreenState extends State<GameScreen> {
                         child: Center(
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(color: const Color(0xEE000000), borderRadius: BorderRadius.circular(20)),
-                            child: Text(game.toast, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                            decoration: toastBox,
+                            child: Text(game.toast, textAlign: TextAlign.center, style: toastText),
                           ),
                         ),
                       )
@@ -207,44 +208,43 @@ class _ScreenTabs extends StatelessWidget {
           height: h + nav,
           padding: EdgeInsets.only(bottom: nav),
           decoration: const BoxDecoration(
-            color: Color(0xFF17142A),
-            border: Border(top: BorderSide(color: C.line)),
+            color: C.wood,
+            border: Border(top: BorderSide(color: C.frame, width: 3)),
           ),
           child: Row(
             children: [
               for (var i = 0; i < 3; i++)
                 Expanded(
-                  child: InkWell(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () => g.goScreen(i),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.fromLTRB(6, 6, 6, 6),
+                      margin: const EdgeInsets.fromLTRB(4, 6, 4, 6),
                       decoration: BoxDecoration(
-                        color: g.screen == i ? C.accent.withValues(alpha: 0.22) : Colors.transparent,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: g.screen == i ? C.accent : Colors.transparent),
+                        color: g.screen == i ? C.panel : const Color(0xFF6E4524),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: C.frame, width: 2),
+                        boxShadow: g.screen == i ? const [BoxShadow(color: Color(0xFFC9A46A), offset: Offset(0, 2))] : null,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(_icons[i], size: 18, color: g.screen == i ? C.accent : C.sub),
+                          Icon(_icons[i], size: 18, color: g.screen == i ? C.accent : const Color(0xFFE8C99A)),
                           const SizedBox(width: 6),
                           Text(_names[i],
                               style: TextStyle(
-                                  color: g.screen == i ? Colors.white : C.sub, fontSize: 13, fontWeight: FontWeight.w800)),
+                                  fontFamily: kFont,
+                                  color: g.screen == i ? C.text : const Color(0xFFF3DDB8),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700)),
                           if (i == 0 && g.modalOpen && g.screen != 0) ...[
                             const SizedBox(width: 4),
-                            const Icon(Icons.error, size: 14, color: C.gold), // 허브에서 확인할 카드가 있음
+                            const Icon(Icons.error, size: 14, color: C.coin), // 허브에서 확인할 카드가 있음
                           ],
                           if (i == 1 && evt > 0) ...[
                             const SizedBox(width: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                              decoration: BoxDecoration(
-                                  color: C.bad, borderRadius: BorderRadius.circular(8)),
-                              child: Text('$evt',
-                                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)),
-                            ),
+                            RedDot(n: evt),
                           ],
                         ],
                       ),

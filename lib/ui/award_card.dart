@@ -18,9 +18,9 @@ class AwardCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
       decoration: BoxDecoration(
         color: C.panel,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: C.gold, width: 2),
-        boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 18)],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: C.frame, width: 3),
+        boxShadow: [BoxShadow(color: C.gold, offset: const Offset(0, 5)), const BoxShadow(color: Colors.black54, blurRadius: 18)],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -81,9 +81,9 @@ class GradeUpCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
       decoration: BoxDecoration(
         color: C.panel,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: C.good, width: 2),
-        boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 18)],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: C.frame, width: 3),
+        boxShadow: [BoxShadow(color: C.good, offset: const Offset(0, 5)), const BoxShadow(color: Colors.black54, blurRadius: 18)],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

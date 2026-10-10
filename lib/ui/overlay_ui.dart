@@ -7,6 +7,7 @@ import 'bottom_bar.dart';
 import 'build_sheet.dart';
 import 'book_sheet.dart';
 import 'building_sheet.dart';
+import 'menu_sheet.dart';
 import 'ops_sheet.dart';
 import 'event_card.dart';
 import 'report_card.dart';
@@ -30,8 +31,10 @@ class OverlayUi extends StatelessWidget {
       sheet = BuildSheet(g);
         } else if (g.sheet == 'book') {
       sheet = BookSheet(g);
-    } else if (g.sheet == 'ops') {
-      sheet = OpsSheet(g);
+    } else if (g.sheet == 'menu') {
+      sheet = MenuSheet(g);
+    } else if (const ['goals', 'research', 'stats', 'region', 'ops'].contains(g.sheet)) {
+      sheet = OpsSheet(g, g.sheet!);
     } else if (g.sheet == 'staff') {
       sheet = StaffSheet(g);
     } else if (g.mode == 0 && g.selected != null) {
@@ -49,17 +52,17 @@ class OverlayUi extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xDD2A2640),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFF0963A)),
+                color: const Color(0xF2FFF6DE),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: C.accent, width: 2),
+                boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(0, 3))],
               ),
-              child: Text(
-                g.hint!,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
+              child: Row(
+                children: [
+                  const Icon(Icons.lightbulb, size: 16, color: C.accent),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(g.hint!, style: Tx.h2.copyWith(fontSize: 12))),
+                ],
               ),
             ),
           ),
@@ -148,15 +151,8 @@ class _Toast extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xEE000000),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white, fontSize: 13),
-      ),
+      decoration: toastBox,
+      child: Text(text, textAlign: TextAlign.center, style: toastText),
     );
   }
 }

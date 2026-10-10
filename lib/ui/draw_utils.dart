@@ -25,7 +25,7 @@ TextPainter _painter(String text, double size, Color color, double maxWidth,
   if (tp == null) {
     if (_tpCache.length > 600) _tpCache.clear();
     tp = TextPainter(
-      text: TextSpan(text: text, style: TextStyle(color: color, fontSize: size)),
+      text: TextSpan(text: text, style: TextStyle(fontFamily: 'Galmuri', color: color, fontSize: size)),
       textDirection: TextDirection.ltr,
       textAlign: center ? TextAlign.center : TextAlign.start,
       maxLines: center ? 2 : null,

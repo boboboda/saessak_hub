@@ -5,106 +5,80 @@ import '../game/hub_game.dart';
 import '../game/region_map.dart';
 import 'theme.dart';
 
-/// 운영 시트: 접수량·달력 / 수익 부스트 / 배송 지역 / 목표
+/// 운영 창들: 하나에 몰아넣지 않고 메뉴마다 따로 연다.
+/// page: 'goals' 목표·업적 · 'research' 연구 · 'stats' 경영 현황 · 'region' 배송 지역
 class OpsSheet extends StatelessWidget {
   final HubGame g;
-  const OpsSheet(this.g, {super.key});
+  final String page;
+  const OpsSheet(this.g, this.page, {super.key});
+
+  static const titles = {'goals': '목표·업적', 'research': '연구', 'stats': '경영 현황', 'region': '배송 지역'};
+  static const colors = {'goals': C.accent, 'research': C.blue, 'stats': C.good, 'region': Color(0xFF8E5BD0)};
 
   @override
   Widget build(BuildContext context) {
     return SheetFrame(
-      title: '운영',
-      heightFactor: 0.74,
+      title: titles[page] ?? '운영',
+      titleColor: colors[page] ?? C.accent,
+      heightFactor: 0.72,
       onClose: g.closeAll,
-      trailing: Padding(
-        padding: const EdgeInsets.only(right: 4),
-        child: Pill(Icons.paid, g.fmt(g.money), color: C.gold),
-      ),
+      trailing: Pill(Icons.paid, g.fmt(g.money), color: C.gold),
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
-        children: [
-          _intake(),
-          const SizedBox(height: 10),
-                    _goals(),
-          const SizedBox(height: 10),
-          _grade(),
-          const SizedBox(height: 10),
-          _fever(),
-          const SizedBox(height: 16),
-          CardBox(
-            child: Row(
-              children: [
-                const Icon(Icons.map, color: C.blue, size: 28),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('노선 지도', style: Tx.h2),
-                      Text('명성 ${g.fame} · 차량 ${g.fleet.length}대', style: Tx.sub),
-                    ],
-                  ),
-                ),
-                AppButton('열기', small: true, color: C.blue, onTap: () {
-                  g.goScreen(1);
-                }),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text('배송 지역', style: Tx.h2),
-          const SizedBox(height: 4),
-          const Text('명성이 쌓이면 새 지역이 열려요. 뒤에 여는 지역일수록 지도가 넓고 집이 많아요', style: Tx.sub),
-          const SizedBox(height: 8),
-          for (var i = 0; i < Cfg.regionName.length; i++) ...[
-            _region(i),
-            const SizedBox(height: 8),
-          ],
-          const SizedBox(height: 8),
-                                        _research(),
-          const SizedBox(height: 16),
-                    CardBox(
-            child: Row(
-              children: [
-                const Icon(Icons.menu_book, color: C.good, size: 28),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('도감', style: Tx.h2),
-                      Text('손님 · 직업 · 세트 ${g.bookFound}/${g.bookTotal} (${(g.bookPct * 100).floor()}%)', style: Tx.sub),
-                    ],
-                  ),
-                ),
-                AppButton('열기', small: true, color: C.good, onTap: () {
-                  g.sheet = 'book';
-                  g.ui();
-                }),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Text('업적', style: Tx.h2),
-              const Spacer(),
-              Pill(Icons.trending_up, '수익 +${g.perkPct}%', color: C.good),
-              const SizedBox(width: 6),
-              Pill(Icons.description, '전직서 ${g.tickets}', color: C.blue),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text('업적마다 돈, 일부는 전직서·영구 수익 보너스(최대 +${Cfg.perkCap}%)', style: Tx.sub),
-          const SizedBox(height: 8),
-          for (var i = 0; i < Cfg.missions.length; i++) ...[
-            _mission(i),
-            const SizedBox(height: 8),
-          ],
-        ],
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
+        children: switch (page) {
+          'goals' => _goalsPage(),
+          'research' => [_research()],
+          'region' => _regionPage(),
+          _ => _statsPage(),
+        },
       ),
     );
   }
+
+  List<Widget> _statsPage() => [
+        _intake(),
+        const SizedBox(height: 10),
+        _fever(),
+        const SizedBox(height: 10),
+        _grade(),
+      ];
+
+  List<Widget> _regionPage() => [
+        const Text('명성이 쌓이면 새 지역이 열려요. 뒤에 여는 지역일수록 지도가 넓고 집이 많아요', style: Tx.sub),
+        const SizedBox(height: 8),
+        for (var i = 0; i < Cfg.regionName.length; i++) ...[
+          _region(i),
+          const SizedBox(height: 8),
+        ],
+        AppButton('노선 지도 열기', color: C.blue, icon: Icons.map, expand: true, onTap: () => g.goScreen(1)),
+      ];
+
+  List<Widget> _goalsPage() => [
+        _goals(),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            const Text('업적', style: Tx.h2),
+            const Spacer(),
+            Pill(Icons.trending_up, '수익 +${g.perkPct}%', color: C.good),
+            const SizedBox(width: 6),
+            Pill(Icons.description, '전직서 ${g.tickets}', color: C.blue),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text('업적마다 돈, 일부는 전직서·영구 수익 보너스(최대 +${Cfg.perkCap}%)', style: Tx.sub),
+        const SizedBox(height: 8),
+        // 받을 보상이 있는 업적을 위로
+        for (final i in [
+          for (var i = 0; i < Cfg.missions.length; i++)
+            if (!g.claimed.contains(i) && g.missionDone(i)) i,
+          for (var i = 0; i < Cfg.missions.length; i++)
+            if (!(!g.claimed.contains(i) && g.missionDone(i))) i,
+        ]) ...[
+          _mission(i),
+          const SizedBox(height: 8),
+        ],
+      ];
 
   /// 접수량: 명성 구간 × 성수기. 다음 구간과 다음 성수기 안내
   Widget _intake() {

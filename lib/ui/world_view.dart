@@ -44,8 +44,24 @@ extension WorldView on HubGame {
     return Rect.fromLTRB(1, cy, a.left + 0.15, cy + 2);
   }
 
+  /// 창고 밖 휴식 자리 (벤치 · 대기 직원 · 벤치 옆에서 쉬는 직원). 이 안에는 배경 장식을 두지 않음
+  Rect get restYard {
+    final b = breakSpot;
+    return Rect.fromLTRB(b.dx - 3.0, b.dy - 1.4, area.left, b.dy + 4.6);
+  }
+
+  /// 인도 칸인지 (왼쪽·위·아래 보도, 입구 길, 도로 오른쪽 인도)
+  bool _walkTile(int x, int y) {
+    if (x >= Cfg.road.right) return true;
+    final p = Offset(x + 0.5, y + 0.5);
+    if (entrancePath.contains(p)) return true;
+    for (final r in Scenery.paths) {
+      if (r.contains(p)) return true;
+    }
+    return false;
+  }
+
   void _drawPaths(Canvas c) {
-    const t = Cfg.tile;
     for (final r in [...Scenery.paths, entrancePath]) {
       for (
         var y = max(r.top.toInt(), y0Of(this));
@@ -57,11 +73,49 @@ extension WorldView on HubGame {
           x < min(r.right.ceil(), x1Of(this));
           x++
         ) {
-          if (!Sprites.drawTile(c, Sprites.sidewalk, x * t, y * t, t)) {
-            box(c, x * t, y * t, t, t, 0xFFB9B5A8);
-          }
+          _paver(c, x, y);
         }
       }
+    }
+  }
+
+  /// 보도블록 한 칸: 따뜻한 베이지 블록을 엇갈려 쌓고, 풀밭·차도와 맞닿은 쪽엔 연석
+  void _paver(Canvas c, int x, int y) {
+    const t = Cfg.tile;
+    final px = x * t, py = y * t;
+    box(c, px, py, t, t, 0xFFB5A386); // 줄눈
+    for (var row = 0; row < 2; row++) {
+      final off = (y * 2 + row).isOdd ? 8.0 : 0.0;
+      for (var k = -1; k < 2; k++) {
+        final bx = px + off + k * 16.0;
+        final l = max(px, bx + 1), r = min(px + t, bx + 16);
+        if (r - l < 1) continue;
+        final by = py + row * 16.0 + 1;
+        final hsh = ((x * 31 + k) * 17 + (y * 2 + row) * 13) & 7;
+        final fill = hsh == 0 ? 0xFFD9C7A5 : (hsh == 1 ? 0xFFE8DABF : 0xFFE2D2B3);
+        box(c, l, by, r - l, 14, fill);
+        box(c, l, by, r - l, 1, 0xFFF2E8D3); // 위 밝은 면
+        box(c, l, by + 13, r - l, 1, 0xFFC6B28F); // 아래 그늘
+      }
+    }
+    // 연석: 이웃 칸이 인도가 아니면 그쪽 가장자리를 진하게
+    const curb = 0xFF9A8B73, dark = 0xFF6E6352;
+    if (!_walkTile(x - 1, y)) {
+      box(c, px, py, 4, t, curb);
+      box(c, px, py, 1, t, dark);
+    }
+    if (!_walkTile(x + 1, y)) {
+      box(c, px + t - 4, py, 4, t, curb);
+      box(c, px + t - 1, py, 1, t, dark);
+    }
+    if (!_walkTile(x, y - 1)) {
+      box(c, px, py, t, 4, curb);
+      box(c, px, py, t, 1, dark);
+    }
+    if (!_walkTile(x, y + 1)) {
+      box(c, px, py + t - 4, t, 4, curb);
+      box(c, px, py + t - 1, t, 1, dark);
+      box(c, px, py + t, t, 2, 0x33000000); // 풀밭에 떨어지는 그림자
     }
   }
 
@@ -82,6 +136,7 @@ extension WorldView on HubGame {
       final w = img.width * k, h = img.height * k; // 도트 원본 크기 그대로
       final r = Rect.fromLTWH(d.x * t - w / 2, d.y * t - h, w, h);
       if (!r.overlaps(view) || r.overlaps(a)) continue;
+      if (restYard.contains(Offset(d.x, d.y - 0.3))) continue; // 창고 밖 휴식 자리는 벤치만 (나무·덤불·꽃 숨김)
       if (!Scenery.onPath.contains(d.key) &&
           entrancePath.contains(Offset(d.x, d.y - 0.3))) {
         continue; // 입구 길 위의 나무 등은 숨김
@@ -221,9 +276,7 @@ extension WorldView on HubGame {
         }
       }
       for (var tx = Cfg.road.right.toInt(); tx < x1Of(this); tx++) {
-        if (!Sprites.drawTile(c, Sprites.sidewalk, tx * t, ty * t, t)) {
-          box(c, tx * t, ty * t, t, t, 0xFFB9B5A8);
-        }
+        _paver(c, tx, ty);
       }
       box(c, rd.center.dx - 1.5, ty * t + 6, 3, t - 12, 0xFFFFD166);
     }
@@ -365,17 +418,11 @@ extension WorldView on HubGame {
         box(c, r.left, r.top, r.width, r.height, Cfg.zoneHot[z]);
       }
     }
-    // 도크 마당에 깐 통로: 노란 칠
+    // 도크 마당에 깐 통로: 창고 안 통로와 같은 보행 차선
+    bool onYard(int x, int y) => Cfg.yard.contains(Offset(x + 0.5, y + 0.5)) && isAisle(x, y);
     for (final k in aisles) {
       final x = k % Cfg.cols, y = k ~/ Cfg.cols;
-      if (!Cfg.yard.contains(Offset(x + 0.5, y + 0.5))) continue;
-      box(c, x * t, y * t, t, t, 0xB3E8C94A);
-      strokeBox(
-        c,
-        Rect.fromLTWH(x * t + 1, y * t + 1, t - 2, t - 2),
-        0x663A2E10,
-        1,
-      );
+      if (onYard(x, y)) drawAisleTile(c, x, y, onYard);
     }
     if (mode == 4) _drawAisleOverlay(c);
     // 건물 구조: 옆벽·남쪽 벽·모서리 기둥·입구 문틀 (바닥에 붙은 것), 북쪽 외벽과 입구 간판은 발끝 정렬
@@ -390,7 +437,7 @@ extension WorldView on HubGame {
     _at(ar.top, () => drawFacade(c, ar));
     final sf = Offset(ar.left - 1.4 * t, door.top - 0.15 * t);
     _at(sf.dy, () => drawEntranceSign(c, sf));
-    label(c, '입구', ar.left - 40, door.center.dy - 7, size: 12);
+    label(c, '입구', ar.left - 40, door.center.dy - 7, size: 12, color: const Color(0xFF6B5638));
   }
 
   /// 통로 모드: 칸 격자 + 직원이 자주 다닌 길(동선) 강조
@@ -1224,11 +1271,8 @@ extension WorldView on HubGame {
 
     _drawPedestrians(c);
 
-    // 창고 밖 휴식 자리 옆 소품: 바깥 벽에 붙은 자판기·사물함, 입구 안쪽 소화기
-    final a = area;
+    // 입구 안쪽 소화기 (창고 밖 휴식 자리는 벤치만 둠)
     for (final (key, x, y) in [
-      ('vend', a.left - 0.6, a.center.dy + 4.95), // 벤치 옆 쉬는 자리(+2.75)보다 아래 (그림 윗부분이 안 겹치게)
-      ('locker', a.left - 0.6, a.center.dy + 6.1),
       ('extinguisher', door.left + 0.25, door.top + 0.4),
     ]) {
       final img = Sprites.decor[key];

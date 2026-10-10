@@ -2,80 +2,70 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import 'menu_sheet.dart';
 import 'theme.dart';
 
-/// 하단 메뉴: 건설 / 직원 / 창고 확장
+/// 하단 메뉴 (카이로소프트풍 아이콘 단추 줄): 건설 / 직원 / 목표 / 연구 / 메뉴
 class BottomBar extends StatelessWidget {
   final HubGame g;
   const BottomBar(this.g, {super.key});
 
+  void _open(String s) {
+    g.selected = null;
+    g.sheet = s;
+    g.ui();
+  }
+
   @override
   Widget build(BuildContext context) {
     final idle = g.staff.where((s) => s.idle).length;
-    final expandSub = g.canExpand ? '${g.nextAreaCost}원' : '최대 크기';
-
+    final reward = g.claimableCount;
+    final btns = [
+      ('build', Icons.construction, '건설', null, () => _open('build')),
+      (
+        'staff',
+        Icons.groups,
+        '직원',
+        idle > 0 ? idle : null,
+        () => _open('staff'),
+      ),
+      (
+        'goal',
+        Icons.emoji_events,
+        '목표',
+        reward > 0 ? reward : null,
+        () => _open('goals'),
+      ),
+      (
+        'research',
+        Icons.science,
+        '연구',
+        g.resNow == null && g.rp > 0 && g.ofType('lab').isNotEmpty ? 0 : null,
+        () => _open('research'),
+      ),
+      ('menu', Icons.apps, '메뉴', null, () => _open('menu')),
+    ];
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 8, 10, 8 + navInset(context)),
+      padding: EdgeInsets.fromLTRB(6, 6, 6, 6 + navInset(context)),
       decoration: const BoxDecoration(
         color: C.panel,
-        border: Border(top: BorderSide(color: C.line)),
+        border: Border(top: BorderSide(color: C.frame, width: 3)),
       ),
       child: Row(
         children: [
-          Expanded(
-            child: _NavBtn(
-              icon: Icons.construction,
-              label: '건설',
-              onTap: () {
-                g.selected = null;
-                g.sheet = 'build';
-                g.ui();
-              },
+          for (final (icon, fb, label, badge, onTap) in btns)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: _NavBtn(
+                  icon: icon,
+                  fallback: fb,
+                  label: label,
+                  badge: badge,
+                  onTap: onTap,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _NavBtn(
-              icon: Icons.groups,
-              label: '직원',
-              sub: idle > 0 ? '대기 $idle' : null,
-              badge: idle > 0,
-              onTap: () {
-                g.selected = null;
-                g.sheet = 'staff';
-                g.ui();
-              },
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _NavBtn(
-              icon: Icons.flag,
-              label: '운영',
-              sub: g.claimableCount > 0 ? '보상 ${g.claimableCount}' : null,
-              badge: g.claimableCount > 0,
-              onTap: () {
-                g.selected = null;
-                g.sheet = 'ops';
-                g.ui();
-              },
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _NavBtn(
-              icon: Icons.open_in_full,
-              label: '창고 확장',
-              sub: expandSub,
-              enabled: g.canExpand,
-              onTap: () {
-                if (!g.canExpand) return;
-                g.selected = null;
-                g.mode = 3;
-                g.ui();
-              },
-            ),
-          ),
         ],
       ),
     );
@@ -103,7 +93,7 @@ class ActionBar extends StatelessWidget {
       final problem = g.ghostProblem;
       okEnabled = problem == null;
       infoColor = okEnabled ? C.good : C.bad;
-            final (near, sets) = g.previewSets(t, g.ghostX, g.ghostY);
+      final (near, sets) = g.previewSets(t, g.ghostX, g.ghostY);
       info =
           '${t.name} ${t.w}×${t.h}칸 · ${t.cost}원 — '
           '${okEnabled ? '놓을 수 있어요' : problem}'
@@ -134,7 +124,7 @@ class ActionBar extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(12, 10, 12, 10 + nav),
       decoration: const BoxDecoration(
         color: C.panel,
-        border: Border(top: BorderSide(color: C.line)),
+        border: Border(top: BorderSide(color: C.frame, width: 3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -143,9 +133,9 @@ class ActionBar extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             decoration: BoxDecoration(
-              color: infoColor.withOpacity(0.15),
+              color: infoColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: infoColor.withOpacity(0.6)),
+              border: Border.all(color: infoColor.withValues(alpha: 0.6)),
             ),
             child: Text(
               info,
@@ -194,13 +184,13 @@ extension on ActionBar {
     final tools = [
       ('깔기', Icons.edit),
       ('철거', Icons.delete_outline),
-      ('화면 이동', Icons.pan_tool),
+      ('이동', Icons.pan_tool),
     ];
     return Container(
       padding: EdgeInsets.fromLTRB(12, 10, 12, 10 + nav),
       decoration: const BoxDecoration(
         color: C.panel,
-        border: Border(top: BorderSide(color: C.line)),
+        border: Border(top: BorderSide(color: C.frame, width: 3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -259,71 +249,54 @@ extension on ActionBar {
   }
 }
 
+/// 아래 메뉴 단추: 크림 판 + 굵은 외곽선 + 도트 아이콘 + 이름. badge: null 없음 · 0 점 · 숫자
 class _NavBtn extends StatelessWidget {
-  final IconData icon;
+  final String icon;
+  final IconData fallback;
   final String label;
-  final String? sub;
-  final bool badge;
-  final bool enabled;
+  final int? badge;
   final VoidCallback onTap;
   const _NavBtn({
     required this.icon,
+    required this.fallback,
     required this.label,
     required this.onTap,
-    this.sub,
-    this.badge = false,
-    this.enabled = true,
+    this.badge,
   });
 
   @override
   Widget build(BuildContext context) {
-    final fg = enabled ? C.text : C.sub.withOpacity(0.5);
-    return Material(
-      color: C.card,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: enabled ? onTap : null,
-        child: Container(
-          height: 56,
-          alignment: Alignment.center,
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon, size: 22, color: fg),
-                  const SizedBox(height: 2),
-                  Text(
-                    sub == null ? label : '$label · $sub',
-                    style: TextStyle(
-                      color: fg,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-              if (badge)
-                Positioned(
-                  top: -2,
-                  right: 14,
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: const BoxDecoration(
-                      color: C.bad,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-            ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            height: 62,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFBEE),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: C.frame, width: 2),
+              boxShadow: const [
+                BoxShadow(color: Color(0xFFC9A46A), offset: Offset(0, 3)),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                UiIcon(icon, fallback, size: 34),
+                Text(label, style: Tx.h2.copyWith(fontSize: 12), maxLines: 1),
+              ],
+            ),
           ),
-        ),
+          if (badge != null)
+            Positioned(
+              top: -6,
+              right: -4,
+              child: RedDot(n: badge == 0 ? null : badge),
+            ),
+        ],
       ),
     );
   }

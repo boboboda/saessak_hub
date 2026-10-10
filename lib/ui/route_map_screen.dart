@@ -117,9 +117,10 @@ class _RouteMapScreenState extends State<RouteMapScreen>
       width: 230,
       padding: const EdgeInsets.fromLTRB(8, 6, 6, 6),
       decoration: BoxDecoration(
-        color: const Color(0xEE1E1B2E),
+        color: const Color(0xF2FFF6DE),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Color(Cfg.regionColor[unit.region]).withValues(alpha: 0.8)),
+        border: Border.all(color: C.frame, width: 2),
+        boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(0, 3))],
       ),
       child: Row(
         children: [
@@ -237,16 +238,16 @@ class _RouteMapScreenState extends State<RouteMapScreen>
       builder: (context, _, __) => Container(
         padding: EdgeInsets.fromLTRB(6, mq.padding.top + 4, 10, 6),
         decoration: const BoxDecoration(
-          color: Color(0xEE1E1B2E),
-          border: Border(bottom: BorderSide(color: C.line)),
+          color: C.panel,
+          border: Border(bottom: BorderSide(color: C.frame, width: 3)),
         ),
         child: Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back, color: C.frame),
               onPressed: () => g.goScreen(0),
             ),
-            const Expanded(child: Text('노선 지도', style: Tx.title)),
+            const Expanded(child: Align(alignment: Alignment.centerLeft, child: TitlePlate('노선 지도', color: C.blue))),
             Pill(Icons.star, '명성 ${g.fame}', color: C.accent),
             const SizedBox(width: 6),
             Pill(Icons.monetization_on, g.fmt(g.money), color: C.gold),
@@ -330,13 +331,14 @@ class _RouteMapScreenState extends State<RouteMapScreen>
                     margin: const EdgeInsets.only(bottom: 3),
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xCC1E1B2E),
+                      color: const Color(0xF2FFF6DE),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: C.frame, width: 1.5),
                     ),
                     child: Text(n.text,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Color(n.color), fontSize: 11)),
+                        style: TextStyle(color: shade(Color(n.color), 0.4), fontSize: 11, fontWeight: FontWeight.w700)),
                   ),
               ],
             ),
@@ -348,12 +350,12 @@ class _RouteMapScreenState extends State<RouteMapScreen>
         if (!open)
           Positioned.fill(
             child: Container(
-              color: const Color(0xAA1E1B2E),
+              color: const Color(0xCCFFF4D8),
               alignment: Alignment.center,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.lock, color: Colors.white, size: 36),
+                  const Icon(Icons.lock, color: C.frame, size: 36),
                   const SizedBox(height: 6),
                   Text('${Cfg.regionName[sel]} 지역',
                       style: Tx.title),
@@ -391,15 +393,17 @@ class _RouteMapScreenState extends State<RouteMapScreen>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
             decoration: BoxDecoration(
-              color: on ? C.accent : const Color(0xCC1E1B2E),
+              color: on ? C.accent : const Color(0xF2FFF6DE),
               borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: C.frame, width: 2),
+              boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(0, 2))],
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(icon, size: 14, color: Colors.white),
+              Icon(icon, size: 14, color: on ? Colors.white : C.text),
               const SizedBox(width: 4),
               Text(text,
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  style: TextStyle(
+                      color: on ? Colors.white : C.text, fontSize: 11, fontWeight: FontWeight.w700)),
             ]),
           ),
         );
@@ -447,7 +451,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
       onPanUpdate: (d) => jump(d.localPosition),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xCC1E1B2E), width: 2),
+          border: Border.all(color: C.frame, width: 2),
           borderRadius: BorderRadius.circular(4),
         ),
         child: CustomPaint(size: Size(w, h), painter: _MiniMap(g, _anim, sel, cam)),
@@ -459,12 +463,13 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xCC1E1B2E),
+        color: const Color(0xF2FFF6DE),
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: C.frame, width: 2),
       ),
       child: Text(t,
           style: const TextStyle(
-              color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+              color: C.text, fontSize: 11, fontWeight: FontWeight.w700)),
     );
   }
 

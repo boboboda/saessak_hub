@@ -22,14 +22,15 @@ class GarageScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.fromLTRB(16, mq.padding.top + 12, 12, 10),
               decoration: const BoxDecoration(
-                color: Color(0xEE1E1B2E),
-                border: Border(bottom: BorderSide(color: C.line)),
+                color: C.panel,
+                border: Border(bottom: BorderSide(color: C.frame, width: 3)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.garage, color: C.accent),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text('차고 · 차량 ${g.fleet.length}대', style: Tx.title)),
+                  Expanded(
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: TitlePlate('차고 · 차량 ${g.fleet.length}대', color: C.wood))),
                   Pill(Icons.monetization_on, g.fmt(g.money), color: C.gold),
                 ],
               ),

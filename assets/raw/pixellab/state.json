@@ -469,5 +469,35 @@
   },
   "story_medicine": {
     "object_id": "aaf8123b-ac86-48f4-b10e-3836ed0b8b17"
+  },
+  "ui_build": {
+    "object_id": "e89a93db-546f-4951-8c05-c4777655d025"
+  },
+  "ui_staff": {
+    "object_id": "514b1ea0-3bb9-46c2-b6a4-04da51b284a0"
+  },
+  "ui_goal": {
+    "object_id": "0004312c-7bd3-47ca-8169-9a0a686c4ebb"
+  },
+  "ui_research": {
+    "object_id": "6b3d66ff-746c-48b0-8519-ad038df40f15"
+  },
+  "ui_menu": {
+    "object_id": "c548a261-cf8b-42e0-bb29-975fe90b2441"
+  },
+  "ui_stats": {
+    "object_id": "4ae4ae37-8f2a-4dff-896d-5058fb3d09c4"
+  },
+  "ui_region": {
+    "object_id": "4e474db0-4f96-4a03-98d7-36be9af4b062"
+  },
+  "ui_book": {
+    "object_id": "ac5aead6-7e0b-45f0-a3a6-359e40ae9f9c"
+  },
+  "ui_expand": {
+    "object_id": "2fc96be4-55b0-46d5-bc26-614324092636"
+  },
+  "ui_aisle": {
+    "object_id": "13591ff1-f353-400c-b14d-cce39365b4d9"
   }
 }

@@ -8,7 +8,7 @@ import '../game/sprites.dart';
 import 'draw_utils.dart';
 
 /// 창고 바닥: 구역마다 재질이 다름 (① 접수 밝은 타일, ② 포장 콘크리트 + 노란 안전선, ③ 보관 공장 바닥),
-/// 유저가 깐 통로(초록 보행로 + 노란 테두리), 바닥에 칠한 구역 글씨.
+/// 유저가 깐 통로(진회색 보행 차선 + 노란 안전선 + 흰 점선), 바닥에 칠한 구역 글씨.
 extension FloorView on HubGame {
   /// 칸 (x, y)의 구역: 0 접수, 1 포장, 2 보관·출고
   int zoneOfX(int x) => x < Cfg.zoneX1 ? 0 : (x < Cfg.zoneX2 ? 1 : 2);
@@ -71,7 +71,12 @@ extension FloorView on HubGame {
           // 0 얼룩 · 1 금 · 3 배수구 (덧댄 판(2)은 빈 자리 표시처럼 보여서 안 씀, 배수구는 보관 구역만)
           var k = const [0, 1, 0, 3][(h >> 5) % 4];
           if (k == 3 && zoneOfX(i) != 2) k = 1;
-          c.drawImageRect(fv, Rect.fromLTWH(k * 32.0, 0, 32, 32), Rect.fromLTWH(i * t, j * t, t, t), paint);
+          c.drawImageRect(
+            fv,
+            Rect.fromLTWH(k * 32.0, 0, 32, 32),
+            Rect.fromLTWH(i * t, j * t, t, t),
+            paint,
+          );
         }
       }
     }
@@ -89,7 +94,12 @@ extension FloorView on HubGame {
     final tape = Paint()..color = const Color(0xCCF2C230);
     for (final b in buildings) {
       if (b.type.id == 'dock') continue;
-      final r = Rect.fromLTWH(b.tx * t, b.ty * t, b.type.w * t, b.type.h * t).inflate(3);
+      final r = Rect.fromLTWH(
+        b.tx * t,
+        b.ty * t,
+        b.type.w * t,
+        b.type.h * t,
+      ).inflate(3);
       const l = 8.0, w = 2.0;
       for (final p in [r.topLeft, r.topRight, r.bottomLeft, r.bottomRight]) {
         final sx = p.dx == r.left ? 1.0 : -1.0, sy = p.dy == r.top ? 1.0 : -1.0;
@@ -98,8 +108,16 @@ extension FloorView on HubGame {
       }
     }
     for (final d in buildings.where((b) => b.type.id == 'dock')) {
-      final z = Rect.fromLTWH((d.tx - 1) * t, d.ty * t + 4, t - 4, d.type.h * t - 8);
-      if (!z.overlaps(Rect.fromLTRB(a.left * t, a.top * t, a.right * t, a.bottom * t))) continue;
+      final z = Rect.fromLTWH(
+        (d.tx - 1) * t,
+        d.ty * t + 4,
+        t - 4,
+        d.type.h * t - 8,
+      );
+      if (!z.overlaps(
+        Rect.fromLTRB(a.left * t, a.top * t, a.right * t, a.bottom * t),
+      ))
+        continue;
       c.drawRect(z, Paint()..color = const Color(0x22F2C230));
       c.save();
       c.clipRect(z);
@@ -118,24 +136,68 @@ extension FloorView on HubGame {
     const ink = [0x55A0783C, 0x55505050, 0x55304030];
     final zx = [a.left, Cfg.zoneX1, Cfg.zoneX2, a.right];
     for (var z = 0; z < 3; z++) {
-      final r = Rect.fromLTRB(zx[z] * t, (a.bottom - 1.2) * t, zx[z + 1] * t, (a.bottom - 0.2) * t);
+      final r = Rect.fromLTRB(
+        zx[z] * t,
+        (a.bottom - 1.2) * t,
+        zx[z + 1] * t,
+        (a.bottom - 0.2) * t,
+      );
       if (r.width < t) continue;
       labelIn(c, names[z], r, size: 15, color: Color(ink[z]));
     }
 
-    // 4) 유저가 깐 통로: 초록 보행로, 통로가 끝나는 쪽에 노란 테두리
-    bool on(int x, int y) => a.contains(Offset(x + 0.5, y + 0.5)) && isAisle(x, y);
+    // 4) 유저가 깐 통로: 진회색 보행 차선 + 바깥 테두리만 노란 안전선(이어진 칸끼리는 선 없음) + 가운데 흰 점선
+    bool on(int x, int y) =>
+        a.contains(Offset(x + 0.5, y + 0.5)) && isAisle(x, y);
     for (var j = ay0; j < ay1; j++) {
       for (var i = ax0; i < ax1; i++) {
         if (!on(i, j)) continue;
-        final x = i * t, y = j * t;
-        box(c, x, y, t, t, 0xFF5E9E6E);
-        box(c, x + 4, y + 4, t - 8, t - 8, 0xFF67A877);
-        if (!on(i - 1, j)) box(c, x, y, 3, t, 0xFFF2C230);
-        if (!on(i + 1, j)) box(c, x + t - 3, y, 3, t, 0xFFF2C230);
-        if (!on(i, j - 1)) box(c, x, y, t, 3, 0xFFF2C230);
-        if (!on(i, j + 1)) box(c, x, y + t - 3, t, 3, 0xFFF2C230);
+        drawAisleTile(c, i, j, on);
       }
     }
+  }
+
+  /// 통로 한 칸 (창고 안·도크 마당 공통). on: 이웃 칸도 통로인지
+  void drawAisleTile(Canvas c, int i, int j, bool Function(int, int) on) {
+    const t = Cfg.tile;
+    final x = i * t, y = j * t;
+    final l = on(i - 1, j),
+        r = on(i + 1, j),
+        u = on(i, j - 1),
+        d = on(i, j + 1);
+    box(c, x, y, t, t, 0xFF6F7884);
+    // 미끄럼 방지 무늬 (칸마다 고정된 작은 점)
+    final h = _h(i + 3, j + 7);
+    for (var k = 0; k < 3; k++) {
+      box(
+        c,
+        x + 4 + (h >> (k * 4)) % 24,
+        y + 4 + (h >> (k * 4 + 2)) % 24,
+        2,
+        2,
+        0xFF7D8692,
+      );
+    }
+    const edge = 0xFFF2C230, sh = 0xFF4E5560;
+    if (!l) {
+      box(c, x, y, 4, t, edge);
+      box(c, x + 4, y, 1, t, sh);
+    }
+    if (!r) {
+      box(c, x + t - 4, y, 4, t, edge);
+      box(c, x + t - 5, y, 1, t, sh);
+    }
+    if (!u) {
+      box(c, x, y, t, 4, edge);
+      box(c, x, y + 4, t, 1, sh);
+    }
+    if (!d) {
+      box(c, x, y + t - 4, t, 4, edge);
+      box(c, x, y + t - 5, t, 1, sh);
+    }
+    // 가운데 흰 점선: 이어진 방향으로 (가로·세로 길이 만나는 칸엔 안 그림)
+    final horiz = (l || r) && !(u || d), vert = (u || d) && !(l || r);
+    if (horiz && i % 2 == 0) box(c, x + 8, y + t / 2 - 1, 16, 2, 0xCCFFFFFF);
+    if (vert && j % 2 == 0) box(c, x + t / 2 - 1, y + 8, 2, 16, 0xCCFFFFFF);
   }
 }

@@ -13,37 +13,107 @@ class TopBar extends StatelessWidget {
     final mq = MediaQuery.of(context);
     final progress = (g.dayTimer / Cfg.dayLength).clamp(0.0, 1.0).toDouble();
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(14, mq.padding.top + 6, 6, 8),
-      decoration: const BoxDecoration(
-        color: Color(0xEE1E1B2E),
-        border: Border(bottom: BorderSide(color: C.line)),
-      ),
+    // 카이로소프트풍: 맵 위에 떠 있는 크림 판들 (왼쪽 날짜·회사, 오른쪽 돈·배속)
+    return Padding(
+      padding: EdgeInsets.fromLTRB(8, mq.padding.top + 6, 2, 4),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: _Board(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${g.year}년차 ${Cfg.seasonName[(g.dayOfYear - 1) ~/ 7]} ${(g.dayOfYear - 1) % 7 + 1}일',
+                        style: Tx.h2.copyWith(fontSize: 15),
+                      ),
+                      Text(
+                        '새싹 택배 · ${Cfg.corpName[g.companyGrade]} · ${Cfg.areaName[g.areaLevel]}',
+                        style: Tx.sub.copyWith(fontSize: 10),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      // 오늘 하루 진행 (해 아이콘 막대)
+                      Row(
+                        children: [
+                          const Icon(Icons.wb_sunny, size: 12, color: C.accent),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Container(
+                              height: 7,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE9D3A6),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: C.frame, width: 1),
+                              ),
+                              child: FractionallySizedBox(
+                                alignment: Alignment.centerLeft,
+                                widthFactor: progress,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: C.accent,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              _Board(
+                padding: const EdgeInsets.fromLTRB(8, 7, 10, 7),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('새싹 택배 허브', style: Tx.title),
-                    Text(
-                      '${Cfg.corpName[g.companyGrade]} · ${Cfg.areaName[g.areaLevel]} · ${g.year}년차 ${Cfg.seasonName[(g.dayOfYear - 1) ~/ 7]} ${(g.dayOfYear - 1) % 7 + 1}일',
-                      style: Tx.sub,
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: C.coin,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: C.frame, width: 1.5),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        '₩',
+                        style: TextStyle(
+                          fontFamily: kFont,
+                          color: C.frame,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
+                    const SizedBox(width: 5),
+                    Text(g.fmt(g.money), style: Tx.h2.copyWith(fontSize: 15)),
                   ],
                 ),
               ),
-              Pill(Icons.monetization_on, g.fmt(g.money), color: C.gold),
-              const SizedBox(width: 6),
-              _SmallBtn('x${g.speedMul}', () {
-                g.speedIdx = (g.speedIdx + 1) % Cfg.speeds.length;
-                g.ui();
-              }),
+              const SizedBox(width: 4),
+              AppButton(
+                'x${g.speedMul}',
+                small: true,
+                color: C.blue,
+                onTap: () {
+                  g.speedIdx = (g.speedIdx + 1) % Cfg.speeds.length;
+                  g.ui();
+                },
+              ),
               PopupMenuButton<int>(
-                icon: const Icon(Icons.bug_report, color: C.sub),
+                icon: const Icon(Icons.bug_report, color: C.frame, size: 20),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 30),
                 color: C.panel,
                 onSelected: (v) {
                   switch (v) {
@@ -69,12 +139,22 @@ class TopBar extends StatelessWidget {
                         builder: (ctx) => AlertDialog(
                           backgroundColor: C.panel,
                           title: const Text('저장을 지울까요?', style: Tx.h2),
-                          content: const Text('지금까지 한 게임이 모두 사라지고 되돌릴 수 없어요.', style: Tx.body),
+                          content: const Text(
+                            '지금까지 한 게임이 모두 사라지고 되돌릴 수 없어요.',
+                            style: Tx.body,
+                          ),
                           actions: [
-                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
                             TextButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('지우기', style: TextStyle(color: C.bad))),
+                              onPressed: () => Navigator.pop(ctx, false),
+                              child: const Text('취소'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, true),
+                              child: const Text(
+                                '지우기',
+                                style: TextStyle(color: C.bad),
+                              ),
+                            ),
                           ],
                         ),
                       ).then((ok) {
@@ -97,18 +177,26 @@ class TopBar extends StatelessWidget {
                       }
                       g.tickets++;
                       break;
-                                        case 9:
+                    case 9:
                       g.debugProps();
                       break;
-                                        case 11:
+                    case 11:
                       g.rp += 1000;
                       break;
-                                                            case 17:
-                      if (!g.debugRouteEvent(g.debugStory++)) g.showToast('달리는 차량이 없어요');
+                    case 17:
+                      if (!g.debugRouteEvent(g.debugStory++))
+                        g.showToast('달리는 차량이 없어요');
                       break;
                     case 16:
                       // 실패 엽서 미리보기 (파손 → 지연 차례로)
-                      g.postcard = StoryResult(g.debugStory % Cfg.storyDefs.length, false, 1 + g.debugStory++ % 2, false, 0, 0);
+                      g.postcard = StoryResult(
+                        g.debugStory % Cfg.storyDefs.length,
+                        false,
+                        1 + g.debugStory++ % 2,
+                        false,
+                        0,
+                        0,
+                      );
                       break;
                     case 15:
                       // 사연 손님 부르기 (차례로, 확률·날짜 무시)
@@ -129,7 +217,8 @@ class TopBar extends StatelessWidget {
                       cu.guest = k;
                       cu.look = Cfg.guestLook0 + k;
                       cu.story = -1;
-                      if (g.rt.foundGuests.add(k)) g.showToast('새 손님 발견! ${Cfg.guestName[k]}');
+                      if (g.rt.foundGuests.add(k))
+                        g.showToast('새 손님 발견! ${Cfg.guestName[k]}');
                       break;
                     case 12:
                       g.runAward(g.year); // 지금 기록으로 시상식 보기
@@ -138,7 +227,8 @@ class TopBar extends StatelessWidget {
                       if (g.companyGrade < Cfg.corpName.length - 1) {
                         g.companyGrade++;
                         g.gradeUp = g.companyGrade;
-                        if (g.companyGrade == Cfg.corpName.length - 1) g.endless = true;
+                        if (g.companyGrade == Cfg.corpName.length - 1)
+                          g.endless = true;
                       }
                       break;
                     case 10:
@@ -182,15 +272,15 @@ class TopBar extends StatelessWidget {
                     value: 9,
                     child: Text('세트 소품 6종 놓기', style: Tx.body),
                   ),
-                                    PopupMenuItem(
+                  PopupMenuItem(
                     value: 10,
                     child: Text('사건 일으키기 (차례로)', style: Tx.body),
                   ),
-                                    PopupMenuItem(
+                  PopupMenuItem(
                     value: 11,
                     child: Text('RP +1000', style: Tx.body),
                   ),
-                                    PopupMenuItem(
+                  PopupMenuItem(
                     value: 12,
                     child: Text('연말 시상식 보기', style: Tx.body),
                   ),
@@ -198,7 +288,7 @@ class TopBar extends StatelessWidget {
                     value: 13,
                     child: Text('회사 등급 +1', style: Tx.body),
                   ),
-                                    PopupMenuItem(
+                  PopupMenuItem(
                     value: 17,
                     child: Text('노선 사건 일으키기 (차례로)', style: Tx.body),
                   ),
@@ -229,7 +319,8 @@ class TopBar extends StatelessWidget {
             child: Wrap(
               spacing: 6,
               children: [
-                                for (final l in g.evtLabels) Pill(Icons.campaign, l, color: C.accent),
+                for (final l in g.evtLabels)
+                  Pill(Icons.campaign, l, color: C.accent),
                 Pill(Icons.inbox, '접수 ${g.done}'),
                 Pill(Icons.inventory_2, '보관 ${g.totalStored}'),
                 Pill(Icons.local_shipping, '배송 ${g.delivered}'),
@@ -256,50 +347,34 @@ class TopBar extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(2),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 3,
-                backgroundColor: C.line,
-                valueColor: const AlwaysStoppedAnimation<Color>(C.accent),
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
 }
 
-class _SmallBtn extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-  const _SmallBtn(this.label, this.onTap);
+/// 맵 위에 뜬 크림 판 (굵은 갈색 테두리 + 아래 그림자)
+class _Board extends StatelessWidget {
+  final Widget child;
+  final EdgeInsets padding;
+  const _Board({
+    required this.child,
+    this.padding = const EdgeInsets.fromLTRB(10, 6, 10, 7),
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: C.card,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: const Color(0xF2FFF6DE),
         borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: C.text,
-              fontWeight: FontWeight.w700,
-              fontSize: 13,
-            ),
-          ),
-        ),
+        border: Border.all(color: C.frame, width: 2),
+        boxShadow: const [
+          BoxShadow(color: Color(0x55000000), offset: Offset(0, 3)),
+        ],
       ),
+      child: child,
     );
   }
 }
