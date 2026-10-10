@@ -85,7 +85,16 @@ extension StorySystem on HubGame {
 
   /// 새 손님이 사연 손님인지 정함. 사연 번호 또는 -1. 거절했던 사연은 조건이 차면 먼저 다시 찾아옴
   int pickStory() {
-    if (day < Cfg.storyFromDay || storyBusy) return -1;
+    if (storyBusy) return -1;
+    if (rs.vipStory > 0) {
+      // VIP 단골이 보낸 사연 손님: 확률·날짜 무시
+      rs.vipStory--;
+      final pool = [for (var k = 0; k < Cfg.storyDefs.length; k++) if (!rt.storyDone.contains(k)) k];
+      final all = pool.isEmpty ? [for (var k = 0; k < Cfg.storyDefs.length; k++) k] : pool;
+      showToast('VIP 단골이 소개한 사연 손님이 왔어요!');
+      return all[rnd.nextInt(all.length)];
+    }
+    if (day < Cfg.storyFromDay) return -1;
     if (rnd.nextDouble() >= Cfg.storyChance) return -1;
     for (final k in rt.storyLocked) {
       if (storyNeedMet(k)) {

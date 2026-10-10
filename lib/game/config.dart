@@ -224,7 +224,19 @@ class Cfg {
     '캠핑 덕후네', '대학원생 언니', '다섯 남매네', '헬스 트레이너', '작은 서점', '분식집 이모',
   ];
   static const List<int> vipGift = [2000, 2500, 3500, 3000, 3000]; // VIP 단골 첫 감사 선물 (지역별)
-  static const int vipGiftFame = 10; // 한 차량에 직접 지정할 수 있는 집 수
+  static const int vipGiftFame = 10;
+  // ---- 랜드마크: 평판 '믿음직한 택배'(2)에 공원, '동네의 상징'(4)에 광장 ----
+  static const List<String> landmarkName = ['', '동네 공원', '중앙 광장'];
+  static const List<int> landmarkLv = [99, 2, 4]; // 필요한 평판 단계
+  static const List<String> landmarkDesc = ['', '주민이 늘고 단골 하트 ×1.2', '의뢰 보상 +20% · 하루 명성 +3'];
+  // ---- 지역 전용 의뢰 (그 지역에서만 나옴) ----
+  static const List<String> localReqName = [
+    '골목 배달: 오토바이로 가까운 동네',
+    '오픈 전 급송: 가볍게(70%) 실은 차로',
+    '냉동 수산물: 소형 트럭으로 정시',
+    '대량 부품: 과적(120% 이상) 차로',
+    '새벽 배송: 지각 없이 연속',
+  ]; // 한 차량에 직접 지정할 수 있는 집 수
 
   // ---- 적재 한도: 적게 실으면 빠르고, 과적하면 많이 싣지만 느리고 위험 ----
   static const List<String> loadName = ['가볍게 70%', '정량 100%', '과적 120%', '과적 150%'];

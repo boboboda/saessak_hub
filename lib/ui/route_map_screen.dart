@@ -9,6 +9,7 @@ import '../game/region_map.dart';
 import '../game/sprites.dart';
 import '../models/models.dart';
 import 'fleet_widgets.dart';
+import 'menu_sheet.dart';
 import 'route_widgets.dart';
 import 'theme.dart';
 
@@ -231,17 +232,27 @@ class _RouteMapScreenState extends State<RouteMapScreen>
             onTap: () => setState(() => _cardOpen = !_cardOpen),
             child: Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Row(children: [
-                Expanded(
-                  child: Text(
-                    unit.isTrunk
-                        ? '적재 ${Cfg.loadName[unit.loadIdx]}'
-                        : '${unit.homes.isNotEmpty ? '지정 집 ${unit.homes.length}채' : (unit.zone < 0 ? '구역 자동' : Cfg.zoneNameR[unit.zone])} · ${Cfg.loadName[unit.loadIdx]} · 집을 눌러 지정',
-                    style: Tx.sub.copyWith(fontSize: 10, color: C.text, fontWeight: FontWeight.w700),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      unit.isTrunk
+                          ? '적재 ${Cfg.loadName[unit.loadIdx]}'
+                          : '${unit.homes.isNotEmpty ? '지정 집 ${unit.homes.length}채' : (unit.zone < 0 ? '구역 자동' : Cfg.zoneNameR[unit.zone])} · ${Cfg.loadName[unit.loadIdx]} · 집을 눌러 지정',
+                      style: Tx.sub.copyWith(
+                        fontSize: 10,
+                        color: C.text,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
-                ),
-                Icon(_cardOpen ? Icons.expand_less : Icons.tune, size: 16, color: C.frame),
-              ]),
+                  Icon(
+                    _cardOpen ? Icons.expand_less : Icons.tune,
+                    size: 16,
+                    color: C.frame,
+                  ),
+                ],
+              ),
             ),
           ),
           if (_cardOpen) UnitRouteControls(g, unit),
@@ -251,7 +262,8 @@ class _RouteMapScreenState extends State<RouteMapScreen>
   }
 
   double _z0 = 1;
-  bool _cardOpen = false; // 지도 위 차량 카드의 노선 설정 펼침
+  bool _cardOpen = false;
+  int _ptab = 0; // 노선 패널 탭 // 지도 위 차량 카드의 노선 설정 펼침
 
   /// 화면의 한 점(focal)을 기준으로 확대 배율을 바꿈 (그 점 아래 지도가 그대로 있게)
   void _zoomAt(Offset focal, double z) {
@@ -450,7 +462,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     return ValueListenableBuilder<int>(
       valueListenable: g.tick,
       builder: (context, _, __) => Container(
-        height: 44,
+        height: 46,
         color: C.panel,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
@@ -459,38 +471,76 @@ class _RouteMapScreenState extends State<RouteMapScreen>
               Expanded(
                 child: GestureDetector(
                   onTap: () => _select(i),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 3,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: sel == i ? Color(Cfg.regionColor[i]) : C.card,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (!g.regionOpen[i])
-                          Icon(
-                            Icons.lock,
-                            size: 12,
-                            color: sel == i ? Colors.black : C.sub,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 3,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: sel == i
+                              ? Color(Cfg.regionColor[i])
+                              : (g.regionOpen[i]
+                                    ? const Color(0xFFFFFBEE)
+                                    : const Color(0xFFE6D6B6)),
+                          borderRadius: BorderRadius.circular(9),
+                          border: Border.all(
+                            color: C.frame,
+                            width: sel == i ? 2.5 : 1.5,
                           ),
-                        if (!g.regionOpen[i]) const SizedBox(width: 2),
-                        Text(
-                          Cfg.regionName[i],
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: sel == i
-                                ? Colors.black
-                                : (g.regionOpen[i] ? C.text : C.sub),
+                          boxShadow: sel == i
+                              ? [
+                                  BoxShadow(
+                                    color: shade(
+                                      Color(Cfg.regionColor[i]),
+                                      0.4,
+                                    ),
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (!g.regionOpen[i])
+                              const Icon(Icons.lock, size: 12, color: C.sub),
+                            if (g.regionOpen[i] && sel != i)
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                  color: Color(Cfg.regionColor[i]),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            const SizedBox(width: 3),
+                            Text(
+                              Cfg.regionName[i],
+                              style: TextStyle(
+                                fontFamily: kFont,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: g.regionOpen[i] ? C.text : C.sub,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // 이 지역 의뢰 수
+                      if (g.regionOpen[i] &&
+                          g.rs.reqs.any((q) => q.region == i))
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: RedDot(
+                            n: g.rs.reqs.where((q) => q.region == i).length,
                           ),
                         ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -521,7 +571,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                for (final n in g.notes.take(2))
+                for (final n in g.notes.take(1))
                   Container(
                     margin: const EdgeInsets.only(bottom: 3),
                     padding: const EdgeInsets.symmetric(
@@ -808,79 +858,92 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     return ListView(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
       children: [
-        RoutePanelExtras(g, sel),
-        CardBox(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 14,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '${Cfg.regionName[sel]} 노선 · 집 ${RegionMap.of(sel).houses.length}채',
-                      style: Tx.h2,
-                    ),
-                  ),
-                  Switch(
-                    value: rt.on,
-                    activeColor: C.good,
-                    onChanged: (v) {
-                      rt.on = v;
-                      g.ui();
-                    },
-                  ),
-                ],
-              ),
-              Text(
-                '대형 트럭 ${g.trunkCount(sel)}대 · 배달 차량 ${g.courierCount(sel)}대 · 편도 ${RegionMap.of(sel).tripSec.round()}초',
-                style: Tx.sub,
-              ),
-              const SizedBox(height: 6),
-              _row('대기', [
-                for (final w in Cfg.waitOptions)
-                  _chip('${w.round()}초', rt.wait == w, () {
-                    rt.wait = w;
-                    g.ui();
-                  }),
-              ]),
-              _row('우선', [
-                for (var p = 1; p <= 3; p++)
-                  _chip(
-                    p == 1 ? '보통' : (p == 2 ? '높음' : '최우선'),
-                    rt.prio == p,
-                    () {
-                      rt.prio = p;
-                      g.ui();
-                    },
-                  ),
-              ]),
-              const SizedBox(height: 6),
-              const Text(
-                '대기: 더 실을 택배가 없을 때 트럭이 기다리는 시간 · 우선: 여러 노선이 동시에 준비되면 높은 쪽이 먼저',
-                style: Tx.sub,
-              ),
-            ],
-          ),
-        ),
-        if (g.trunkCount(sel) == 0 || g.courierCount(sel) == 0) ...[
-          const SizedBox(height: 8),
+        RoutePanelTabs(_ptab, (i) => setState(() => _ptab = i), [
+          0,
+          g.rs.reqs.where((q) => q.region == sel).length,
+          [
+            for (var f = 0; f < Cfg.facName.length; f++)
+              if (!g.hasFac(sel, f) && g.money >= g.facCost(sel, f)) f,
+          ].length,
+          0,
+          0,
+        ]),
+        const SizedBox(height: 10),
+        if (_ptab < 4) RoutePanelExtras(g, sel, tab: _ptab),
+        if (_ptab == 4) ...[
           CardBox(
-            child: Text(
-              g.trunkCount(sel) == 0
-                  ? '이 노선에는 대형 트럭이 없어요. 차량 구입 탭에서 사거나, 내 차량 탭에서 다른 지역 차량을 옮겨 오세요.'
-                  : '이 노선에는 배달 차량이 없어 센터에 택배가 쌓여요. 오토바이나 소형 트럭을 배정하세요.',
-              style: const TextStyle(color: C.gold, fontSize: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${Cfg.regionName[sel]} 노선 · 집 ${RegionMap.of(sel).houses.length}채',
+                        style: Tx.h2,
+                      ),
+                    ),
+                    Switch(
+                      value: rt.on,
+                      activeColor: C.good,
+                      onChanged: (v) {
+                        rt.on = v;
+                        g.ui();
+                      },
+                    ),
+                  ],
+                ),
+                Text(
+                  '대형 트럭 ${g.trunkCount(sel)}대 · 배달 차량 ${g.courierCount(sel)}대 · 편도 ${RegionMap.of(sel).tripSec.round()}초',
+                  style: Tx.sub,
+                ),
+                const SizedBox(height: 6),
+                _row('대기', [
+                  for (final w in Cfg.waitOptions)
+                    _chip('${w.round()}초', rt.wait == w, () {
+                      rt.wait = w;
+                      g.ui();
+                    }),
+                ]),
+                _row('우선', [
+                  for (var p = 1; p <= 3; p++)
+                    _chip(
+                      p == 1 ? '보통' : (p == 2 ? '높음' : '최우선'),
+                      rt.prio == p,
+                      () {
+                        rt.prio = p;
+                        g.ui();
+                      },
+                    ),
+                ]),
+                const SizedBox(height: 6),
+                const Text(
+                  '대기: 더 실을 택배가 없을 때 트럭이 기다리는 시간 · 우선: 여러 노선이 동시에 준비되면 높은 쪽이 먼저',
+                  style: Tx.sub,
+                ),
+              ],
             ),
           ),
+          if (g.trunkCount(sel) == 0 || g.courierCount(sel) == 0) ...[
+            const SizedBox(height: 8),
+            CardBox(
+              child: Text(
+                g.trunkCount(sel) == 0
+                    ? '이 노선에는 대형 트럭이 없어요. 차량 구입 탭에서 사거나, 내 차량 탭에서 다른 지역 차량을 옮겨 오세요.'
+                    : '이 노선에는 배달 차량이 없어 센터에 택배가 쌓여요. 오토바이나 소형 트럭을 배정하세요.',
+                style: const TextStyle(color: C.gold, fontSize: 12),
+              ),
+            ),
+          ],
         ],
       ],
     );
@@ -1092,9 +1155,21 @@ class _MapPainter extends CustomPainter {
 
     // 2) 세워진 것들을 아래쪽 순서대로 그림 (앞에 있는 게 위에 오도록). 화면 밖은 건너뜀
     final items = <_Item>[];
+    final lm = open ? g.landmarkOf(sel) : 0;
+    final lmRect = l.landmark;
     for (final d in l.decor) {
+      if (lm > 0 &&
+          lmRect != null &&
+          lmRect.inflate(0.3).contains(Offset(d.x, d.y - 0.2)))
+        continue;
       if (cull.contains(Offset(d.x, d.y)))
         items.add(_Item(d.y, (cv) => _decor(cv, d)));
+    }
+    if (lm > 0 && lmRect != null && cull.overlaps(lmRect)) {
+      _landmarkGround(c, lmRect, lm);
+      for (final (y, f) in _landmarkItems(lmRect, lm)) {
+        items.add(_Item(y, f));
+      }
     }
     for (var k = 0; k < l.houses.length; k++) {
       final h = l.houses[k];
@@ -1171,42 +1246,207 @@ class _MapPainter extends CustomPainter {
         final h = l.houses[l.deliver[k]];
         final on = u.homes.contains(k);
         if (!g.houseOpen(sel, k)) continue; // 빈 집터는 지정 못 함
-        final r = Rect.fromCenter(center: _px(Offset(h.x, h.y + 0.55)), width: t * 0.9, height: t * 0.42);
-        c.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(t * 0.1)), Paint()..color = on ? const Color(0xFFF08A24) : const Color(0xDDFFF6DE));
-        c.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(t * 0.1)),
-            Paint()..color = const Color(0xFF5B3A1F)..style = PaintingStyle.stroke..strokeWidth = 1.2);
-        _label(c, '${k + 1}', r.center, t * 0.3, on ? Colors.white : const Color(0xFF4A2F1A));
+        final r = Rect.fromCenter(
+          center: _px(Offset(h.x, h.y + 0.55)),
+          width: t * 0.9,
+          height: t * 0.42,
+        );
+        c.drawRRect(
+          RRect.fromRectAndRadius(r, Radius.circular(t * 0.1)),
+          Paint()
+            ..color = on ? const Color(0xFFF08A24) : const Color(0xDDFFF6DE),
+        );
+        c.drawRRect(
+          RRect.fromRectAndRadius(r, Radius.circular(t * 0.1)),
+          Paint()
+            ..color = const Color(0xFF5B3A1F)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.2,
+        );
+        _label(
+          c,
+          '${k + 1}',
+          r.center,
+          t * 0.3,
+          on ? Colors.white : const Color(0xFF4A2F1A),
+        );
       }
       for (final k in u.homes) {
         if (k >= l.deliver.length) continue;
         final h = l.houses[l.deliver[k]];
         final p = _px(Offset(h.x + 0.7, h.y + 0.1));
-        c.drawLine(p, p.translate(0, -t * 1.1), Paint()..color = const Color(0xFF5B3A1F)..strokeWidth = 2);
+        c.drawLine(
+          p,
+          p.translate(0, -t * 1.1),
+          Paint()
+            ..color = const Color(0xFF5B3A1F)
+            ..strokeWidth = 2,
+        );
         final flag = Path()
           ..moveTo(p.dx, p.dy - t * 1.1)
           ..lineTo(p.dx + t * 0.6, p.dy - t * 0.9)
           ..lineTo(p.dx, p.dy - t * 0.7)
           ..close();
         c.drawPath(flag, Paint()..color = const Color(0xFFF08A24));
-        c.drawPath(flag, Paint()..color = const Color(0xFF5B3A1F)..style = PaintingStyle.stroke..strokeWidth = 1.2);
+        c.drawPath(
+          flag,
+          Paint()
+            ..color = const Color(0xFF5B3A1F)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.2,
+        );
       }
     }
+  }
+
+  /// 랜드마크 바닥: 공원은 밝은 잔디 + 둥근 산책로, 광장은 보도블록 + 테두리
+  void _landmarkGround(Canvas c, Rect b, int lm) {
+    final r = Rect.fromLTRB(
+      b.left * t,
+      b.top * t,
+      b.right * t,
+      b.bottom * t,
+    ).deflate(t * 0.3);
+    if (lm == 1) {
+      c.drawRRect(
+        RRect.fromRectAndRadius(r, Radius.circular(t * 0.6)),
+        Paint()..color = const Color(0xFF7CC26A),
+      );
+      final ring = Rect.fromCenter(
+        center: r.center,
+        width: r.width * 0.7,
+        height: r.height * 0.6,
+      );
+      c.drawOval(
+        ring,
+        Paint()
+          ..color = const Color(0xFFE2D2B3)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = t * 0.45,
+      );
+    } else {
+      c.drawRRect(
+        RRect.fromRectAndRadius(r, Radius.circular(t * 0.3)),
+        Paint()..color = const Color(0xFFE2D2B3),
+      );
+      final line = Paint()..color = const Color(0xFFC6B28F);
+      for (var x = r.left; x < r.right; x += t * 0.5) {
+        c.drawRect(Rect.fromLTWH(x, r.top, 1, r.height), line);
+      }
+      for (var y = r.top; y < r.bottom; y += t * 0.5) {
+        c.drawRect(Rect.fromLTWH(r.left, y, r.width, 1), line);
+      }
+      c.drawRRect(
+        RRect.fromRectAndRadius(r, Radius.circular(t * 0.3)),
+        Paint()
+          ..color = const Color(0xFF9A8B73)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3,
+      );
+      // 가운데 원형 무늬
+      c.drawCircle(
+        r.center,
+        min(r.width, r.height) * 0.28,
+        Paint()..color = const Color(0xFFD9C7A5),
+      );
+    }
+  }
+
+  /// 랜드마크 위에 서는 것들 (발끝 y, 그리기). 기존 지도 소품을 조합
+  List<(double, void Function(Canvas))> _landmarkItems(Rect b, int lm) {
+    final out = <(double, void Function(Canvas))>[];
+    final cx = b.center.dx, cy = b.center.dy;
+    void put(ui.Image? img, double x, double y, [double s = 1]) {
+      if (img == null) return;
+      out.add((y, (cv) => _sprite(cv, img, x, y, s)));
+    }
+
+    put(Sprites.mapProps['fountain'], cx, cy + 0.6, propScale['fountain'] ?? 1);
+    put(Sprites.decor['bench'], cx - 2.0, cy + 1.6);
+    put(Sprites.decor['bench'], cx + 2.0, cy + 1.6);
+    put(Sprites.decor['flower'], b.left + 1.0, b.bottom - 0.6);
+    put(Sprites.decor['flower'], b.right - 1.0, b.bottom - 0.6);
+    if (lm == 1) {
+      put(Sprites.decor['tree'], b.left + 1.2, b.top + 1.8);
+      put(Sprites.decor['tree2'], b.right - 1.2, b.top + 1.8);
+    } else {
+      put(Sprites.decor['lamp'], b.left + 0.8, b.top + 1.4);
+      put(Sprites.decor['lamp'], b.right - 0.8, b.top + 1.4);
+      put(
+        Sprites.mapProps['billboard'],
+        cx,
+        b.top + 1.6,
+        propScale['billboard'] ?? 1,
+      );
+      put(
+        Sprites.mapProps['vending'],
+        b.left + 1.0,
+        cy + 1.0,
+        propScale['vending'] ?? 1,
+      );
+      put(
+        Sprites.mapProps['busstop'],
+        b.right - 1.2,
+        cy + 1.0,
+        propScale['busstop'] ?? 1,
+      );
+    }
+    // 이름표
+    out.add((
+      b.bottom,
+      (cv) {
+        final name = Cfg.landmarkName[lm];
+        final tp = TextPainter(
+          text: TextSpan(
+            text: name,
+            style: TextStyle(
+              fontFamily: 'Galmuri',
+              color: Colors.white,
+              fontSize: t * 0.36,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        final r = Rect.fromCenter(
+          center: Offset(cx * t, (b.bottom - 0.2) * t),
+          width: tp.width + t * 0.5,
+          height: tp.height + t * 0.15,
+        );
+        cv.drawRRect(
+          RRect.fromRectAndRadius(r, Radius.circular(t * 0.15)),
+          Paint()..color = const Color(0xFF8E5BD0),
+        );
+        cv.drawRRect(
+          RRect.fromRectAndRadius(r, Radius.circular(t * 0.15)),
+          Paint()
+            ..color = const Color(0xFF5B3A1F)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5,
+        );
+        tp.paint(cv, Offset(r.left + t * 0.25, r.top + t * 0.07));
+      },
+    ));
+    return out;
   }
 
   /// 동네 주민: 보도(배달 길)를 따라 천천히 오가는 사람들. 평판이 오를수록 많아짐
   void _walkers(Canvas c, Rect cull) {
     if (l.courier.isEmpty) return;
-    final n = 3 + g.repLv(sel) * 2;
+    final n = 3 + g.repLv(sel) * 2 + g.landmarkOf(sel) * 3; // 공원·광장이 생기면 더 북적임
     for (var i = 0; i < n; i++) {
       final path = l.courier[(i * 5 + 1) % l.courier.length];
       final len = RegionMap.pathLen(path);
       if (len < 2) continue;
       const speed = 0.7; // 칸/초
-      final ph = (g.clock * speed / len + i * 0.37) % 2.0;
-      final f = ph < 1 ? ph : 2 - ph; // 왕복
+      final ph = (g.clock * speed / len + i * 0.618) % 2.0;
+      final f = 0.2 + 0.8 * (ph < 1 ? ph : 2 - ph); // 왕복 (센터 앞에 몰리지 않게 길 앞부분은 뺌)
       final p = _MapPainter._pointAt(path, len * f);
       if (!cull.contains(p)) continue;
-      final q = _MapPainter._pointAt(path, (len * f + (ph < 1 ? 0.1 : -0.1)).clamp(0.0, len));
+      final q = _MapPainter._pointAt(
+        path,
+        (len * f + (ph < 1 ? 0.1 : -0.1)).clamp(0.0, len),
+      );
       final dx = q.dx - p.dx, dy = q.dy - p.dy;
       final dir = dx.abs() > dy.abs() ? (dx < 0 ? 1 : 2) : (dy < 0 ? 3 : 0);
       final foot = _px(p).translate(t * 0.3, t * 0.2); // 보도 가장자리 쪽으로
@@ -1251,11 +1491,26 @@ class _MapPainter extends CustomPainter {
       // 단골 이름표 (지붕 위)
       final nm = g.houseName(sel, e.value);
       final ntp = TextPainter(
-        text: TextSpan(text: nm, style: TextStyle(fontFamily: 'Galmuri', color: const Color(0xFF4A2F1A), fontSize: t * 0.28, fontWeight: FontWeight.w700)),
+        text: TextSpan(
+          text: nm,
+          style: TextStyle(
+            fontFamily: 'Galmuri',
+            color: const Color(0xFF4A2F1A),
+            fontSize: t * 0.28,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         textDirection: TextDirection.ltr,
       )..layout();
-      final nr = Rect.fromCenter(center: top.translate(0, -t * 0.5 + bob), width: ntp.width + t * 0.3, height: ntp.height + t * 0.08);
-      c.drawRRect(RRect.fromRectAndRadius(nr, Radius.circular(t * 0.1)), Paint()..color = const Color(0xEEFFF4D8));
+      final nr = Rect.fromCenter(
+        center: top.translate(0, -t * 0.5 + bob),
+        width: ntp.width + t * 0.3,
+        height: ntp.height + t * 0.08,
+      );
+      c.drawRRect(
+        RRect.fromRectAndRadius(nr, Radius.circular(t * 0.1)),
+        Paint()..color = const Color(0xEEFFF4D8),
+      );
       ntp.paint(c, Offset(nr.left + t * 0.15, nr.top + t * 0.04));
       final txt = '♥' * lv;
       final tp = TextPainter(
@@ -1546,10 +1801,21 @@ class _MapPainter extends CustomPainter {
       return;
     }
     final base = _px(Offset(h.x, h.y));
-    final lot = Rect.fromCenter(center: base.translate(0, -t * 0.35), width: t * 2.0, height: t * 0.75);
-    c.drawRRect(RRect.fromRectAndRadius(lot, Radius.circular(t * 0.1)), Paint()..color = const Color(0xFFB8925E));
+    final lot = Rect.fromCenter(
+      center: base.translate(0, -t * 0.35),
+      width: t * 2.0,
+      height: t * 0.75,
+    );
+    c.drawRRect(
+      RRect.fromRectAndRadius(lot, Radius.circular(t * 0.1)),
+      Paint()..color = const Color(0xFFB8925E),
+    );
     for (var i = 0; i < 4; i++) {
-      c.drawCircle(lot.topLeft.translate(t * (0.25 + i * 0.5), t * (0.2 + (i % 2) * 0.3)), t * 0.07, Paint()..color = const Color(0xFF8C6A3E));
+      c.drawCircle(
+        lot.topLeft.translate(t * (0.25 + i * 0.5), t * (0.2 + (i % 2) * 0.3)),
+        t * 0.07,
+        Paint()..color = const Color(0xFF8C6A3E),
+      );
     }
     // 울타리 말뚝
     final fence = Paint()
@@ -1557,15 +1823,41 @@ class _MapPainter extends CustomPainter {
       ..strokeWidth = 2;
     for (var i = 0; i <= 4; i++) {
       final x = lot.left + lot.width * i / 4;
-      c.drawLine(Offset(x, lot.bottom), Offset(x, lot.bottom - t * 0.45), fence);
+      c.drawLine(
+        Offset(x, lot.bottom),
+        Offset(x, lot.bottom - t * 0.45),
+        fence,
+      );
     }
-    c.drawLine(Offset(lot.left, lot.bottom - t * 0.3), Offset(lot.right, lot.bottom - t * 0.3), fence);
+    c.drawLine(
+      Offset(lot.left, lot.bottom - t * 0.3),
+      Offset(lot.right, lot.bottom - t * 0.3),
+      fence,
+    );
     // 표지판
-    final sign = Rect.fromCenter(center: base.translate(0, -t * 1.25), width: t * 1.5, height: t * 0.5);
-    c.drawLine(sign.bottomCenter, sign.bottomCenter.translate(0, t * 0.45), Paint()..color = const Color(0xFF5B3A1F)..strokeWidth = 2);
-    c.drawRRect(RRect.fromRectAndRadius(sign, Radius.circular(t * 0.08)), Paint()..color = const Color(0xFFFFF4D8));
-    c.drawRRect(RRect.fromRectAndRadius(sign, Radius.circular(t * 0.08)),
-        Paint()..color = const Color(0xFF5B3A1F)..style = PaintingStyle.stroke..strokeWidth = 1.5);
+    final sign = Rect.fromCenter(
+      center: base.translate(0, -t * 1.25),
+      width: t * 1.5,
+      height: t * 0.5,
+    );
+    c.drawLine(
+      sign.bottomCenter,
+      sign.bottomCenter.translate(0, t * 0.45),
+      Paint()
+        ..color = const Color(0xFF5B3A1F)
+        ..strokeWidth = 2,
+    );
+    c.drawRRect(
+      RRect.fromRectAndRadius(sign, Radius.circular(t * 0.08)),
+      Paint()..color = const Color(0xFFFFF4D8),
+    );
+    c.drawRRect(
+      RRect.fromRectAndRadius(sign, Radius.circular(t * 0.08)),
+      Paint()
+        ..color = const Color(0xFF5B3A1F)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
     _label(c, '분양 중', sign.center, t * 0.26, const Color(0xFF5B3A1F));
   }
 

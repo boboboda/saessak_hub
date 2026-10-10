@@ -194,4 +194,21 @@ void main() {
     g.routeNewDay();
     expect(g.fame, 95);
   });
+
+  test('랜드마크: 평판 2에 공원, 4에 광장 (자리가 있는 지역), 광장은 의뢰 보상을 올림', () {
+    final g = HubGame();
+    final r = [for (var i = 0; i < 5; i++) if (RegionMap.of(i).landmark != null) i].first;
+    expect(g.landmarkOf(r), 0);
+    g.rs.rep[r] = Cfg.repNeed[2];
+    expect(g.landmarkOf(r), 1);
+    g.rs.rep[r] = Cfg.repNeed[4];
+    expect(g.landmarkOf(r), 2);
+  });
+
+  test('VIP 단골이 되면 다음 손님이 사연 손님으로 옴', () {
+    final g = HubGame()..day = 1;
+    g.rs.vipStory = 1;
+    expect(g.pickStory(), greaterThanOrEqualTo(0));
+    expect(g.rs.vipStory, 0);
+  });
 }

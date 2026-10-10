@@ -24,6 +24,7 @@ class RouteRequest {
         3 => '${Cfg.regionName[region]} 단골 집에 $need번 배달',
         4 => '${Cfg.regionName[region]} 연속 의뢰 $step/3 · 정시 $need건',
         5 => '${Cfg.regionName[region]} 궂은 날씨에 $need건 (비·눈·안개 날만)',
+        7 => '${Cfg.localReqName[region]} $need건',
         _ => '${Cfg.rivalName[rival]}와 대결! ${Cfg.regionName[region]} $need건',
       };
 
@@ -50,6 +51,7 @@ class RouteState {
   final List<int> today = List.filled(5, 0), yday = List.filled(5, 0); // 지역별 오늘·어제 배달 수 (의뢰 크기)
   final Set<String> vipGiven = {}; // VIP 선물을 받은 집 ('지역:번호')
   List<String> summary = []; // 어제 노선 결산 (정산 카드)
+  int vipStory = 0; // VIP 단골이 허브로 보낼 사연 택배 (다음 사연 손님으로)
 
   Map<String, dynamic> toJson() => {
         'h': [for (final m in hearts) m.map((k, v) => MapEntry('$k', v))],
@@ -63,6 +65,7 @@ class RouteState {
         'bn': breakN,
         'yd': yday,
         'vip': vipGiven.toList(),
+        'vs': vipStory,
       };
 
   void load(Map<String, dynamic> j) {
@@ -90,6 +93,7 @@ class RouteState {
     tomorrow = (j['tw'] as int?) ?? 0;
     policeN = (j['pn'] as int?) ?? 0;
     breakN = (j['bn'] as int?) ?? 0;
+    vipStory = (j['vs'] as int?) ?? 0;
     vipGiven
       ..clear()
       ..addAll(((j['vip'] as List?) ?? const []).map((e) => e as String));
@@ -214,6 +218,14 @@ extension RouteSystem on HubGame {
     return lv;
   }
 
+  // ---------------- 랜드마크 ----------------
+  /// 0 없음 · 1 동네 공원 · 2 중앙 광장 (평판 단계로, 지도에 자리가 있을 때)
+  int landmarkOf(int region) {
+    if (RegionMap.of(region).landmark == null) return 0;
+    final lv = repLv(region);
+    return lv >= Cfg.landmarkLv[2] ? 2 : (lv >= Cfg.landmarkLv[1] ? 1 : 0);
+  }
+
   // ---------------- 동네 성장 ----------------
   /// 지금 배달할 수 있는 집 수 (평판이 오를수록 늘어남)
   int activeHouses(int region) {
@@ -276,6 +288,9 @@ extension RouteSystem on HubGame {
       line += ' · 최고 ${best.driver} ${fmt(best.dPay)}원';
       out.add(line);
     }
+    for (var r = 0; r < 5; r++) {
+      if (regionOpen[r] && landmarkOf(r) == 2) fame += 3; // 중앙 광장: 하루 명성 +3
+    }
     rs.summary = out;
     for (final u in fleet) {
       u.dPay = 0;
@@ -306,7 +321,7 @@ extension RouteSystem on HubGame {
       note('${Cfg.rivalName[q.rival]}와의 대결에서 졌어요… 명성 -5', 0xFFE5484D);
     }
     rs.reqs.removeWhere((r) => r.until < day);
-    // 평판이 올라 새 집이 생겼으면 알림
+    // 평판이 올라 새 집·랜드마크가 생겼으면 알림
     for (var r = 0; r < 5; r++) {
       if (regionOpen[r] && activeHouses(r) > open0[r]) {
         note('${Cfg.regionName[r]}에 새 집 ${activeHouses(r) - open0[r]}채가 생겼어요!', 0xFF3FB27F);
@@ -326,7 +341,7 @@ extension RouteSystem on HubGame {
     var guard = 0;
     while (rs.reqs.length < Cfg.reqMax && guard++ < 20) {
       final r = open[rnd.nextInt(open.length)];
-      var kind = rnd.nextInt(7);
+      var kind = rnd.nextInt(8);
       if (kind == 3 && regularCount(r) == 0) kind = 0;
       if (kind == 5 && rs.weather == 0 && rs.tomorrow == 0) kind = 1; // 궂은 날이 올 때만
       if (kind == 6 && repLv(r) < 1) kind = 2; // 대결은 알려진 뒤부터
@@ -342,11 +357,12 @@ extension RouteSystem on HubGame {
         3 => 2 + lv,
         4 => (base * 0.8).round().clamp(5, 50),
         5 => (base * 0.6).round().clamp(4, 40),
+        7 => (base * 0.5).round().clamp(4, 40),
         _ => (base * 1.6).round().clamp(10, 100),
       };
       final k = (1 + 0.15 * lv) * (hasFac(r, 3) ? 1.3 : 1.0) * Cfg.regionPayMul[r];
       final reward = ((need * 70 * k) / 100).round() * 100;
-      final mulK = switch (kind) { 4 => 1.2, 5 => 1.5, 6 => 2.0, _ => 1.0 };
+      final mulK = switch (kind) { 4 => 1.2, 5 => 1.4, 6 => 1.7, 7 => 1.3, _ => 1.0 } * (landmarkOf(r) == 2 ? 1.2 : 1.0);
       final q = RouteRequest(kind, r, need, (reward * mulK / 100).round() * 100, ((3 + lv) * mulK).round(), day + Cfg.reqDays - 1);
       if (kind == 6) q.rival = rnd.nextInt(Cfg.rivalName.length);
       rs.reqs.add(q);
@@ -445,7 +461,7 @@ extension RouteSystem on HubGame {
     }
     // 단골: 하트 + 팁
     final before = regularLv(r, u.house);
-    final gain = (u.trait == 3 ? 2 : 1) * (hasFac(r, 3) ? 1.5 : 1.0);
+    final gain = (u.trait == 3 ? 2 : 1) * (hasFac(r, 3) ? 1.5 : 1.0) * (landmarkOf(r) >= 1 ? 1.2 : 1.0);
     rs.hearts[r][u.house] = heartsOf(r, u.house) + max(1, gain.round());
     final after = regularLv(r, u.house);
     if (after > before) {
@@ -458,7 +474,8 @@ extension RouteSystem on HubGame {
         dayEarn += gift;
         fame += Cfg.vipGiftFame;
         note('$nm이(가) 감사 선물을 보냈어요! +${fmt(gift)}원 · 명성 +${Cfg.vipGiftFame}', 0xFFFF4F8B);
-        showToast('$nm의 감사 편지: "늘 고마워요!" +${fmt(gift)}원');
+        showToast('$nm의 감사 편지: "늘 고마워요!" +${fmt(gift)}원 · 곧 허브에 사연 택배를 맡기러 와요');
+        rs.vipStory++;
       }
     }
     final tip = Cfg.heartTip[after] * (n - broke);
@@ -468,7 +485,13 @@ extension RouteSystem on HubGame {
     rs.today[r] += n;
     if (repLv(r) > lv0) {
       note('${Cfg.regionName[r]} 평판 상승: ${Cfg.repName[repLv(r)]} (수익 +${(Cfg.repPay * repLv(r) * 100).round()}%)', 0xFF3FB27F);
-      showToast('${Cfg.regionName[r]} 평판 ${Cfg.repName[repLv(r)]}!');
+      final lm = landmarkOf(r);
+      if (lm > 0 && Cfg.landmarkLv[lm] == repLv(r)) {
+        note('${Cfg.regionName[r]}에 ${Cfg.landmarkName[lm]}이 생겼어요! ${Cfg.landmarkDesc[lm]}', 0xFF8E5BD0);
+        showToast('${Cfg.regionName[r]}에 ${Cfg.landmarkName[lm]} 완성! ${Cfg.landmarkDesc[lm]}');
+      } else {
+        showToast('${Cfg.regionName[r]} 평판 ${Cfg.repName[repLv(r)]}!');
+      }
     }
     _reqProgress(r, 0, ok);
     if (zoneOf(r, u.house) == 2) _reqProgress(r, 1, n - broke);
@@ -477,6 +500,19 @@ extension RouteSystem on HubGame {
     _reqProgress(r, 4, ok);
     if (rs.weather != 0) _reqProgress(r, 5, ok);
     _reqProgress(r, 6, n - broke);
+    final local = switch (r) {
+      0 => u.type == 2 && zoneOf(r, u.house) == 0,
+      1 => u.loadIdx == 0,
+      2 => u.type == 1,
+      3 => u.loadIdx >= 2,
+      _ => true,
+    };
+    if (r == 4 && ok < n) {
+      for (final q in rs.reqs.where((q) => q.kind == 7 && q.region == 4)) {
+        q.got = 0; // 새벽 배송: 지각이 나면 처음부터
+      }
+    }
+    if (local) _reqProgress(r, 7, r == 2 || r == 4 ? ok : n - broke);
     // 오늘 기록 (결산)
     u.dN += n;
     u.dLate += n - ok;

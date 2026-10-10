@@ -183,6 +183,13 @@ class TopBar extends StatelessWidget {
                     case 11:
                       g.rp += 1000;
                       break;
+                    case 19:
+                      // 지금 고른 노선 지역 평판 한 단계 올리기 (동네 성장·랜드마크 확인용)
+                      final r = g.mapSel;
+                      final lv = g.repLv(r);
+                      if (lv + 1 < Cfg.repNeed.length) g.rs.rep[r] = Cfg.repNeed[lv + 1];
+                      g.showToast('${Cfg.regionName[r]} 평판 ${Cfg.repName[g.repLv(r)]} · 집 ${g.activeHouses(r)}채');
+                      break;
                     case 18:
                       // 장비 연구 모두 열기 + 돈 (장비 확인용)
                       for (var i = 0; i < Cfg.research.length; i++) {
@@ -299,6 +306,10 @@ class TopBar extends StatelessWidget {
                   PopupMenuItem(
                     value: 17,
                     child: Text('노선 사건 일으키기 (차례로)', style: Tx.body),
+                  ),
+                  PopupMenuItem(
+                    value: 19,
+                    child: Text('노선 평판 한 단계 올리기', style: Tx.body),
                   ),
                   PopupMenuItem(
                     value: 18,

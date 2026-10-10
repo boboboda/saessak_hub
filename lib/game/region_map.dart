@@ -25,6 +25,7 @@ class RegionMap {
   double hubX = 1.4, hubFoot = 0; // 허브 건물 왼쪽, 바닥
   double cx0 = 0, cFoot = 0; // 센터 건물 왼쪽, 바닥
   Offset courierHome = Offset.zero; // 배달 차량이 기다리는 보도 칸 중심
+  Rect? landmark; // 랜드마크(공원·광장) 블록 (칸 좌표), 없을 수도 있음
 
   RegionMap._(this.region, this.gw, this.gh)
     : cell = Uint8List(gw * gh),
@@ -391,6 +392,9 @@ class RegionMap {
       if (style == 'industrial') ...cand.reversed.take(3),
     };
     final towns = cand.where((b) => !moodBlocks.contains(b)).take(Cfg.regionTowns[r]).toList();
+    // 랜드마크 자리: 동네·분위기 블록이 아닌 빈 블록 중 센터에 가장 가까운 곳 (평판이 오르면 공원 → 광장)
+    final spare = cand.where((b) => !moodBlocks.contains(b) && !towns.contains(b)).toList();
+    if (spare.isNotEmpty) m.landmark = spare.first;
     final pool = housePool[r % housePool.length];
     var hi = rnd.nextInt(pool.length);
     // 높은 동네 블록은 가운데에 골목을 하나 내서 집 줄을 늘림 (양옆 보도와 이어짐)
