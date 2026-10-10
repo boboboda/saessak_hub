@@ -214,7 +214,17 @@ class Cfg {
   static const List<String> zoneNameR = ['가까운 동네', '중간 동네', '먼 동네'];
   static const List<double> zonePay = [0.9, 1.05, 1.25];
   static const List<int> zoneColor = [0xFF7BD389, 0xFFFFD166, 0xFFF0963A];
-  static const int homesMax = 4; // 한 차량에 직접 지정할 수 있는 집 수
+  static const int homesMax = 4;
+  // ---- 동네 성장: 평판 단계마다 배달할 수 있는 집이 늘어남 (나머지는 '분양 중' 빈 집터) ----
+  static const List<double> townOpen = [0.45, 0.6, 0.75, 0.88, 1.0];
+  // ---- 단골 집 이름 (지역·집 번호로 고정) ----
+  static const List<String> houseNames = [
+    '김할머니네', '꽃집 사장님', '303호 신혼부부', '박씨네 철물점', '재택근무 개발자', '쌍둥이네', '고양이 다섯 마리 집',
+    '야간 간호사님', '동네 빵집', '이장님 댁', '자취생 민수', '화가 아저씨', '할아버지 바둑방', '피아노 학원',
+    '캠핑 덕후네', '대학원생 언니', '다섯 남매네', '헬스 트레이너', '작은 서점', '분식집 이모',
+  ];
+  static const List<int> vipGift = [2000, 2500, 3500, 3000, 3000]; // VIP 단골 첫 감사 선물 (지역별)
+  static const int vipGiftFame = 10; // 한 차량에 직접 지정할 수 있는 집 수
 
   // ---- 적재 한도: 적게 실으면 빠르고, 과적하면 많이 싣지만 느리고 위험 ----
   static const List<String> loadName = ['가볍게 70%', '정량 100%', '과적 120%', '과적 150%'];
@@ -267,7 +277,7 @@ class Cfg {
   static const List<String> evtChoiceName = ['기사에게 맡기기', '우회로', '서둘러!'];
 
   // ---- 의뢰 게시판 ----
-  static const int reqMax = 3; // 동시에 걸리는 의뢰 수
+  static const int reqMax = 4; // 동시에 걸리는 의뢰 수
   static const int reqDays = 2; // 의뢰 기한 (일)
   static const List<String> regionStyle = ['residential', 'commercial', 'harbor', 'industrial', 'newtown'];
   static const List<double> regionPay = [1.0, 1.0, 1.0, 1.0, 1.0]; // 같은 급이라 수익 배수 같음

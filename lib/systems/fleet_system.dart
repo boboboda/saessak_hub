@@ -333,7 +333,10 @@ extension FleetSystem on HubGame {
               ? '${u.driver} 정시 배달 ${n}건 +${fmt(pay)}원'
               : '${u.driver} 배달 ${n}건 (지각 $late) +${fmt(pay)}원',
           late == 0 ? 0xFFFFD166 : 0xFFE5484D);
-      mapFx.add(MapFx(u.region, false, u.house, '+${fmt(pay)}', 0xFFFFD166));
+      u.dPay += pay;
+      if (n > u.baseCap) u.dOverGain += (pay * (n - u.baseCap) / n).round(); // 과적으로 더 실은 몫
+      final reg = this.regularLv(u.region, u.house) > 0;
+      mapFx.add(MapFx(u.region, false, u.house, '${reg ? '♥ ' : ''}+${fmt(pay)}', reg ? 0xFFFF7EB6 : 0xFFFFD166));
       u.cargo = 0;
       u.state = 2;
       u.t = 0;

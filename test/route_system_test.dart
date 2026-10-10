@@ -10,6 +10,7 @@ void main() {
     final m = RegionMap.of(0);
     final zs = [for (var k = 0; k < m.courier.length; k++) g.zoneOf(0, k)];
     expect(zs.toSet(), {0, 1, 2});
+    g.rs.rep[0] = Cfg.repNeed.last; // 동네가 다 자란 상태
     final u = g.makeUnit(2, 0)..zone = 2;
     for (var i = 0; i < 30; i++) {
       expect(g.zoneOf(0, g.pickHouse(u)), 2);
@@ -115,6 +116,7 @@ void main() {
 
   test('집 직접 지정: 지정한 집에만 배달하고, 최대 개수까지만', () {
     final g = HubGame();
+    g.rs.rep[0] = Cfg.repNeed.last;
     final u = g.makeUnit(2, 0)..zone = 0;
     g.toggleHome(u, 5);
     g.toggleHome(u, 6);
@@ -160,5 +162,36 @@ void main() {
     u.cargo = 5;
     g.checkPolice(u);
     expect(u.wear, Cfg.wearMax - 1);
+  });
+
+  test('동네 성장: 처음엔 센터 가까운 집만, 평판이 오르면 먼 동네까지 열림', () {
+    final g = HubGame();
+    final n = RegionMap.of(0).courier.length;
+    final a0 = g.activeHouses(0);
+    expect(a0, lessThan(n));
+    expect(g.zoneOpen(0, 0), isTrue);
+    final u = g.makeUnit(2, 0);
+    for (var i = 0; i < 40; i++) {
+      expect(g.houseOpen(0, g.pickHouse(u)), isTrue); // 빈 집터로는 안 감
+    }
+    g.rs.rep[0] = Cfg.repNeed.last;
+    expect(g.activeHouses(0), n);
+    expect(g.zoneOpen(0, 2), isTrue);
+  });
+
+  test('연속 의뢰: 완료하면 다음 단계가 이어지고, 대결 의뢰는 지면 명성이 깎임', () {
+    final g = HubGame()..day = 3;
+    g.rs.reqs.add(RouteRequest(4, 0, 2, 1000, 5, 4));
+    final u = g.makeUnit(2, 0)..house = 0;
+    g.deliveryExtras(u, 2, 2);
+    expect(g.rs.reqs.single.step, 2);
+    expect(g.rs.reqs.single.need, greaterThan(2));
+    g.rs.reqs
+      ..clear()
+      ..add(RouteRequest(6, 0, 999, 5000, 10, 3));
+    g.fame = 100;
+    g.day = 4;
+    g.routeNewDay();
+    expect(g.fame, 95);
   });
 }

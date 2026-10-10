@@ -39,6 +39,8 @@ class FleetUnit {
   int evtChoice = -1; // 플레이어가 고른 사건 대응 (-1 아직, 0 맡기기 · 1 우회 · 2 서둘러)
   double evtWaitT = 0; // 사건 선택을 기다리는 남은 시간 (실제 초)
   int evtPendKind = 0;
+  // 오늘 운행 기록 (노선 결산 카드용, 저장 안 함)
+  int dPay = 0, dN = 0, dLate = 0, dFine = 0, dBroke = 0, dOverGain = 0;
 
   FleetUnit(this.id, this.type, this.driver, this.skill, this.region);
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/region_map.dart';
 import '../models/models.dart';
 import 'theme.dart';
 
@@ -57,7 +58,9 @@ class UnitRouteControls extends StatelessWidget {
           Wrap(spacing: 4, runSpacing: 4, children: [
             routeChip('자동', u.zone < 0, () => g.setZone(u, -1)),
             for (var z = 0; z < 3; z++)
-              routeChip('${Cfg.zoneNameR[z]} ×${Cfg.zonePay[z]}', u.zone == z, () => g.setZone(u, z), color: Color(Cfg.zoneColor[z])),
+              g.zoneOpen(u.region, z)
+                  ? routeChip('${Cfg.zoneNameR[z]} ×${Cfg.zonePay[z]}', u.zone == z, () => g.setZone(u, z), color: Color(Cfg.zoneColor[z]))
+                  : routeChip('${Cfg.zoneNameR[z]} 🔒', false, () => g.showToast('평판이 오르면 ${Cfg.zoneNameR[z]}에 집이 생겨요')),
           ]),
           const SizedBox(height: 4),
         ],
@@ -156,10 +159,12 @@ class RoutePanelExtras extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 3),
+              Text('배달할 수 있는 집 ${g.activeHouses(r)}/${RegionMap.of(r).courier.length}채 (나머지는 분양 중)',
+                  style: Tx.sub.copyWith(color: C.text)),
               Text(
                 next == null
                     ? '최고 평판! 수익 +${(Cfg.repPay * lv * 100).round()}%'
-                    : '정시 배달 ${g.rs.rep[r]}/$next · 지금 수익 +${(Cfg.repPay * lv * 100).round()}% · 오르면 의뢰가 커져요',
+                    : '정시 배달 ${g.rs.rep[r]}/$next · 지금 수익 +${(Cfg.repPay * lv * 100).round()}% · 오르면 새 집이 생기고 의뢰가 커져요',
                 style: Tx.sub,
               ),
             ],
@@ -187,6 +192,14 @@ class RoutePanelExtras extends StatelessWidget {
                     decoration: BoxDecoration(color: Color(Cfg.regionColor[q.region]), shape: BoxShape.circle),
                   ),
                   const SizedBox(width: 5),
+                  if (q.special)
+                    Container(
+                      margin: const EdgeInsets.only(right: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(color: C.bad, borderRadius: BorderRadius.circular(4)),
+                      child: Text(q.kind == 4 ? '연속' : (q.kind == 5 ? '날씨' : '대결'),
+                          style: const TextStyle(fontFamily: kFont, color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                    ),
                   Expanded(child: Text(q.text, style: Tx.body.copyWith(fontWeight: FontWeight.w700))),
                   Text('${q.got}/${q.need}', style: Tx.sub.copyWith(color: C.text)),
                 ]),
@@ -245,7 +258,7 @@ class RoutePanelExtras extends StatelessWidget {
               Text('같은 집에 배달할수록 하트가 쌓여요. 구역을 정해 주면 같은 동네를 자주 가요', style: Tx.sub.copyWith(fontSize: 10)),
               for (final k in regulars.take(5))
                 Text(
-                  '${k + 1}번 집 · ${Cfg.regularName[g.regularLv(r, k)]} (하트 ${g.heartsOf(r, k)}) · 팁 ${Cfg.heartTip[g.regularLv(r, k)]}원/건 · ${Cfg.zoneNameR[g.zoneOf(r, k)]}',
+                  '${g.houseName(r, k)} · ${Cfg.regularName[g.regularLv(r, k)]} (하트 ${g.heartsOf(r, k)}) · 팁 ${Cfg.heartTip[g.regularLv(r, k)]}원/건 · ${Cfg.zoneNameR[g.zoneOf(r, k)]}',
                   style: Tx.sub.copyWith(color: C.text),
                 ),
             ],

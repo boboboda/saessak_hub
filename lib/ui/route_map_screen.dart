@@ -1099,7 +1099,7 @@ class _MapPainter extends CustomPainter {
     for (var k = 0; k < l.houses.length; k++) {
       final h = l.houses[k];
       if (cull.contains(Offset(h.x, h.y)))
-        items.add(_Item(h.y, (cv) => _house(cv, h)));
+        items.add(_Item(h.y, (cv) => _lotOrHouse(cv, k, h)));
     }
     if (cull.overlaps(
       Rect.fromLTRB(l.hubX - 1, l.hubFoot - 6, l.hubX + 7, l.hubFoot + 1),
@@ -1121,6 +1121,7 @@ class _MapPainter extends CustomPainter {
     for (final it in items) {
       it.draw(c);
     }
+    if (open) _walkers(c, cull);
     if (open) _hearts(c, cull);
     if (open) _homeFlags(c);
     if (open) _facMarks(c);
@@ -1144,6 +1145,7 @@ class _MapPainter extends CustomPainter {
     for (final e in _houseToK.entries) {
       final h = l.houses[e.key];
       if (!cull.contains(Offset(h.x, h.y))) continue;
+      if (!g.houseOpen(sel, e.value)) continue; // 빈 집터엔 구역 표시 안 함
       final z = g.zoneOf(sel, e.value);
       final strong = pick != null && pick.zone == z;
       final dim = pick != null && pick.zone >= 0 && pick.zone != z;
@@ -1168,6 +1170,7 @@ class _MapPainter extends CustomPainter {
       for (var k = 0; k < l.deliver.length; k++) {
         final h = l.houses[l.deliver[k]];
         final on = u.homes.contains(k);
+        if (!g.houseOpen(sel, k)) continue; // 빈 집터는 지정 못 함
         final r = Rect.fromCenter(center: _px(Offset(h.x, h.y + 0.55)), width: t * 0.9, height: t * 0.42);
         c.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(t * 0.1)), Paint()..color = on ? const Color(0xFFF08A24) : const Color(0xDDFFF6DE));
         c.drawRRect(RRect.fromRectAndRadius(r, Radius.circular(t * 0.1)),
@@ -1187,6 +1190,32 @@ class _MapPainter extends CustomPainter {
         c.drawPath(flag, Paint()..color = const Color(0xFFF08A24));
         c.drawPath(flag, Paint()..color = const Color(0xFF5B3A1F)..style = PaintingStyle.stroke..strokeWidth = 1.2);
       }
+    }
+  }
+
+  /// 동네 주민: 보도(배달 길)를 따라 천천히 오가는 사람들. 평판이 오를수록 많아짐
+  void _walkers(Canvas c, Rect cull) {
+    if (l.courier.isEmpty) return;
+    final n = 3 + g.repLv(sel) * 2;
+    for (var i = 0; i < n; i++) {
+      final path = l.courier[(i * 5 + 1) % l.courier.length];
+      final len = RegionMap.pathLen(path);
+      if (len < 2) continue;
+      const speed = 0.7; // 칸/초
+      final ph = (g.clock * speed / len + i * 0.37) % 2.0;
+      final f = ph < 1 ? ph : 2 - ph; // 왕복
+      final p = _MapPainter._pointAt(path, len * f);
+      if (!cull.contains(p)) continue;
+      final q = _MapPainter._pointAt(path, (len * f + (ph < 1 ? 0.1 : -0.1)).clamp(0.0, len));
+      final dx = q.dx - p.dx, dy = q.dy - p.dy;
+      final dir = dx.abs() > dy.abs() ? (dx < 0 ? 1 : 2) : (dy < 0 ? 3 : 0);
+      final foot = _px(p).translate(t * 0.3, t * 0.2); // 보도 가장자리 쪽으로
+      c.save();
+      c.translate(foot.dx, foot.dy);
+      c.scale(0.62);
+      c.translate(-foot.dx, -foot.dy);
+      Sprites.drawPerson(c, foot.dx, foot.dy, dir, true, g.clock + i, i + sel);
+      c.restore();
     }
   }
 
@@ -1219,6 +1248,15 @@ class _MapPainter extends CustomPainter {
         );
         continue;
       }
+      // 단골 이름표 (지붕 위)
+      final nm = g.houseName(sel, e.value);
+      final ntp = TextPainter(
+        text: TextSpan(text: nm, style: TextStyle(fontFamily: 'Galmuri', color: const Color(0xFF4A2F1A), fontSize: t * 0.28, fontWeight: FontWeight.w700)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final nr = Rect.fromCenter(center: top.translate(0, -t * 0.5 + bob), width: ntp.width + t * 0.3, height: ntp.height + t * 0.08);
+      c.drawRRect(RRect.fromRectAndRadius(nr, Radius.circular(t * 0.1)), Paint()..color = const Color(0xEEFFF4D8));
+      ntp.paint(c, Offset(nr.left + t * 0.15, nr.top + t * 0.04));
       final txt = '♥' * lv;
       final tp = TextPainter(
         text: TextSpan(
@@ -1498,6 +1536,37 @@ class _MapPainter extends CustomPainter {
       return;
     }
     _sprite(c, img, d.x, d.y, 1);
+  }
+
+  /// 아직 안 생긴 집(평판이 낮아 닫힌 배달지)은 '분양 중' 빈 집터로
+  void _lotOrHouse(Canvas c, int houseIdx, MapHouse h) {
+    final k = _houseToK[houseIdx];
+    if (k == null || !g.regionOpen[sel] || g.houseOpen(sel, k)) {
+      _house(c, h);
+      return;
+    }
+    final base = _px(Offset(h.x, h.y));
+    final lot = Rect.fromCenter(center: base.translate(0, -t * 0.35), width: t * 2.0, height: t * 0.75);
+    c.drawRRect(RRect.fromRectAndRadius(lot, Radius.circular(t * 0.1)), Paint()..color = const Color(0xFFB8925E));
+    for (var i = 0; i < 4; i++) {
+      c.drawCircle(lot.topLeft.translate(t * (0.25 + i * 0.5), t * (0.2 + (i % 2) * 0.3)), t * 0.07, Paint()..color = const Color(0xFF8C6A3E));
+    }
+    // 울타리 말뚝
+    final fence = Paint()
+      ..color = const Color(0xFFF2EAD8)
+      ..strokeWidth = 2;
+    for (var i = 0; i <= 4; i++) {
+      final x = lot.left + lot.width * i / 4;
+      c.drawLine(Offset(x, lot.bottom), Offset(x, lot.bottom - t * 0.45), fence);
+    }
+    c.drawLine(Offset(lot.left, lot.bottom - t * 0.3), Offset(lot.right, lot.bottom - t * 0.3), fence);
+    // 표지판
+    final sign = Rect.fromCenter(center: base.translate(0, -t * 1.25), width: t * 1.5, height: t * 0.5);
+    c.drawLine(sign.bottomCenter, sign.bottomCenter.translate(0, t * 0.45), Paint()..color = const Color(0xFF5B3A1F)..strokeWidth = 2);
+    c.drawRRect(RRect.fromRectAndRadius(sign, Radius.circular(t * 0.08)), Paint()..color = const Color(0xFFFFF4D8));
+    c.drawRRect(RRect.fromRectAndRadius(sign, Radius.circular(t * 0.08)),
+        Paint()..color = const Color(0xFF5B3A1F)..style = PaintingStyle.stroke..strokeWidth = 1.5);
+    _label(c, '분양 중', sign.center, t * 0.26, const Color(0xFF5B3A1F));
   }
 
   void _house(Canvas c, MapHouse hs) {

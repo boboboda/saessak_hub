@@ -93,6 +93,34 @@ class ReportCard extends StatelessWidget {
               ],
             ),
           ],
+          if (g.rs.summary.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFBEE),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: C.line, width: 1.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(children: [
+                    Icon(Icons.local_shipping, size: 16, color: C.blue),
+                    SizedBox(width: 4),
+                    Text('노선 결산', style: Tx.h2),
+                  ]),
+                  const SizedBox(height: 3),
+                  for (final line in g.rs.summary)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(line, style: Tx.body.copyWith(fontSize: 11)),
+                    ),
+                ],
+              ),
+            ),
+          ],
           if (r.yearText != null) ...[
             const SizedBox(height: 10),
             Container(
