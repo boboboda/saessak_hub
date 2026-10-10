@@ -64,6 +64,8 @@ class _RouteMapScreenState extends State<RouteMapScreen>
       for (final (u, pos) in _MapPainter.units(g, sel)) {
         if (u.id == cam.follow) target = pos * T - half;
       }
+      // 따라가는 차량은 가운데보다 조금 아래에 둠 (위쪽 정보 카드와 말풍선이 안 겹치게)
+      if (target != null) target = target - Offset(0, v.height * 0.15);
       if (target == null) {
         cam.follow = null;
       } else {
@@ -339,9 +341,10 @@ class _RouteMapScreenState extends State<RouteMapScreen>
               ],
             ),
           ),
-        Positioned(left: 8, bottom: 8 + navInset(context), child: _camButtons()),
+        // 지도 칸 안의 아래쪽 (화면 맨 아래가 아니라서 시스템 바·화면 탭 여백은 안 씀)
+        Positioned(left: 8, bottom: 8, child: _camButtons()),
         if (open && cam.pick != null) Positioned(left: 8, top: 40, child: _unitInfo()),
-        Positioned(right: 8, bottom: 8 + navInset(context), child: _miniMap()),
+        Positioned(right: 8, bottom: 8, child: _miniMap()),
         if (!open)
           Positioned.fill(
             child: Container(

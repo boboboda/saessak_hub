@@ -209,6 +209,10 @@ class _ScreenTabs extends StatelessWidget {
                           Text(_names[i],
                               style: TextStyle(
                                   color: g.screen == i ? Colors.white : C.sub, fontSize: 13, fontWeight: FontWeight.w800)),
+                          if (i == 0 && g.modalOpen && g.screen != 0) ...[
+                            const SizedBox(width: 4),
+                            const Icon(Icons.error, size: 14, color: C.gold), // 허브에서 확인할 카드가 있음
+                          ],
                           if (i == 1 && evt > 0) ...[
                             const SizedBox(width: 4),
                             Container(

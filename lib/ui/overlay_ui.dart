@@ -86,14 +86,6 @@ class OverlayUi extends StatelessWidget {
           ),
         if (sheet != null)
           Positioned(left: 0, right: 0, bottom: 0, child: sheet),
-        // 알림은 시트 위에 (시트보다 앞에 끼우면 시트가 다시 만들어져 스크롤이 처음으로 돌아감)
-        if (g.toastTime > 0)
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: navInset(context) + (g.mode == 0 ? 96 : 160),
-            child: Center(child: _Toast(g.toast)),
-          ),
         // 선택형 사건 (정산 카드보다 아래, 둘이 겹치면 정산 먼저)
                 // 연말 시상식 · 승급 (정산 카드를 닫은 뒤)
         if (g.report == null && g.award != null) ...[
@@ -135,7 +127,15 @@ class OverlayUi extends StatelessWidget {
           Positioned.fill(child: Container(color: Colors.black45)),
           Positioned.fill(child: TapGuard(key: ValueKey('report${g.day}'), child: Center(child: ReportCard(g)))),
         ],
-      ],
+          // 알림은 맨 위에 (카드가 떠 있을 때 막힌 이유도 보이게). 시트 위에 (시트보다 앞에 끼우면 시트가 다시 만들어져 스크롤이 처음으로 돌아감)
+        if (g.toastTime > 0)
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: navInset(context) + (g.mode == 0 ? 96 : 160),
+            child: Center(child: _Toast(g.toast)),
+          ),
+    ],
     );
   }
 }

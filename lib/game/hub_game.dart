@@ -90,9 +90,17 @@ class HubGame extends FlameGame {
   int mapSel = 0; // 노선 지도·차고에서 고른 지역
   int? mapFollow; // 노선 지도에 들어가면 따라갈 차량 (차고 '지도에서 보기')
 
+  /// 허브에 떠서 골라야 하는 카드 (정산·시상식·승급·사건·사연·엽서)가 있는지
+  bool get modalOpen =>
+      report != null || award != null || gradeUp != null || evtNow != null || storyAsk != null || postcard != null;
+
   /// 화면 바꾸기 (시트·선택은 닫음)
   void goScreen(int s) {
     if (s == screen) return;
+    if (s != 0 && modalOpen) {
+      showToast('열린 카드를 먼저 확인해 주세요'); // 정산·사건·사연 카드가 허브에 떠 있으면 다른 화면으로 못 감
+      return;
+    }
     if (s != 0) closeAll();
     screen = s;
     ui();
