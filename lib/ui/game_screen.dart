@@ -106,6 +106,26 @@ class _GameScreenState extends State<GameScreen> {
             ),
             if (_wipe > 0) Positioned(left: 0, right: 0, bottom: nav + tabH - 6, height: 40, child: _TruckWipe(key: ValueKey(_wipe), toRight: _shown > _from)),
             Positioned(left: 0, right: 0, bottom: 0, child: _ScreenTabs(game, nav, tabH)),
+            // 허브가 아닌 화면에서도 알림이 보이게 (허브 알림은 OverlayUi 가 그림)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: nav + tabH + 16,
+              child: ValueListenableBuilder<int>(
+                valueListenable: game.tick,
+                builder: (context, _, __) => game.screen != 0 && game.toastTime > 0
+                    ? IgnorePointer(
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(color: const Color(0xEE000000), borderRadius: BorderRadius.circular(20)),
+                            child: Text(game.toast, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ),
           ],
         ),
       ),
@@ -121,7 +141,9 @@ class _GameScreenState extends State<GameScreen> {
       begin: Offset(incoming ? dir : -dir * 0.3, 0),
       end: Offset.zero,
     ).animate(a);
-    return FadeTransition(opacity: a, child: SlideTransition(position: off, child: child));
+    // 들어오는 화면은 불투명하게 밀려 들어옴 (반투명이면 허브 메뉴가 먼저 사라져 깨져 보임), 나가는 화면만 흐려짐
+    final slid = SlideTransition(position: off, child: child);
+    return incoming ? slid : FadeTransition(opacity: a, child: slid);
   }
 
   Widget _hub() {
@@ -156,7 +178,8 @@ class _GameScreenState extends State<GameScreen> {
         Positioned.fill(
           child: ValueListenableBuilder<int>(
             valueListenable: game.tick,
-            builder: (context, _, __) => game.screen == 0 ? OverlayUi(game) : const SizedBox.shrink(),
+            // 전환이 끝날 때까지는 허브 메뉴도 그대로 둠 (다 덮이면 허브 전체가 Offstage 로 쉼)
+            builder: (context, _, __) => OverlayUi(game),
           ),
         ),
       ],

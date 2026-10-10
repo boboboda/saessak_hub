@@ -1227,8 +1227,8 @@ extension WorldView on HubGame {
     // 창고 밖 휴식 자리 옆 소품: 바깥 벽에 붙은 자판기·사물함, 입구 안쪽 소화기
     final a = area;
     for (final (key, x, y) in [
-      ('vend', a.left - 0.6, a.center.dy + 4.4),
-      ('locker', a.left - 0.6, a.center.dy + 5.7),
+      ('vend', a.left - 0.6, a.center.dy + 4.95), // 벤치 옆 쉬는 자리(+2.75)보다 아래 (그림 윗부분이 안 겹치게)
+      ('locker', a.left - 0.6, a.center.dy + 6.1),
       ('extinguisher', door.left + 0.25, door.top + 0.4),
     ]) {
       final img = Sprites.decor[key];

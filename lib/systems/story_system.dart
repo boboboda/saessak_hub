@@ -104,7 +104,8 @@ extension StorySystem on HubGame {
   void storyCustomerStep(Customer c, double dt) {
     final spot = storySpot;
     c.pos = stepToward(c.pos, spot, Cfg.customerSpeed, dt);
-    if ((c.pos - spot).distance < 0.05 && storyAsk != c) c.storyT += dt;
+    // 기다리는 시간은 배속과 상관없이 실제 시간으로 (10배속에서도 35초는 기다려 줌)
+    if ((c.pos - spot).distance < 0.05 && storyAsk != c) c.storyT += dt / speedMul;
     if (c.storyT >= Cfg.storyWait) {
       c.story = -1;
       c.state = 2;
@@ -206,7 +207,7 @@ extension StorySystem on HubGame {
     for (final s in act) {
       s.working = true;
     }
-    j.t += d;
+    j.t += d / speedMul; // 연출 시간은 배속과 상관없이 실제 시간 (10배속에서도 포장하는 모습이 보이게)
     if (j.t < Cfg.storyPackTime) return;
     final def = storyOf(j.story);
     final chance = j.mode == 0 ? 1.0 : (j.mode == 2 ? Cfg.storyTempOk : Cfg.storyNormalOk);
