@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/config.dart';
 import '../game/hub_game.dart';
+import '../game/sprites.dart';
 import 'theme.dart';
 
 /// 건설 메뉴: 건물 목록. '건설'을 누르면 시트가 닫히고 지도에서 목업(고스트)을 옮겨 놓는다.
@@ -15,12 +16,9 @@ class BuildSheet extends StatelessWidget {
       title: '건설',
       heightFactor: 0.62,
       onClose: g.closeAll,
-      trailing: Padding(
-        padding: const EdgeInsets.only(right: 4),
-        child: Pill(Icons.paid, '${g.money}원', color: C.gold),
-      ),
+      trailing: Pill(Icons.paid, '${g.fmt(g.money)}원', color: C.gold),
       child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
         itemCount: Cfg.types.length + 1,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (_, i) =>
@@ -46,23 +44,14 @@ class _TypeCard extends StatelessWidget {
     return CardBox(
       child: Row(
         children: [
-          // 크기 견본
-          Container(
-            width: 52,
-            height: 52,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: swatch.withOpacity(0.22),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: swatch, width: 2),
-            ),
-            child: Text(
-              '${t.w}×${t.h}',
-              style: TextStyle(
-                color: swatch,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
+          // 시설 그림 + 크기 (잠긴 건 흐리게)
+          Opacity(
+            opacity: locked ? 0.45 : 1,
+            child: ItemFrame(
+              image: Sprites.forBuilding(t.id as String),
+              fallback: Text('${t.w}×${t.h}', style: TextStyle(fontFamily: kFont, color: swatch, fontSize: 14, fontWeight: FontWeight.w700)),
+              tag: '${t.w}×${t.h}',
+              tagColor: swatch,
             ),
           ),
           const SizedBox(width: 12),
@@ -89,7 +78,7 @@ class _TypeCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${t.cost}원',
+                '${g.fmt(t.cost as int)}원',
                 style: TextStyle(
                   color: can ? C.gold : C.bad,
                   fontSize: 13,
@@ -121,17 +110,7 @@ class _AisleCard extends StatelessWidget {
     return CardBox(
       child: Row(
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: swatch.withValues(alpha: 0.22),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: swatch, width: 2),
-            ),
-            child: const Icon(Icons.timeline, color: swatch),
-          ),
+          const ItemFrame(icon: 'aisle', fallback: Icon(Icons.timeline, color: swatch), tag: '1×1', tagColor: Color(0xFFB08A10)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

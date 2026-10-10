@@ -72,8 +72,11 @@ class _Tab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: on ? C.accent : C.card,
-      borderRadius: BorderRadius.circular(10),
+      color: on ? C.accent : const Color(0xFFFFFBEE),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: const BorderSide(color: C.frame, width: 2),
+      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
         onTap: onTap,

@@ -41,8 +41,12 @@ class AlertBar extends StatelessWidget {
       children: [
         for (final a in list)
           Material(
-            color: _color(a).withOpacity(0.92),
-            borderRadius: BorderRadius.circular(20),
+            color: _color(a),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: const BorderSide(color: C.frame, width: 2),
+            ),
+            elevation: 2,
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
               onTap: () => g.runAlert(a),
@@ -63,12 +67,13 @@ class AlertBar extends StatelessWidget {
                       padding:
                           const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.black26,
+                        color: const Color(0xFFFFFBEE),
+                        border: Border.all(color: C.frame, width: 1.5),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(a.action,
                           style: const TextStyle(
-                              color: Colors.white,
+                              color: C.text,
                               fontSize: 11,
                               fontWeight: FontWeight.w800)),
                     ),

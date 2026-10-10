@@ -79,6 +79,57 @@ class UiIcon extends StatelessWidget {
   }
 }
 
+/// 물건 그림 칸 (건설 목록 등): 흰 크림 판 + 갈색 테두리 + 도트 그림, 아래 오른쪽에 작은 꼬리표
+class ItemFrame extends StatelessWidget {
+  final dynamic image; // ui.Image? (시설 그림)
+  final String? icon; // 메뉴 아이콘 이름 (image 대신)
+  final Widget fallback;
+  final String? tag;
+  final Color tagColor;
+  final double size;
+  const ItemFrame({super.key, this.image, this.icon, required this.fallback, this.tag, this.tagColor = C.accent, this.size = 58});
+
+  @override
+  Widget build(BuildContext context) {
+    final img = image ?? (icon == null ? null : Sprites.menuIcons[icon]);
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned.fill(
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFBEE),
+                borderRadius: BorderRadius.circular(9),
+                border: Border.all(color: C.frame, width: 2),
+              ),
+              alignment: Alignment.center,
+              child: img == null ? fallback : RawImage(image: img, fit: BoxFit.contain, filterQuality: FilterQuality.none),
+            ),
+          ),
+          if (tag != null)
+            Positioned(
+              right: -4,
+              bottom: -4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                decoration: BoxDecoration(
+                  color: tagColor,
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(color: C.frame, width: 1.5),
+                ),
+                child: Text(tag!, style: const TextStyle(fontFamily: kFont, color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 /// 작은 정보 알약 (아이콘 + 글자): 크림 바탕 + 갈색 테두리
 class Pill extends StatelessWidget {
   final IconData icon;
